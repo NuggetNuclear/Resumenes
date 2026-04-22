@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistemas Distribuidos · Consolidado S1</title>
+<style>
+  /* Paleta Sobria y Eye-Comfort (Inspiración en temas de desarrollo/lectura nocturna) */
+  :root {
+    --bg-main: #18181b;       /* Zinc 900 - Fondo principal suave */
+    --bg-card: #27272a;       /* Zinc 800 - Tarjetas y secciones */
+    --bg-surface: #3f3f46;    /* Zinc 700 - Elementos interactivos/hover */
+    --text-main: #e4e4e7;     /* Zinc 200 - Texto principal (sin ser blanco puro) */
+    --text-muted: #a1a1aa;    /* Zinc 400 - Texto secundario */
+    --accent: #cbd5e1;        /* Slate 300 - Acento sobrio principal */
+    --accent-subtle: #94a3b8; /* Slate 400 - Acento secundario */
+    --border: #3f3f46;        /* Zinc 700 - Bordes sutiles */
+    
+    /* Colores semánticos desaturados para no cansar la vista */
+    --color-blue: #60a5fa;
+    --color-purple: #a78bfa;
+    --color-pink: #f472b6;
+    --color-green: #34d399;
+    --color-orange: #fb923c;
+    --color-yellow: #fbbf24;
+    --color-red: #f87171;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    line-height: 1.75;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+  }
+
+  .container {
+    max-width: 960px; /* Ancho optimizado para lectura (aprox 65-75 caracteres por línea) */
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+  }
+
+  /* --- HEADER / HERO --- */
+  header.hero {
+    padding: 3rem 1.5rem;
+    background-color: var(--bg-main);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  header.hero h1 {
+    margin: 0 0 0.5rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.02em;
+  }
+  header.hero p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+  header.hero .tags {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  header.hero .tag {
+    background: var(--bg-card);
+    color: var(--text-muted);
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  /* --- TABLA DE CONTENIDOS (TOC) --- */
+  nav.toc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+    margin: 0 0 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  nav.toc summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-main);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.05rem;
+  }
+  nav.toc summary::after {
+    content: "▾";
+    transition: transform 0.2s;
+    color: var(--text-muted);
+  }
+  nav.toc[open] summary::after {
+    transform: rotate(180deg);
+  }
+  nav.toc ol {
+    margin: 1rem 0 0;
+    padding-left: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  nav.toc ol li { margin: 0.4rem 0; }
+  nav.toc a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  nav.toc a:hover {
+    color: var(--text-main);
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+  }
+
+  /* --- SECCIONES PRINCIPALES --- */
+  section {
+    background: transparent;
+    padding: 2.5rem 0;
+    margin: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  section:last-of-type { border-bottom: none; }
+  
+  section > h2 {
+    margin: 0 0 1.5rem;
+    font-size: 1.5rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+  }
+  section > h2 .num {
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-weight: 600;
+  }
+
+  h3 {
+    color: var(--text-main);
+    margin: 2rem 0 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  h4 {
+    color: var(--text-main);
+    margin: 1.2rem 0 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  
+  p { margin: 0.8rem 0; }
+  ul, ol { padding-left: 1.5rem; margin: 0.8rem 0; }
+  li { margin: 0.4rem 0; }
+  
+  code {
+    background: var(--bg-card);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 0.85em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    border: 1px solid var(--border);
+  }
+  
+  .muted { color: var(--text-muted); }
+  strong { color: #ffffff; font-weight: 600; }
+  em { color: var(--text-main); font-style: italic; }
+
+  /* --- GRIDS --- */
+  .grid { display: grid; gap: 1rem; margin: 1.5rem 0; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  @media(min-width: 768px){
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  /* --- TARJETAS (CARDS) --- */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    transition: border-color 0.2s ease;
+  }
+  .card:hover { border-color: var(--bg-surface); }
+  .card h4:first-child { margin-top: 0; }
+  
+  /* Variantes semánticas sobrias (bordes sutiles en lugar de colores llamativos) */
+  .card.pink { border-top: 3px solid var(--color-pink); }
+  .card.blue { border-top: 3px solid var(--color-blue); }
+  .card.purple { border-top: 3px solid var(--color-purple); }
+  .card.green { border-top: 3px solid var(--color-green); }
+  .card.orange { border-top: 3px solid var(--color-orange); }
+  .card.red { border-top: 3px solid var(--color-red); }
+
+  /* --- CALLOUTS (NOTAS IMPORTANTES) --- */
+  .callout {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent-subtle);
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    margin: 1.5rem 0;
+  }
+  .callout.warn { border-left-color: var(--color-yellow); }
+  .callout.ok { border-left-color: var(--color-green); }
+  .callout.danger { border-left-color: var(--color-red); }
+  
+  .callout .label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-main);
+    margin-bottom: 0.4rem;
+  }
+  .callout.warn .label { color: var(--color-yellow); }
+  .callout.ok .label { color: var(--color-green); }
+  .callout.danger .label { color: var(--color-red); }
+
+  /* --- TABLAS --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    background: var(--bg-card);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  th, td {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-surface);
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+  /* --- FÓRMULAS Y DIAGRAMAS ASCII --- */
+  .formula {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    margin: 1.5rem 0;
+    color: var(--text-main);
+    font-size: 1.1rem;
+  }
+  
+  .diag {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+  }
+
+  /* --- VERDADERO / FALSO --- */
+  .vf {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin: 1rem 0;
+    position: relative;
+  }
+  .vf .stmt {
+    color: var(--text-main);
+    font-style: italic;
+    padding-left: 1rem;
+    border-left: 2px solid var(--border);
+    margin-bottom: 1rem;
+  }
+  .vf .verdict {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+  .vf .verdict.correcto {
+    background: rgba(52, 211, 153, 0.1);
+    color: var(--color-green);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+  }
+  .vf .verdict.incorrecto {
+    background: rgba(248, 113, 113, 0.1);
+    color: var(--color-red);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+  }
+  .vf .explain {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  /* --- ETIQUETAS (CHIPS) --- */
+  .chip {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 0 0.2rem;
+  }
+  .chip.pro { background: rgba(52, 211, 153, 0.1); color: var(--color-green); border: 1px solid rgba(52, 211, 153, 0.2); }
+  .chip.con { background: rgba(248, 113, 113, 0.1); color: var(--color-red); border: 1px solid rgba(248, 113, 113, 0.2); }
+  .chip.info { background: rgba(96, 165, 250, 0.1); color: var(--color-blue); border: 1px solid rgba(96, 165, 250, 0.2); }
+
+  /* --- MISCELÁNEOS --- */
+  .big {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-main);
+    text-align: center;
+    margin: 2rem 0 1rem;
+  }
+  .arrow {
+    color: var(--text-muted);
+    font-weight: normal;
+  }
+  blockquote {
+    border-left: 3px solid var(--border);
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  
+  footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>Sistemas Distribuidos</h1>
+  <p>Consolidado Solemne 1 · Prof. Nicolás Hidalgo · UDP</p>
+  <div class="tags">
+    <span class="tag">Fundamentos</span>
+    <span class="tag">Escalabilidad</span>
+    <span class="tag">Comunicación</span>
+    <span class="tag">Arquitecturas</span>
+    <span class="tag">P2P</span>
+  </div>
+</header>
+
+<div class="container">
+
+<nav class="toc">
+<details open>
+<summary>📑 Tabla de contenidos</summary>
+<ol>
+  <li><a href="#s1">Fundamentos: ¿Qué es un SD?</a></li>
+  <li><a href="#s2">Ventajas, desafíos y objetivos de diseño</a></li>
+  <li><a href="#s3">Transparencia (las 7 dimensiones)</a></li>
+  <li><a href="#s4">Escalabilidad (horizontal vs vertical)</a></li>
+  <li><a href="#s5">Particionamiento y Sharding</a></li>
+  <li><a href="#s6">Replicación</a></li>
+  <li><a href="#s7">Cache</a></li>
+  <li><a href="#s8">Fundamentos de Comunicación y Redes</a></li>
+  <li><a href="#s9">Protocolos y Middleware</a></li>
+  <li><a href="#s10">Paradigmas de comunicación</a></li>
+  <li><a href="#s11">RPC y RMI</a></li>
+  <li><a href="#s12">Message Queues vs Pub/Sub</a></li>
+  <li><a href="#s13">Arquitecturas distribuidas</a></li>
+  <li><a href="#s14">Cliente/Servidor</a></li>
+  <li><a href="#s15">Computación distribuida: Cluster, Grid, P2P</a></li>
+  <li><a href="#s16">P2P Estructurado: Chord, Pastry, DHT</a></li>
+  <li><a href="#s17">P2P No estructurado y búsquedas</a></li>
+  <li><a href="#s18">P2P Híbrido (Super-Peers) y Edge</a></li>
+  <li><a href="#s19">Banco de preguntas V/F resueltas</a></li>
+  <li><a href="#s20">Glosario rápido</a></li>
+</ol>
+</details>
+</nav>
+
+<section id="s1">
+<h2><span class="num">1</span> Fundamentos: ¿Qué es un Sistema Distribuido?</h2>
+
+<div class="callout">
+<div class="label">Definición clave</div>
+<p><strong>Sistema Distribuido (SD):</strong> conjunto de máquinas autónomas que <strong>coordinan sus acciones</strong> únicamente mediante <strong>paso de mensajes</strong>, y que aparecen al usuario como un <strong>sistema único y coherente</strong>.</p>
+</div>
+
+<div class="grid grid-2">
+  <div class="card blue">
+    <h4>Coulouris (2011)</h4>
+    <p class="muted">"A system in which hardware or software components located at networked computers communicate and coordinate their actions <strong>only by passing messages</strong>."</p>
+  </div>
+  <div class="card purple">
+    <h4>Tanenbaum (2006)</h4>
+    <p class="muted">"A distributed system is a collection of independent computers that appears to its users as a <strong>single coherent system</strong>."</p>
+  </div>
+</div>
+
+<h3>SD ≠ Red de computadores</h3>
+<table>
+  <thead><tr><th>Sistema Distribuido</th><th>Red de computadores</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>El sistema</strong> invoca la acción. Los usuarios ven una capa unificada.</td>
+      <td><strong>El usuario</strong> invoca la acción. Interactúa directamente con cada máquina.</td>
+    </tr>
+    <tr>
+      <td>Emplea <strong>middleware</strong> sobre la red para coordinar.</td>
+      <td>Cada máquina expone su propio SO, arquitectura y hardware.</td>
+    </tr>
+    <tr>
+      <td>Ej: Gmail, Facebook, Google Search.</td>
+      <td>Ej: SSH a un servidor remoto para ejecutar algo.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Componentes esenciales</h3>
+<ul>
+  <li><strong>Componentes autónomos:</strong> computadores, móviles, impresoras, sensores.</li>
+  <li><strong>Paso de mensajes:</strong> único medio de interacción, viaja por la red.</li>
+  <li><strong>Usuarios</strong> (personas o programas) ven un sistema único.</li>
+  <li><strong>Middleware:</strong> capa de software entre el SO y la app distribuida que oculta la complejidad.</li>
+</ul>
+
+<div class="callout warn">
+<div class="label">¿Por qué distribuir?</div>
+<p>Para lograr <strong>escalabilidad, disponibilidad, eficiencia y cercanía al usuario</strong>, superando los límites de un sistema centralizado. Pero <em>no siempre es buena idea</em>: la decisión depende del <strong>tamaño/escala</strong> del sistema y la <strong>infraestructura disponible</strong>.</p>
+</div>
+
+</section>
+
+<section id="s2">
+<h2><span class="num">2</span> Ventajas, Desafíos y Objetivos de Diseño</h2>
+
+<div class="grid grid-2">
+  <div class="card green">
+    <h4>✅ Ventajas</h4>
+    <ul>
+      <li>Compartir recursos (económico, colaboración)</li>
+      <li>Mejora de desempeño</li>
+      <li>Mayor adaptabilidad</li>
+      <li>Mayor disponibilidad / fiabilidad</li>
+      <li>Escalabilidad</li>
+    </ul>
+  </div>
+  <div class="card red">
+    <h4>⚠️ Desafíos</h4>
+    <ul>
+      <li>Heterogeneidad del hardware</li>
+      <li>Consistencia de la interacción</li>
+      <li>Siempre disponible (24/7)</li>
+      <li>Usuarios/apps no deben notar caídas</li>
+      <li>Seguridad (comunicación + acceso)</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Los 4 Objetivos de Diseño</h3>
+
+<div class="grid grid-2">
+  <div class="card blue">
+    <h4>1️⃣ Poner recursos a disposición</h4>
+    <p>Facilitar a usuarios y apps acceder a recursos remotos de manera eficiente (impresoras, almacenamiento, datos, cómputo).</p>
+    <p><strong>Razones:</strong> económicas y de colaboración/intercambio.</p>
+    <p class="muted">⚠️ Al aumentar conectividad y compartición, la <strong>seguridad</strong> se vuelve crítica: seguridad de comunicación (encriptación) y de acceso (autenticación).</p>
+  </div>
+  <div class="card purple">
+    <h4>2️⃣ Hacer transparente la distribución</h4>
+    <p>Esconder el hecho de que procesos y recursos están físicamente distribuidos. Usuarios ven <strong>un sistema único y coherente</strong>.</p>
+    <p class="muted">Ver sección 3: las 7 dimensiones de transparencia.</p>
+  </div>
+  <div class="card green">
+    <h4>3️⃣ Ser abierto</h4>
+    <p>Ofrecer servicios bajo <strong>reglas estándar</strong> (sintaxis + semántica).</p>
+    <ul>
+      <li><strong>IDL</strong> (Interface Definition Language): API, RPC.</li>
+      <li><strong>Interoperabilidad:</strong> procesos se comunican con implementaciones distintas.</li>
+      <li><strong>Portabilidad:</strong> extensiones reutilizables.</li>
+      <li><strong>Extensibilidad:</strong> agregar componentes.</li>
+    </ul>
+    <p class="muted">En la práctica, muchos sistemas son <strong>monolíticos (cerrados)</strong>.</p>
+  </div>
+  <div class="card orange">
+    <h4>4️⃣ Ser escalable</h4>
+    <p><em>"Capacidad de expandir el sistema para atender las necesidades del negocio, agregando o mejorando hardware sin cambiar mucho la app."</em></p>
+    <p>Ver sección 4 para los dos tipos y las 3 técnicas.</p>
+  </div>
+</div>
+
+<div class="callout danger">
+<div class="label">Ojo — transparencia total es imposible</div>
+<p>Latencia entre continentes no es nula; ocultar caídas y fallas es teórica y prácticamente imposible. ¿Servidor lento o caído? ¿Hizo lo solicitado? Y además <strong>full transparencia tiene alto costo en rendimiento</strong>.</p>
+</div>
+
+<div class="callout">
+<div class="label">Importancia de los estándares</div>
+<p>23 de septiembre de 1999: la NASA perdió el Mars Orbiter de <strong>US$125 millones</strong> porque un equipo usó unidades métricas y el otro inglesas. 🚀💥</p>
+</div>
+</section>
+
+<section id="s3">
+<h2><span class="num">3</span> Transparencia: las 7 dimensiones</h2>
+<p>Esconder la distribución física para que el sistema se vea coherente. Se evalúa en 7 ámbitos:</p>
+
+<table>
+<thead><tr><th>Tipo</th><th>Qué oculta</th><th>Ejemplo</th></tr></thead>
+<tbody>
+<tr><td><strong>Acceso</strong></td><td>Diferencias de SO (nomenclatura de archivos, manejo)</td><td>Mismo <code>open()</code> en Linux vs Windows</td></tr>
+<tr><td><strong>Ubicación</strong></td><td>Dónde está físicamente el recurso</td><td>Nombre lógico: <code>www.udp.cl</code></td></tr>
+<tr><td><strong>Migración</strong></td><td>El recurso se mueve sin afectar su localización lógica</td><td>Reubicar un sitio web de un datacenter a otro</td></tr>
+<tr><td><strong>Re-localización</strong></td><td>El recurso se mueve <em>mientras está en uso</em></td><td>FaceTime cambiando de Wi-Fi a 4G</td></tr>
+<tr><td><strong>Replicación</strong></td><td>Existen múltiples copias (incluye transparencia de ubicación)</td><td>CDN devolviendo la réplica más cercana</td></tr>
+<tr><td><strong>Concurrencia</strong></td><td>Dos usuarios acceden simultáneamente al recurso sin notarlo</td><td>Edición colaborativa en Google Docs</td></tr>
+<tr><td><strong>Falla</strong></td><td>El usuario no nota que el sistema falló ni que se recuperó</td><td>Failover automático a réplica</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="s4">
+<h2><span class="num">4</span> Escalabilidad</h2>
+
+<div class="grid grid-2">
+  <div class="card blue">
+    <h4>📏 Horizontal (scaling <em>out</em>)</h4>
+    <p><strong>Aumentar la cantidad</strong> de recursos (más máquinas).</p>
+    <ul>
+      <li>Agregar más nodos de trabajo.</li>
+      <li><strong>Front-end sin estado</strong>: lo ocurrido antes no influye en decisiones futuras.</li>
+      <li><strong>Backend con particionamiento</strong>, modelo master/slave.</li>
+    </ul>
+    <p class="muted">Ej: comprar más servidores.</p>
+  </div>
+  <div class="card purple">
+    <h4>📈 Vertical (scaling <em>up</em>)</h4>
+    <p><strong>Aumentar las capacidades</strong> del recurso existente.</p>
+    <ul>
+      <li>Agregar CPU, memoria, disco.</li>
+      <li>Manejar más conexiones/operaciones/usuarios simultáneos.</li>
+      <li>Buen I/O y modelos de concurrencia (hebras, asincronismo).</li>
+    </ul>
+    <p class="muted">Ej: comprar más RAM para el servidor.</p>
+  </div>
+</div>
+
+<h3>Las 3 técnicas básicas para escalar</h3>
+<div class="grid grid-3">
+  <div class="card green">
+    <h4>I. Particionar y distribuir</h4>
+    <p>Dividir un componente en partes distribuidas.</p>
+    <ul><li>Vertical</li><li>Horizontal (Sharding)</li></ul>
+  </div>
+  <div class="card orange">
+    <h4>II. Replicar</h4>
+    <p>Hacer copias del recurso en distintos lugares.</p>
+  </div>
+  <div class="card pink">
+    <h4>III. Cache</h4>
+    <p>Subconjunto de recursos de acceso fácil y rápido.</p>
+  </div>
+</div>
+</section>
+
+<section id="s5">
+<h2><span class="num">5</span> Particionamiento y Sharding</h2>
+
+<blockquote>
+"Partitioning is a generic term that just means dividing your logical entities into different physical entities for performance, availability, or some other purpose." — Quora
+</blockquote>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h4>Particionamiento vertical</h4>
+    <p>Divide por <strong>atributos/columnas</strong>. Cada partición tiene un subconjunto de campos del mismo recurso.</p>
+  </div>
+  <div class="card">
+    <h4>Particionamiento horizontal = <em>Sharding</em></h4>
+    <p>Divide por <strong>filas/registros</strong>. Cada shard guarda un subconjunto de registros.</p>
+  </div>
+</div>
+
+<h3>Sharding — ¿por qué?</h3>
+<p>Permite escalar casi ilimitadamente, mayor throughput de lectura/escritura, capacidad de almacenamiento y alta disponibilidad. Ideal para <strong>altos flujos de consulta y datos masivos</strong>.</p>
+
+<div class="callout warn">
+<div class="label">Desventajas del sharding</div>
+<ul>
+<li><strong>Sobrecarga</strong> en una o más particiones (hot-spots cuando hay datos muy populares).</li>
+<li><strong>Complejidad de administración</strong> y consistencia.</li>
+</ul>
+</div>
+
+<h3>Tipos de Sharding</h3>
+<table>
+<thead><tr><th>Tipo</th><th>Cómo funciona</th><th>Uso ideal</th></tr></thead>
+<tbody>
+<tr><td><strong>Hash-Based</strong></td><td>Función hash sobre un atributo decide a qué shard va el dato. Distribución uniforme.</td><td>Buen balance de carga genérico.</td></tr>
+<tr><td><strong>Range</strong></td><td>Particiona por rangos ordenados de un número o clave.</td><td>Consultas por rangos específicos (ej: fechas).</td></tr>
+<tr><td><strong>Geographical</strong></td><td>Datos ubicados en distintas regiones/datacenters.</td><td>Reducir latencia, cumplir regulaciones locales.</td></tr>
+<tr><td><strong>Directory / Virtual Bucket</strong></td><td>Servicio de lookup centralizado (directorio) decide qué shard tiene la clave.</td><td>Flexibilidad alta, pero el directorio es punto crítico.</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+<div class="label">Resharding</div>
+<p>Cuando se agregan/quitan shards, hay que <strong>redistribuir</strong> los datos. Es una operación costosa. Las técnicas como <strong>consistent hashing</strong> minimizan el impacto (solo se mueven los datos del rango afectado).</p>
+</div>
+</section>
+
+<section id="s6">
+<h2><span class="num">6</span> Replicación</h2>
+
+<blockquote>
+"Replication involves sharing information so as to ensure consistency between redundant resources, to improve reliability, fault-tolerance, or accessibility." — Wikipedia
+</blockquote>
+
+<h3>Ventajas</h3>
+<ul>
+<li><span class="chip pro">Fault tolerance</span> evita puntos únicos de falla.</li>
+<li><span class="chip pro">Accesos paralelos</span> evita cuellos de botella.</li>
+<li><span class="chip pro">Balance de carga</span> entre las réplicas.</li>
+</ul>
+
+<h3>Desventajas</h3>
+<ul>
+<li><span class="chip con">Costo de la réplica</span> infraestructura y almacenamiento.</li>
+<li><span class="chip con">Mantener el estado</span> el costo depende del nº de réplicas y la relación <strong>read/write</strong> del sistema.</li>
+</ul>
+
+<div class="callout warn">
+<div class="label">Regla de oro</div>
+<p>Cuanto más pesado el sistema en <strong>escrituras</strong>, más cara es la replicación (hay que propagar updates a todas las copias). Sistemas <strong>read-heavy</strong> escalan muy bien con réplicas.</p>
+</div>
+
+<h3>Problemas clave</h3>
+<ul>
+<li><strong>Ubicación del servidor de réplica:</strong> trade-off performance vs elasticidad (agregar/reducir réplicas).</li>
+<li><strong>Actualización:</strong> estado, updates síncronos vs asíncronos.</li>
+<li><strong>¿Quién inicia la actualización?</strong> Push vs Pull.</li>
+</ul>
+
+<h3>Push vs Pull</h3>
+<table>
+<thead><tr><th></th><th>PUSH</th><th>PULL</th></tr></thead>
+<tbody>
+<tr><td><strong>Mecanismo</strong></td><td>Cuando el estado cambia, el sistema <strong>notifica</strong> a las réplicas.</td><td>Las réplicas <strong>consultan</strong> si hay updates (polling).</td></tr>
+<tr><td><strong>Pro</strong></td><td>Actualización más rápida.</td><td>No hay costo si nadie consulta.</td></tr>
+<tr><td><strong>Contra</strong></td><td>Costo innecesario sin demanda real; saturación de red con muchas actualizaciones.</td><td>Si las réplicas están ocupadas, pueden <strong>perder updates → inconsistencia</strong>.</td></tr>
+<tr><td><strong>Ejemplos</strong></td><td>Mail, bases de datos relacionales.</td><td>Motores de búsqueda (Google, Yahoo), HDFS.</td></tr>
+</tbody>
+</table>
+
+<h3>Sistemas de almacenamiento que replican</h3>
+<p class="muted">OceanStore · GFS (Google File System) · HDFS (Hadoop) · Amazon S3</p>
+</section>
+
+<section id="s7">
+<h2><span class="num">7</span> Cache</h2>
+
+<p><strong>Cache:</strong> espacio reducido que almacena información de manera temporal y de acceso rápido. Reduce <strong>latencia</strong> y <strong>carga del backend</strong>.</p>
+
+<div class="grid grid-2">
+  <div class="card blue">
+    <h4>🕒 Localidad temporal</h4>
+    <p>Datos usados recientemente tienen alta probabilidad de volver a ser utilizados pronto.</p>
+  </div>
+  <div class="card purple">
+    <h4>📍 Localidad espacial</h4>
+    <p>Si se accede a un dato, es probable que se acceda también a datos cercanos.</p>
+  </div>
+</div>
+
+<div class="big">Hit vs Miss 🎯</div>
+<p class="muted" style="text-align:center">Maximizar hits, minimizar misses, con mecanismos rápidos y eficientes.</p>
+
+<h3>Los 3 ejes de decisión</h3>
+<div class="grid grid-3">
+  <div class="card pink">
+    <h4>1. Políticas de remoción (eviction)</h4>
+    <p>Capturan el patrón de repetición. Deben ser <strong>simples y rápidas</strong>.</p>
+    <ul>
+      <li><strong>LRU</strong> (Least Recently Used)</li>
+      <li><strong>FIFO</strong> (First-In First-Out)</li>
+      <li><strong>Random</strong>, <strong>Harmonic</strong></li>
+      <li><strong>MRU</strong> (Most Recently Used)</li>
+      <li><strong>SIZE</strong></li>
+      <li>Variaciones LRU-C, LRU-S</li>
+    </ul>
+    <p class="muted">⚠️ <strong>LFU</strong> (Least Frequently Used) <em>no</em> se usa mucho por ser muy costoso.</p>
+  </div>
+  <div class="card orange">
+    <h4>2. Políticas de ingreso (admission)</h4>
+    <p><strong>¡No todo sirve!</strong> Ley de potencias.</p>
+    <ul>
+      <li>Mecanismos de control de ingreso.</li>
+      <li>Basado en <strong>análisis histórico</strong> (frecuencia, nº caracteres, palabras).</li>
+      <li>Cumple → entra; no cumple → se evalúa.</li>
+    </ul>
+    <p class="muted">⚠️ El histórico solo sirve en sistemas <strong>estacionarios</strong>; en ambientes dinámicos pierde utilidad.</p>
+  </div>
+  <div class="card green">
+    <h4>3. TTL (Time-To-Live)</h4>
+    <p>Tiempo que una entrada permanece en cache.</p>
+    <ul>
+      <li>Al expirar, se elimina automáticamente.</li>
+      <li>Ayuda a controlar la <strong>obsolescencia</strong>.</li>
+      <li>Depende de la app.</li>
+    </ul>
+    <p class="muted">TTL adaptativo: ajusta dinámicamente según tasa de updates.</p>
+  </div>
+</div>
+
+<h3>Sistema de Cache de Dos Niveles (SDC — Static Dynamic Caching)</h3>
+<div class="grid grid-3">
+  <div class="card blue">
+    <h4>Estático</h4>
+    <ul>
+      <li>Resultados de las consultas <strong>más frecuentes históricamente</strong>.</li>
+      <li>Entradas <strong>bloqueadas</strong>: no se reemplazan dinámicamente.</li>
+      <li>Se actualiza periódicamente según datos de uso.</li>
+      <li><strong>Ventaja:</strong> acceso sin sincronización → buen rendimiento multi-thread.</li>
+      <li>Ej: consultas frecuentes que no cambian mucho con el tiempo.</li>
+    </ul>
+  </div>
+  <div class="card purple">
+    <h4>Dinámico</h4>
+    <ul>
+      <li>Entradas gestionadas con política de reemplazo.</li>
+      <li>Atiende consultas <strong>populares temporalmente</strong> o por eventos inesperados (noticias de último minuto).</li>
+      <li>Políticas soportadas: LRU, LRU/2, FBR, SLRU, 2Q, PDC.</li>
+    </ul>
+  </div>
+  <div class="card green">
+    <h4>Flujo de consulta q</h4>
+    <ol>
+      <li>Buscar q en <strong>conjunto estático</strong>. Si está → hit inmediato.</li>
+      <li>Si no → buscar en <strong>conjunto dinámico</strong>. Si está → hit.</li>
+      <li>Si no → cache miss → consultar backend (WSE) y eventualmente reemplazar entrada del dinámico.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="callout ok">
+<div class="label">Ventajas del cache 2 niveles</div>
+<ol>
+<li>El estático asegura acceso rápido a las consultas más frecuentes.</li>
+<li>El dinámico cubre picos de popularidad o consultas inesperadas.</li>
+<li>Mejora throughput y eficiencia, especialmente en sistemas con muchos hilos concurrentes.</li>
+</ol>
+</div>
+
+<h3>Caso clásico: Motor de búsqueda (Alta Vista)</h3>
+<div class="callout">
+<p><strong>Problema:</strong> 128.000 consultas populares. Algunas son populares durante largos periodos, otras solo en picos cortos. El cache es limitado.</p>
+<p><strong>Análisis de distancia:</strong> cuántas consultas no populares ocurren entre dos apariciones de una popular (ej: A, B, C, A → distancia 2).</p>
+<p><strong>Decisión:</strong></p>
+<ul>
+<li>Política híbrida (estático + dinámico) captura ambos patrones — mejor que LRU o LFU puro.</li>
+<li>Aumentar el tamaño del cache da mejoras <strong>hasta capturar el "tall head"</strong> de la distribución; luego la ganancia es marginal (ley de potencias).</li>
+</ul>
+</div>
+</section>
+
+<section id="s8">
+<h2><span class="num">8</span> Fundamentos de Comunicación y Redes</h2>
+
+<p><em>"La comunicación ocurre en internet: sistemas poco seguros y saturados. La red determina cómo se diseña la arquitectura."</em></p>
+
+<h3>Componentes de la red</h3>
+<ul>
+<li>Variados <strong>dispositivos de hardware</strong>: cables, routers, switches, etc.</li>
+<li>Variados <strong>componentes de software</strong>.</li>
+<li><strong>Medio físico</strong> para la comunicación.</li>
+</ul>
+
+<h3>Métricas de performance</h3>
+<table>
+<thead><tr><th>Métrica</th><th>Definición</th><th>Afectada por</th></tr></thead>
+<tbody>
+<tr><td><strong>Latencia (t<sub>L</sub>)</strong></td><td>Tiempo de transmitir un "mensaje vacío"</td><td>Sobrecarga de software, ruteo, carga del canal</td></tr>
+<tr><td><strong>Tasa de transferencia (t<sub>T</sub> / BW)</strong></td><td>Velocidad de transmisión (bit/s)</td><td>Características físicas de la red</td></tr>
+<tr><td><strong>Jitter</strong></td><td>Variación del tiempo entre mensajes sucesivos</td><td>Relevante para multimedia y apps real-time</td></tr>
+</tbody>
+</table>
+
+<div class="formula">
+T<sub>m</sub> = t<sub>L</sub> + b / t<sub>T</sub>
+</div>
+<p class="muted" style="text-align:center;font-size:0.9rem">Tiempo para transmitir un mensaje de <strong>b bits</strong>: latencia fija + tamaño / ancho de banda.</p>
+
+<h3>Tipos de red</h3>
+<table>
+<thead><tr><th>Red</th><th>Características</th></tr></thead>
+<tbody>
+<tr><td><strong>LAN</strong> (Local)</td><td>Alta velocidad. Distribuida en segmentos.</td></tr>
+<tr><td><strong>MAN</strong> (Metropolitan)</td><td>Alta velocidad en regiones más grandes. Útil para SD (velocidad).</td></tr>
+<tr><td><strong>WAN</strong> (Wide)</td><td>Velocidad menor. Conecta organizaciones distantes. Latencia depende de la ruta.</td></tr>
+<tr><td><strong>Wireless</strong></td><td>Útil para móviles. Alternativa a LAN cableadas.</td></tr>
+<tr><td><strong>Internetworks</strong></td><td>Conexión de subsistemas. Diferentes tecnologías y protocolos. Útil para SD extensibles y abiertos.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="s9">
+<h2><span class="num">9</span> Protocolos y Middleware</h2>
+
+<div class="grid grid-2">
+  <div class="card blue">
+    <h4>📋 Protocolo</h4>
+    <p><em>"Conjunto de reglas y estándares que controlan la secuencia de mensajes entre entidades que forman una red."</em></p>
+    <ul>
+      <li>Define <strong>codificación</strong>, inicio/fin del mensaje, detección de errores.</li>
+      <li>Estandariza representación de datos (enteros, strings, <strong>endianness</strong>).</li>
+    </ul>
+  </div>
+  <div class="card purple">
+    <h4>🔌 Middleware</h4>
+    <p>Capa de software entre el <strong>SO y las aplicaciones distribuidas</strong>.</p>
+    <ul>
+      <li>Ofrece servicios: llamadas remotas, mensajería, invocación de objetos.</li>
+      <li>Abstrae detalles de red (sockets, IP, TCP, UDP).</li>
+      <li>Ejemplos: <strong>sockets, RPC, RMI, pub/sub</strong>.</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Stack de comunicación</h3>
+<div class="diag">
+┌─────────────────────────────────────┐
+│  Distributed Applications           │  (la app, ej: Gmail, Facebook)
+├─────────────────────────────────────┤
+│  Middleware                         │  (remote calls, object invocation, messages)
+├─────────────────────────────────────┤
+│  Operating System Comms             │  (sockets, IP, TCP, UDP)
+├─────────────────────────────────────┤
+│  Network                            │  (packets, bits)
+└─────────────────────────────────────┘
+</div>
+
+<h3>Preguntas que responde el protocolo</h3>
+<ul>
+<li>¿Hablamos el mismo lenguaje? (codificación)</li>
+<li>¿Cuándo empieza y termina la comunicación?</li>
+<li>¿Cómo detectamos si el mensaje está dañado?</li>
+<li>¿Cómo se representa la info? (enteros, strings, little/big endian)</li>
+</ul>
+<p class="muted">Estandarización → <strong>modelo OSI</strong> (Open Systems Interconnection).</p>
+</section>
+
+<section id="s10">
+<h2><span class="num">10</span> ¿Cómo se comunican los procesos? Los 3 paradigmas</h2>
+
+<div class="grid grid-3">
+  <div class="card blue">
+    <h4>1. Interprocess Communication (IPC)</h4>
+    <ul>
+      <li>Comunicación <strong>directa de bajo nivel</strong>.</li>
+      <li>Usa primitivas <code>send</code>/<code>receive</code>.</li>
+      <li>Acceso directo a APIs de protocolos de internet.</li>
+      <li><strong>Ejemplos:</strong> Sockets, MPI.</li>
+    </ul>
+  </div>
+  <div class="card purple">
+    <h4>2. Remote Invocation</h4>
+    <ul>
+      <li>Comunicación <strong>bidireccional</strong> (request/reply).</li>
+      <li>Paradigma más común en SD.</li>
+      <li>Modelo Cliente/Servidor.</li>
+      <li><strong>Ejemplos:</strong> RPC, RMI.</li>
+    </ul>
+  </div>
+  <div class="card green">
+    <h4>3. Indirect Communication</h4>
+    <ul>
+      <li>Una <strong>tercera entidad</strong> intermediaria.</li>
+      <li><strong>Space uncoupling:</strong> emisor y receptor no se conocen.</li>
+      <li><strong>Time uncoupling:</strong> no necesitan existir al mismo tiempo.</li>
+      <li><strong>Ejemplos:</strong> Pub/Sub, Message Queues, Group Communication.</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section id="s11">
+<h2><span class="num">11</span> RPC y RMI</h2>
+
+<blockquote>
+<strong>RPC</strong> (Remote Procedure Call): "Protocolo que permite a un programa solicitar un servicio desde otro programa ubicado en otra máquina de la red <strong>sin tener que entender los detalles de la red</strong>." — Birrel y Nelson, 1984
+</blockquote>
+
+<h3>Propiedades del RPC</h3>
+<ul>
+<li><strong>Nivel de lenguaje:</strong> llamada a función (fácil para el programador).</li>
+<li><strong>Request/Reply síncrono:</strong> natural; calce de replies con requests.</li>
+<li><strong>Distribución transparente</strong> al programador.</li>
+<li><strong>Garantía parcial ante fallas</strong> (retry).</li>
+</ul>
+
+<h3>Flujo básico</h3>
+<ol>
+<li>Proceso A invoca procedimiento en máquina B.</li>
+<li>Define parámetros y espera resultado.</li>
+<li>El cliente <strong>se bloquea</strong> durante la llamada.</li>
+<li>El servidor ejecuta y retorna el resultado.</li>
+</ol>
+
+<h3>Stubs — el corazón del RPC</h3>
+<div class="grid grid-2">
+  <div class="card blue">
+    <h4>Stub Cliente</h4>
+    <ul>
+      <li><strong>Objetivo:</strong> hacer la llamada remota <em>igual</em> a una local.</li>
+      <li>El llamador no nota que la ejecución es remota.</li>
+      <li><strong>Empaqueta</strong> (marshalling) los parámetros.</li>
+      <li>Los envía por la red en vez de pedirlos al SO.</li>
+      <li>Al recibir respuesta, <strong>desempaqueta</strong> el resultado.</li>
+    </ul>
+  </div>
+  <div class="card purple">
+    <h4>Stub Servidor</h4>
+    <ul>
+      <li>Recibe el mensaje y lo transforma a llamadas locales.</li>
+      <li>Se <strong>bloquea</strong> esperando la invocación del cliente.</li>
+      <li><strong>Desempaqueta</strong> (unmarshalling) los parámetros.</li>
+      <li>Llama al procedimiento local.</li>
+      <li>Retorna el resultado al stub cliente.</li>
+    </ul>
+  </div>
+</div>
+<div class="callout">
+<p><em>El paso de mensajes queda oculto — no hay invocación explícita a <code>send</code>/<code>receive</code>.</em></p>
+</div>
+
+<h3>Desventajas del RPC</h3>
+<ul>
+<li><span class="chip con">Atado al C/S</span></li>
+<li><span class="chip con">Síncrono</span> cliente bloqueado esperando</li>
+<li><span class="chip con">Overhead</span> marshalling/unmarshalling, aumento de latencia</li>
+<li><span class="chip con">Sin full transparencia</span></li>
+<li><span class="chip con">No OO</span> se invocan funciones, no métodos sobre objetos</li>
+</ul>
+
+<h3>Tipos de fallas y manejo</h3>
+<ul>
+<li>Congestión de red o servidor.</li>
+<li>Caída del cliente durante la llamada.</li>
+<li>Caída del servidor durante la ejecución.</li>
+<li>Falla de red entre C/S.</li>
+</ul>
+<p class="muted"><strong>Manejo:</strong> el error se delega al programador (retry).</p>
+
+<h3>Paso de parámetros (Marshalling)</h3>
+<p><strong>Marshalling</strong> = transformación de datos al formato adecuado para transmisión. También llamado <em>serialización</em> en Java.</p>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h4>Por valor</h4>
+    <ul>
+      <li>Se envía una copia del dato en el mensaje.</li>
+      <li>Problema: representación (ASCII vs EBCDIC).</li>
+      <li>Problema: <strong>endianness</strong> (little vs big endian).</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Por referencia</h4>
+    <ul>
+      <li>Las referencias <em>solo tienen sentido localmente</em>.</li>
+      <li><strong>Solución:</strong> copiar el arreglo completo, enviarlo.</li>
+      <li>El servidor lo referencia en su espacio local.</li>
+      <li>El arreglo modificado se retorna al cliente.</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Java RMI (Remote Method Invocation)</h3>
+<div class="card green">
+<ul>
+<li>RPC <strong>orientado a objetos</strong> en Java (OOM: Object Oriented Middleware).</li>
+<li>Objetos remotos con <strong>interfaces remotas</strong>.</li>
+<li><strong>Stub</strong> en el cliente, <strong>Skeleton</strong> en el servidor.</li>
+<li>Enmascara objetos remotos con un <strong>proxy</strong>.</li>
+<li>Funciones análogas a stub C/S.</li>
+</ul>
+</div>
+
+<h3>RPC Asíncrono</h3>
+<p>Por defecto el RPC es <strong>síncrono y bloqueante</strong>. Optimización: RPC asíncrono.</p>
+
+<table>
+<thead><tr><th></th><th>RPC Síncrono (clásico)</th><th>RPC Asíncrono (optimizado)</th></tr></thead>
+<tbody>
+<tr><td><strong>Request</strong></td><td>Cliente envía request al servidor</td><td>Cliente envía request al servidor</td></tr>
+<tr><td><strong>Respuesta inmediata</strong></td><td>Espera reply completo</td><td>Servidor envía <strong>ACK de aceptación</strong></td></tr>
+<tr><td><strong>Bloqueo cliente</strong></td><td>Bloqueado esperando reply</td><td>No se bloquea, continúa ejecutando</td></tr>
+<tr><td><strong>Implementación</strong></td><td>Sencilla pero ineficiente</td><td>Multi-threading; resultado llega después</td></tr>
+<tr><td><strong>Rendimiento</strong></td><td>Bajo</td><td>Mayor rendimiento y escalabilidad</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="s12">
+<h2><span class="num">12</span> Message Queues vs Pub/Sub</h2>
+
+<p>Ambos son <strong>comunicación indirecta</strong>, ideales para escalar horizontalmente. La comunicación es <strong>más durable</strong> que la sincronía tradicional.</p>
+
+<div class="grid grid-2">
+  <div class="card blue">
+    <h4>📮 Message Queues</h4>
+    <ul>
+      <li>Delegan trabajo de un servicio a otro.</li>
+      <li><strong>Sin orden garantizado</strong>.</li>
+      <li>Si un consumidor cae, <strong>otro toma el mensaje</strong>.</li>
+      <li>Ideal para distribuir trabajo entre workers.</li>
+      <li><strong>Ej:</strong> RabbitMQ.</li>
+    </ul>
+  </div>
+  <div class="card purple">
+    <h4>📡 Pub/Sub</h4>
+    <ul>
+      <li>Todos los suscriptores reciben al menos 1 copia del mensaje.</li>
+      <li><strong>Mismo orden</strong> para todos los suscriptores.</li>
+      <li>Cada suscriptor tiene su <strong>propia cola</strong>.</li>
+      <li>Al recuperarse, consume eventos pendientes de su cola.</li>
+      <li>Ideal para difundir eventos a múltiples receptores.</li>
+      <li><strong>Ej:</strong> Kafka.</li>
+    </ul>
+  </div>
+</div>
+
+<h3>RabbitMQ vs Kafka (comparación rápida)</h3>
+<table>
+<thead><tr><th></th><th>RabbitMQ</th><th>Kafka</th></tr></thead>
+<tbody>
+<tr><td>Modelo típico</td><td>Message Queue (broker tradicional)</td><td>Pub/Sub (log distribuido)</td></tr>
+<tr><td>Orden</td><td>No garantizado entre consumidores</td><td>Orden por partición</td></tr>
+<tr><td>Persistencia</td><td>Opcional; mensajes se borran al consumir</td><td>Log persistente; eventos se retienen por tiempo</td></tr>
+<tr><td>Consumo</td><td>Un consumidor por mensaje</td><td>Múlticas consumidores leen el mismo log</td></tr>
+<tr><td>Caso típico</td><td>Task distribution (workers)</td><td>Event streaming, analytics</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="s13">
+<h2><span class="num">13</span> Arquitecturas distribuidas</h2>
+
+<blockquote>
+"A distributed architecture: components are presented on different platforms and several components can cooperate over a communication network to achieve a specific goal."
+</blockquote>
+
+<p>Una <strong>buena organización</strong> es la clave para alcanzar las propiedades deseadas.</p>
+
+<h3>Clasificación por ubicación de componentes</h3>
+<div class="grid grid-3">
+  <div class="card blue">
+    <h4>Centralizadas</h4>
+    <p>Cliente/Servidor</p>
+    <p class="muted">Request-reply. Escalamiento vertical. Posibles cuellos de botella. Modelo seguro. Recursos dedicados.</p>
+  </div>
+  <div class="card purple">
+    <h4>Descentralizadas</h4>
+    <p>Peer-to-Peer (P2P)</p>
+    <p class="muted">Todos los peers son simétricos. Comunicación directa. Escalabilidad alta. Autonomía.</p>
+  </div>
+  <div class="card green">
+    <h4>Híbridas</h4>
+    <p>Edge</p>
+    <p class="muted">Procesamiento más cercano a los usuarios finales. Reduce latencia, mejora eficacia.</p>
+  </div>
+</div>
+</section>
+
+<section id="s14">
+<h2><span class="num">14</span> Cliente/Servidor</h2>
+
+<h3>Modelo básico (2-tier)</h3>
+<ul>
+<li>Dos sub-sistemas: <strong>Cliente</strong> (solicita servicio) y <strong>Servidor</strong> (lo implementa).</li>
+<li>La app se modela como conjunto de servicios provistos por servidores + conjunto de clientes que los usan.</li>
+<li>Interacción: <strong>request-reply</strong>.</li>
+</ul>
+
+<h3>Características</h3>
+<ul>
+<li><span class="chip info">Escalamiento vertical</span></li>
+<li><span class="chip con">Posibles cuellos de botella</span></li>
+<li><span class="chip pro">Modelo seguro</span></li>
+<li><span class="chip pro">Recursos dedicados</span></li>
+</ul>
+
+<h3>Distribución de las 3 capas (Interface / App / DB)</h3>
+<div class="diag">
+    (a)       (b)       (c)       (d)       (e)
+  ┌─────┐   ┌─────┐   ┌─────┐   ┌─────┐   ┌─────┐
+  │ UI  │   │ UI  │   │ UI  │   │ UI  │   │ UI  │    ← CLIENTE
+  │     │   │     │   │ App │   │ App │   │ App │
+  │     │   │     │   │     │   │     │   │ DB  │
+  ├─────┤   ├─────┤   ├─────┤   ├─────┤   ├─────┤
+  │ UI  │   │     │   │     │   │     │   │     │
+  │ App │   │ App │   │ App │   │     │   │     │    ← SERVIDOR
+  │ DB  │   │ DB  │   │ DB  │   │ DB  │   │ DB  │
+  └─────┘   └─────┘   └─────┘   └─────┘   └─────┘
+    thin                                    fat
+  server                                   client
+</div>
+
+<div class="callout warn">
+<div class="label">Regla práctica</div>
+<p>La tendencia es mantener el <strong>mayor procesamiento en el lado del servidor</strong>. Los <em>fat clients</em> son más difíciles de mantener (más sensibles a errores), por eso hoy se prefieren <strong>thin clients</strong>.</p>
+</div>
+
+<h3>Multi-tier (3-tier)</h3>
+<p>Un servidor puede a veces <strong>actuar como cliente</strong> de otro servidor. Esto lleva a arquitecturas de 3 niveles físicos.</p>
+<div class="diag">
+Cliente ──request──▶ Servidor App ──request──▶ Servidor DB
+                    (actúa como cliente del DB)
+</div>
+</section>
+
+<section id="s15">
+<h2><span class="num">15</span> Computación Distribuida: Cluster, Grid, P2P</h2>
+
+<p>3 arquitecturas orientadas a <strong>alto rendimiento (HPC)</strong>:</p>
+
+<div class="grid grid-3">
+  <div class="card blue">
+    <h4>🏢 Cluster</h4>
+    <ul>
+      <li>Nodos <strong>homogéneos</strong> en red rápida.</li>
+      <li>Hardware uniforme.</li>
+      <li>Tradicionalmente para <strong>apps paralelas</strong>: un programa corriendo en paralelo en varias máquinas.</li>
+      <li>Popular por precio/rendimiento PCs mejorado.</li>
+      <li>Cluster vs Supercomputador: económicamente mejor opción.</li>
+    </ul>
+  </div>
+  <div class="card purple">
+    <h4>🌐 Grid</h4>
+    <ul>
+      <li>Nodos <strong>heterogéneos</strong> en red compartida bajo <strong>varias administraciones</strong>.</li>
+      <li>Entidades distribuidas geográficamente que comparten recursos heterogéneos.</li>
+      <li>Reutilizan recursos de cada organización.</li>
+      <li>Organización virtual con recursos compartidos.</li>
+      <li>NO usan redes abiertas (buscan cómputo <strong>seguro y confiable</strong>).</li>
+      <li>Recursos <strong>completamente configurables</strong> (SO, software, nodos).</li>
+    </ul>
+  </div>
+  <div class="card green">
+    <h4>🔗 Peer-to-Peer</h4>
+    <ul>
+      <li>Nodos <strong>heterogéneos</strong> en red compartida <strong>completamente abierta</strong>.</li>
+      <li>Cada peer entrega <em>y</em> consume recursos.</li>
+      <li><strong>100% descentralizado</strong>, sin cuellos de botella.</li>
+      <li>Auto-organizado, participantes autónomos.</li>
+      <li>Escalabilidad lineal con nº de nodos.</li>
+      <li>Conexiones/participantes <strong>no confiables</strong>.</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Grid vs Cloud</h3>
+<table>
+<thead><tr><th></th><th>Cloud Computing</th><th>Grid Computing</th></tr></thead>
+<tbody>
+<tr><td>Arquitectura</td><td>Cliente-Servidor</td><td>Distributed / descentralizada</td></tr>
+<tr><td>Escalabilidad</td><td>Alta</td><td>Normal</td></tr>
+<tr><td>Flexibilidad</td><td>Más flexible</td><td>Menos flexible que cloud</td></tr>
+<tr><td>Gestión</td><td>Centralizada</td><td>Descentralizada</td></tr>
+<tr><td>Propiedad</td><td>Infraestructura de proveedores</td><td>Poseído por la organización</td></tr>
+<tr><td>Modelo</td><td>IaaS, PaaS, SaaS</td><td>Distributed computing, info, pervasive</td></tr>
+<tr><td>Orientación</td><td>Service-oriented</td><td>Application-oriented</td></tr>
+<tr><td>Acceso</td><td>Protocolos web estándar</td><td>Grid middleware</td></tr>
+<tr><td>Configuración</td><td>Poca visibilidad real (multi-tenancy)</td><td>"Bare-metal as a service" — todo reconfigurable</td></tr>
+</tbody>
+</table>
+
+<h3>Ejemplos P2P de cómputo voluntario (BOINC)</h3>
+<ul>
+<li><strong>SETI@home</strong>: radio-astronomía, 3.8M usuarios en 226 países, 38 TeraFlops, 77 tipos de procesadores heterogéneos.</li>
+<li><strong>Folding@home</strong>: plegamiento de proteínas (Alzheimer, cáncer). Orden de Peta Flops.</li>
+<li><strong>Universe@home, LHC@home, Albert@home, etc.</strong></li>
+</ul>
+
+<h3>Otros tipos de SD</h3>
+<ul>
+<li><strong>Sistemas de Información:</strong> Enterprise Information Systems (EIS), procesadores de transacciones (ACID), SOA.</li>
+<li><strong>Sistemas Pervasivos:</strong> incluyen movilidad, sin control centralizado, restricciones de energía/cómputo. Ejemplos: Home systems, Health (body-area networks), <strong>Smartcities</strong> (smart parking, noise maps, smart lighting, waste management, smart roads, traffic congestion).</li>
+</ul>
+</section>
+
+<section id="s16">
+<h2><span class="num">16</span> P2P Estructurado: DHT, Chord, Pastry</h2>
+
+<p>Surge para <strong>resolver los problemas de escalabilidad</strong> de los P2P no estructurados.</p>
+
+<h3>Características</h3>
+<ul>
+<li>Construido con proceso <strong>determinístico</strong>.</li>
+<li>Estructura bien definida.</li>
+<li>Usa <strong>Distributed Hash Tables (DHT)</strong> para su generación (SHA-1 o MD5).</li>
+<li>Escala a <strong>cientos de millones</strong> de participantes.</li>
+<li>Provee <strong>búsquedas completas y puntuales</strong>.</li>
+<li>Usa <strong>KBR</strong> (Key-Based Routing) para enrutar/buscar.</li>
+<li>Capa distribuida uniformemente (<strong>no</strong> agrupada por datos relacionados).</li>
+<li>Búsqueda eficiente en orden <strong>log(N)</strong>.</li>
+</ul>
+
+<h3>Desventajas</h3>
+<ul>
+<li><span class="chip con">Alta latencia</span> en búsquedas (nodos cercanos en el overlay ≠ cercanos físicamente)</li>
+<li><span class="chip con">Sistema no seguro</span></li>
+<li><span class="chip con">Solo búsquedas puntuales/exactas</span></li>
+<li><span class="chip con">Alto dinamismo (churn)</span></li>
+</ul>
+
+<h3>¿Qué es un Overlay?</h3>
+<div class="callout">
+<p>Es una <strong>red de computadores construida sobre otra red</strong>. Organización <em>lógica</em> de la red <em>física</em> de comunicación. No necesariamente representa la distribución física — un vecino cercano en el overlay puede estar físicamente lejos.</p>
+</div>
+
+<h3>Distributed Hash Table (DHT)</h3>
+<p>Función hash especial que toma una <strong>clave</strong> (key) y produce un <strong>identificador (ID) numérico</strong> dentro de un rango fijo. Organiza nodos por su <strong>posición lógica</strong>, no física.</p>
+
+<div class="card blue">
+<h4>Consistent Hashing</h4>
+<p>Almacena pares <strong>llave-valor</strong> (sin réplicas por defecto).</p>
+<p><strong>Problema:</strong> ¿Dónde guardamos eficientemente cada par?<br><strong>Solución:</strong> consistent hashing.</p>
+
+<h4>Método de búsqueda</h4>
+<ol>
+<li>Un nodo recibe la consulta.</li>
+<li>Comprueba si tiene la clave.</li>
+<li>Si no, calcula el <strong>vecino más cercano</strong> (distancia lógica) y reenvía.</li>
+<li>Cada nodo repite hasta encontrar la clave.</li>
+<li>La clave se devuelve al solicitante.</li>
+</ol>
+</div>
+
+<h3>¿Qué pasa si un peer se desconecta?</h3>
+<ul>
+<li>Solo se afectan los pares llave-valor del nodo desconectado.</li>
+<li>Otro nodo tendrá el ID más cercano y <strong>toma responsabilidad</strong> de almacenar y responder las consultas relacionadas.</li>
+<li>Se previene pérdida replicando en los <strong>S sucesores más cercanos</strong>.</li>
+</ul>
+
+<h3>Chord</h3>
+<div class="card purple">
+<ul>
+<li><strong>Organización tipo anillo</strong> de 0 a 2<sup>m</sup></li>
+<li>Cada peer tiene ID generado con SHA-1 sobre (IP + puerto).</li>
+<li>ID del recurso = SHA(recurso).</li>
+<li>Asignación de recursos: <strong>sucesor</strong> de la key (sentido horario).</li>
+<li><strong>Join:</strong> se hace responsable de un grupo de recursos, recibe recursos.</li>
+<li><strong>Leave:</strong> entrega recursos al nuevo sucesor.</li>
+<li><strong>Ruteo:</strong> tipo árbol. Mantenimiento caro: O((log N)²).</li>
+<li>Detección de caídas: <strong>heartbeats</strong>. Réplicas en S sucesores.</li>
+</ul>
+
+<h4>Finger Table (DHT de Chord)</h4>
+<p>Tabla que contiene información de <strong>log m</strong> peers en la red. Permite <strong>saltar peers</strong> y acercarse más rápido al peer responsable (en vez de seguir sucesor por sucesor).</p>
+
+<p><strong>Métrica:</strong> cercanía entre identificadores.</p>
+</div>
+
+<h3>Pastry</h3>
+<div class="card green">
+<ul>
+<li>Organizado en <strong>anillo</strong>, ruteo <strong>Plaxon-Tree</strong>.</li>
+<li>Ruteo basado en <strong>prefijo</strong>.</li>
+<li>Identificador <strong>128 bits</strong> con SHA-1. Espacio 0 a 2<sup>128</sup>.</li>
+<li>Ruteo <strong>O(log N)</strong> saltos al destino.</li>
+</ul>
+
+<h4>Tablas de ruta</h4>
+<ul>
+<li><strong>Leafset:</strong> L peers vecinos en el anillo (-L/2 y L/2). Usado para balance de carga, tolerancia a fallos, réplicas, multi-path search.</li>
+<li><strong>Routing Table:</strong> organizada por prefijo. Fila i contiene peers que comparten prefijo de tamaño i. Más prefijos comunes → más cerca del destino.</li>
+<li><strong>Neighbours Set:</strong> peers cercanos en <strong>latencia</strong> (ping o IP). Útil para búsquedas diversas.</li>
+</ul>
+</div>
+
+<div class="callout warn">
+<div class="label">Limitación: búsquedas no puntuales</div>
+<p>Búsqueda puntual en overlays estructurados es un problema. Soluciones:</p>
+<ul>
+<li>Generar <strong>índices</strong> sobre el overlay: Prefix-Tree (PHT), multi-anillos.</li>
+<li>Generar overlay que <strong>preserve la localidad</strong>: Locality-Sensitive Hash (LSH).</li>
+</ul>
+</div>
+</section>
+
+<section id="s17">
+<h2><span class="num">17</span> P2P No Estructurado y Búsquedas</h2>
+
+<h3>Características</h3>
+<ul>
+<li><strong>Estructura aleatoria</strong>.</li>
+<li>Solo <strong>conocimiento local</strong>.</li>
+<li>Búsqueda basada en <strong>inundación (Flooding)</strong>.</li>
+<li><strong>Gran autonomía</strong>.</li>
+<li>"Nadie a quien demandar" 😅 (sin control central).</li>
+</ul>
+
+<h3>Bootstrap (cómo me conecto)</h3>
+<ul>
+<li>Contactar un <strong>bootstrap node</strong> (lista preexistente o bootstrap cache).</li>
+<li>Problema: limitar conexiones para balancear carga (ej: Gnutella 0.4 → max 5 conexiones).</li>
+</ul>
+
+<h3>Recursos y búsqueda — propiedades</h3>
+<ul>
+<li>Recursos se almacenan en <strong>peers aleatorios</strong>.</li>
+<li>Recursos pueden quedar <strong>lejos</strong> del peer que consulta (Gnutella 0.4 TTL max = 7).</li>
+<li><span class="chip con">Búsquedas incompletas</span> no garantizan encontrar resultado.</li>
+<li><span class="chip con">Poco eficientes</span> muchos mensajes.</li>
+<li><span class="chip pro">Gran expresividad</span> (comparación de strings).</li>
+<li><span class="chip pro">Descentralizada</span></li>
+<li>Efectivo en contenido popular; difícil encontrar no-popular.</li>
+</ul>
+
+<h3>Tipos de búsqueda</h3>
+<table>
+<thead><tr><th>Método</th><th>Cómo funciona</th><th>Pros / Contras</th></tr></thead>
+<tbody>
+<tr><td><strong>Flooding</strong></td><td>Mensaje enviado a <em>todos</em> los vecinos conocidos.</td><td>❌ Poco eficiente, problemas de escalabilidad, poco realista en redes grandes.</td></tr>
+<tr><td><strong>BFS</strong> (Breadth First Search)</td><td>Flooding controlado por TTL o routing hops. Se hace forward si no hay resultados. Repite TTL veces.</td><td>❌ Muchos mensajes duplicados, gran overhead.</td></tr>
+<tr><td><strong>Iterative Deepening</strong> (Expanding Ring)</td><td>Múltiples BFS secuenciales. Comienza con búsquedas poco profundas; si no encuentra, itera con más profundidad. Nodos en camino cachean la pregunta por un tiempo → evitan mensajes repetidos.</td><td>✅ Mejor que BFS puro cuando recursos son populares.</td></tr>
+<tr><td><strong>Directed BFS</strong></td><td>Subconjunto de vecinos: se elige los más probables (random, menos saltos, menos latencia…).</td><td>✅ Adivina mejor vecino; ❌ más mensajes recibidos.</td></tr>
+<tr><td><strong>Local Indexes</strong></td><td>"Radius of knowledge": saber qué archivos tienen mis vecinos y los vecinos de mis vecinos.</td><td>✅ Más efectivo; ❌ memoria y overhead para mantener listas.</td></tr>
+<tr><td><strong>Random Walks</strong></td><td>Mensaje enviado a <em>un</em> vecino aleatorio. Si hit → retorna. Si no → repite hasta TTL. Ciego y sin memoria.</td><td>✅ Menos mensajes; ❌ mayor latencia.</td></tr>
+<tr><td><strong>K-Random Walks</strong></td><td>Varios random walks en paralelo.</td><td>✅ Menor latencia. Variantes: APS (Adaptative Probabilistic), Id-based, Two-Level.</td></tr>
+</tbody>
+</table>
+
+<h3>Condiciones de término</h3>
+<ul>
+<li><strong>TTL:</strong> difícil de setear en red dinámica.</li>
+<li><strong>Chequeo de resultados:</strong> consultar al nodo origen cada ciertos saltos (ej. cada 4).</li>
+</ul>
+</section>
+
+<section id="s18">
+<h2><span class="num">18</span> P2P Híbrido (Super-Peers) y Edge</h2>
+
+<h3>Super-Peers</h3>
+<div class="callout">
+<p>Encontrar información en red no estructurada es problemático. No hay proceso determinístico.<br>
+<strong>Solución:</strong> índice. <strong>¿Dónde?</strong> En <strong>super-peers</strong>.</p>
+</div>
+
+<ul>
+<li>Se pierde la <strong>simetría</strong> de otros overlays.</li>
+<li><strong>Super-peers</strong> son peers con mayores capacidades o roles especiales:
+  <ul>
+    <li>Más procesamiento, ancho de banda, estabilidad.</li>
+    <li>Actúan como índices o brokers.</li>
+  </ul>
+</li>
+<li><strong>Organización jerárquica:</strong> peers regulares conectados a SP. Toda la comunicación pasa por el SP.</li>
+<li>Relación <strong>estable</strong> con SP; sesiones largas, alta disponibilidad.</li>
+</ul>
+
+<h3>Preguntas abiertas con SP</h3>
+<ul>
+<li>¿Es beneficioso conectarse siempre al mismo SP? <em>No siempre</em> (anonimato, file-sharing).</li>
+<li>Estrategias para asignación dinámica a SP.</li>
+<li>¿Qué nodos son candidatos a SP? ¿Cómo los elegimos? → <strong>Algoritmos de elección</strong>.</li>
+</ul>
+
+<p class="muted"><strong>Ejemplo clásico:</strong> Skype usa arquitectura de super-peers.</p>
+
+<h3>Edge Architectures</h3>
+<div class="card green">
+<ul>
+<li>Soluciones en los <strong>bordes (edges)</strong> de la red.</li>
+<li>End-users se conectan a <strong>edge servers</strong>.</li>
+<li>Permite <strong>optimizar entrega de contenido</strong>.</li>
+<li>Se aplican técnicas de SD: <strong>réplicas en otros edge servers</strong> (ej: web pages).</li>
+<li>Reduce latencia, mejora eficacia (arquitectura híbrida).</li>
+</ul>
+<h4>Ejemplos</h4>
+<ul>
+<li><strong>Akamai:</strong> CDN global.</li>
+<li><strong>Netflix Open Connect:</strong> edge servers en los ISPs.</li>
+<li><strong>Nanodatacenters:</strong> Set-Top-Boxes (STBs) controladas por ISPs. Muchas disponibles (~160M en US). Peers estables y seguros. Gran cantidad de recursos.</li>
+</ul>
+</div>
+</section>
+
+<section id="s19">
+<h2><span class="num">19</span> Banco de preguntas V/F resueltas</h2>
+
+<p class="muted">Preguntas extraídas de ayudantías, con justificación técnica.</p>
+
+<div class="vf">
+<div class="stmt">"Un sistema distribuido consiste en procesos y recursos alojados remotamente que se comunican por medio de una red y brindan una vista unificada del sistema al usuario. Este tipo de sistemas provee un modelo ideal para dar soporte a <strong>todo tipo</strong> de aplicaciones."</div>
+<div class="verdict incorrecto">❌ INCORRECTO</div>
+<div class="explain">Depende de la <strong>escala</strong> (datos y usuarios) y los <strong>recursos disponibles</strong> primordialmente. No todos los sistemas necesitan distribuirse (si son pequeños, centralizar puede ser mejor).</div>
+</div>
+
+<div class="vf">
+<div class="stmt">"Para lograr escalar un sistema que tiene estado se pueden crear réplicas para paralelizar accesos y balancear carga. Sin embargo, la cantidad de réplicas dependerá principalmente de la relación de eventos de escritura/lectura en dicho sistema."</div>
+<div class="verdict correcto">✅ CORRECTO</div>
+<div class="explain">La relación read/write determina el costo de mantener consistencia. Sistemas read-heavy toleran muchas réplicas; write-heavy se vuelven costosos.</div>
+</div>
+
+<div class="vf">
+<div class="stmt">"La decisión de generar un sistema bajo un modelo distribuido depende principalmente del tamaño o escala del sistema, y la infraestructura o recursos disponibles."</div>
+<div class="verdict correcto">✅ CORRECTO</div>
+<div class="explain">Exacto: escala + infraestructura son los dos factores clave al decidir distribuir.</div>
+</div>
+
+<div class="vf">
+<div class="stmt">"El sharding es una técnica de particionamiento que permite escalar los sistemas de manera sencilla, sin embargo una de las restricciones es que cada partición debe tener un número de recursos <strong>similares</strong> para poder balancear la carga y escalar."</div>
+<div class="verdict incorrecto">❌ INCORRECTO</div>
+<div class="explain">No es necesario que las particiones sean iguales. Todo depende del <strong>tipo de recursos</strong> con que se cuente y la <strong>distribución de las consultas</strong>. Puede haber shards grandes con pocas queries y viceversa.</div>
+</div>
+
+<div class="vf">
+<div class="stmt">"Modelos de comunicación de espacio de tuplas permiten desacoplar las interacciones logrando un modelo de comunicación asíncrono. Los RPC siguen este modelo clásico permitiendo la comunicación de manera sencilla, transparente y escalable entre procesos distribuidos."</div>
+<div class="verdict incorrecto">❌ INCORRECTO</div>
+<div class="explain">El modelo <strong>RPC es síncrono</strong> y radica en un modelo <strong>cliente-servidor</strong> bajo comunicación por paso de mensajes. Se puede atacar por el lado de la escalabilidad al ser C/S.</div>
+</div>
+
+<div class="vf">
+<div class="stmt">"Permite mejorar el balance de carga en el sistema permitiendo escalar de mejor manera en términos de los accesos."</div>
+<div class="verdict incorrecto">❌ DESACUERDO</div>
+<div class="explain">Si bien permite balancear carga en términos de <strong>almacenamiento</strong>, no lo garantiza en términos de <strong>accesos</strong>. Si hay un conjunto de datos muy populares, la partición asociada tendrá más carga (hot-spots).</div>
+</div>
+
+<div class="vf">
+<div class="stmt">"La parametrización de un cache es un proceso complejo que requiere estudio y comprensión del escenario. Sin embargo, podemos afirmar que la distribución de frecuencia de las consultas no es importante al momento de definir el tamaño del sistema de caching."</div>
+<div class="verdict incorrecto">❌ DESACUERDO</div>
+<div class="explain">El patrón de distribución de frecuencia es <strong>exactamente lo que se busca capturar</strong> en un cache. Si el tamaño no es adecuado, dicho patrón se dificulta de capturar. Esto se complementa con políticas de remoción y temporales.</div>
+</div>
+
+<div class="vf">
+<div class="stmt">"Ante la existencia de réplicas y la necesidad de coordinación de estas para mantener consistencia, podemos aplicar modelos de dos tipos: Push y Pull. En estos modelos el modelo <strong>pull</strong> aplica una estrategia de polling para propagar las actualizaciones."</div>
+<div class="verdict correcto">✅ CORRECTO</div>
+<div class="explain">Pull = las réplicas preguntan activamente si hay updates (polling). Push = el sistema notifica activamente.</div>
+</div>
+
+<h3>Problema Cache-TOn (análisis de α en ley de potencias)</h3>
+<div class="callout">
+<p><strong>Contexto:</strong> 3 distribuciones con parámetro α = 1, 2, 3. A mayor α, más sesgada la distribución (cola más corta).</p>
+
+<p><strong>a) ¿Cuál requiere un tamaño de cache mayor?</strong> → <strong>α = 1</strong>. Posee mayor número de consultas con alta repetición, lo cual requiere caches mayores para capturar el patrón.</p>
+
+<p><strong>b) ¿Cuál escenario es mejor para implementar un sistema de cache?</strong> → <strong>α = 3</strong>. Para un cache el tamaño debe ser limitado; una distribución con mayor sesgo y menor grupo de consultas repetidas es más favorable (requiere menos recursos y es más fácil capturar el patrón de repetición).</p>
+</div>
+
+<h3>Problema Alta Vista (distancia entre repeticiones)</h3>
+<div class="callout">
+<p><strong>1) ¿LRU, LFU o híbrida?</strong> → <strong>Híbrida</strong>. Las consultas populares por largo tiempo se benefician del lado <strong>estático</strong> (persistentes); las populares en picos cortos del lado <strong>dinámico</strong> (LRU). LFU solo sería muy costoso y MRU no captura popularidad.</p>
+
+<p><strong>2) ¿Hasta qué punto aumentar tamaño?</strong> → Mientras la distribución de distancias lo permita. Una vez capturadas las consultas del "tall head" (20% popular con 80% de tráfico), la ganancia es marginal (ley de potencias / long tail).</p>
+</div>
+</section>
+
+<section id="s20">
+<h2><span class="num">20</span> Glosario rápido</h2>
+<table>
+<tbody>
+<tr><td><strong>ACID</strong></td><td>Atómico, Consistente, Aislado, Durable (transacciones)</td></tr>
+<tr><td><strong>API</strong></td><td>Application Programming Interface</td></tr>
+<tr><td><strong>BFS</strong></td><td>Breadth First Search</td></tr>
+<tr><td><strong>BOINC</strong></td><td>Berkeley Open Infrastructure for Network Computing</td></tr>
+<tr><td><strong>Churn</strong></td><td>Alto dinamismo de join/leave en P2P</td></tr>
+<tr><td><strong>DHT</strong></td><td>Distributed Hash Table</td></tr>
+<tr><td><strong>Endianness</strong></td><td>Orden de bytes (little vs big endian)</td></tr>
+<tr><td><strong>Fat/Thin client</strong></td><td>Cliente con mucho/poco procesamiento</td></tr>
+<tr><td><strong>FIFO / LRU / LFU / MRU</strong></td><td>Políticas de remoción de cache</td></tr>
+<tr><td><strong>Flooding</strong></td><td>Inundación de mensajes (P2P no estructurado)</td></tr>
+<tr><td><strong>GFS / HDFS</strong></td><td>Google / Hadoop File System</td></tr>
+<tr><td><strong>HPC</strong></td><td>High Performance Computing</td></tr>
+<tr><td><strong>IDL</strong></td><td>Interface Definition Language</td></tr>
+<tr><td><strong>IPC</strong></td><td>Interprocess Communication</td></tr>
+<tr><td><strong>Jitter</strong></td><td>Variación de latencia entre mensajes sucesivos</td></tr>
+<tr><td><strong>KBR</strong></td><td>Key-Based Routing</td></tr>
+<tr><td><strong>LSH</strong></td><td>Locality-Sensitive Hash</td></tr>
+<tr><td><strong>Marshalling</strong></td><td>Serialización de parámetros para transmisión</td></tr>
+<tr><td><strong>Middleware</strong></td><td>Capa entre SO y apps distribuidas</td></tr>
+<tr><td><strong>OOM</strong></td><td>Object Oriented Middleware</td></tr>
+<tr><td><strong>Overlay</strong></td><td>Red lógica sobre red física</td></tr>
+<tr><td><strong>P2P</strong></td><td>Peer-to-Peer</td></tr>
+<tr><td><strong>PHT</strong></td><td>Prefix Hash Tree</td></tr>
+<tr><td><strong>Pub/Sub</strong></td><td>Publish/Subscribe</td></tr>
+<tr><td><strong>Resharding</strong></td><td>Redistribución de shards al escalar</td></tr>
+<tr><td><strong>RMI</strong></td><td>Remote Method Invocation (Java)</td></tr>
+<tr><td><strong>RPC</strong></td><td>Remote Procedure Call</td></tr>
+<tr><td><strong>SDC</strong></td><td>Static Dynamic Caching</td></tr>
+<tr><td><strong>SHA-1 / MD5</strong></td><td>Funciones hash usadas en DHTs</td></tr>
+<tr><td><strong>Sharding</strong></td><td>Particionamiento horizontal</td></tr>
+<tr><td><strong>SOA</strong></td><td>Service-Oriented Architecture</td></tr>
+<tr><td><strong>Stub / Skeleton</strong></td><td>Proxies cliente/servidor en RPC/RMI</td></tr>
+<tr><td><strong>Super-peer</strong></td><td>Peer con roles especiales (índice, broker)</td></tr>
+<tr><td><strong>TTL</strong></td><td>Time-To-Live</td></tr>
+</tbody>
+</table>
+</section>
+
+<footer>
+📚 Consolidado preparado para la Solemne 1 de Sistemas Distribuidos · UDP · Semestre 1/2026<br>
+<span class="muted">Basado en material del Prof. Nicolás Hidalgo y ayudantías 2–4 (V. Díaz, J. Villegas, B. Aceituno, I. González, N. Ortega)</span>
+</footer>
+
+</div>
+</body>
+</html>
