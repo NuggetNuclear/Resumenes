@@ -29,6 +29,10 @@
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   
+  html, body {
+    overflow-x: hidden;
+  }
+  
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -241,6 +245,9 @@
 
   /* --- TABLAS --- */
   table {
+    display: block; /* Convierte la tabla en un bloque deslizable */
+    overflow-x: auto; /* Activa el scroll horizontal solo si es necesario */
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iPhones */
     width: 100%;
     border-collapse: collapse;
     margin: 1.5rem 0;
@@ -248,7 +255,6 @@
     background: var(--bg-card);
     border-radius: 8px;
     border: 1px solid var(--border);
-    overflow: hidden;
   }
   th, td {
     padding: 0.8rem 1rem;
@@ -278,6 +284,7 @@
     margin: 1.5rem 0;
     color: var(--text-main);
     font-size: 1.1rem;
+    overflow-x: auto; /* Línea nueva */
   }
   
   .diag {
