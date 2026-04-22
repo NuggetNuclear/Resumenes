@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resúmenes · Índice General</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Paleta Dark Mode / Developer Focus */
+    --bg-main: #09090b;       /* Zinc 950 */
+    --bg-surface: #18181b;    /* Zinc 900 */
+    --bg-hover: #27272a;      /* Zinc 800 */
+    --bg-active: rgba(99, 102, 241, 0.1); /* Indigo sutil */
+    
+    --text-main: #f4f4f5;     /* Zinc 50 */
+    --text-muted: #a1a1aa;    /* Zinc 400 */
+    --text-dim: #71717a;      /* Zinc 500 */
+    
+    --accent: #818cf8;        /* Indigo 400 */
+    --accent-hover: #6366f1;  /* Indigo 500 */
+    --border: #27272a;        /* Zinc 800 */
+    --border-soft: #1f1f22;   /* Zinc 850 */
+    
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Monaco, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 40px 80px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- HEADER ---------- */
+  header.masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  
+  .masthead-left .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  
+  .masthead-left h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-main);
+    line-height: 1.1;
+  }
+  
+  .masthead-left h1 em {
+    font-style: normal;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .masthead-right {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ---------- META STRIP ---------- */
+  .meta-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    background: var(--bg-surface);
+    padding: 20px 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+  
+  .meta-strip > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .meta-strip .k {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+  }
+  
+  .meta-strip .v {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+  }
+  
+  .meta-strip .v.rust {
+    color: var(--accent);
+  }
+
+  /* ---------- SECTION LABEL ---------- */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .section-label .dash {
+    width: 24px;
+    height: 1px;
+    background: var(--border);
+  }
+  
+  .section-label .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  
+  .section-label .count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 6px;
+  }
+  
+  .section-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+
+  /* ---------- INDEX TABLE ---------- */
+  .index {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 24px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .entry:hover {
+    border-color: var(--text-dim);
+  }
+
+  .entry.is-active {
+    background: var(--bg-active);
+    border-color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  /* numeral column */
+  .entry .folio {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text-dim);
+    transition: color 0.2s ease;
+  }
+  
+  .entry.is-active .folio {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* middle column */
+  .entry .body {
+    min-width: 0;
+  }
+  
+  .entry .title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+  
+  .entry .name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+  
+  .entry .code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-main);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  
+  .entry.is-active .code {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: transparent;
+  }
+  
+  .entry .desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 90%;
+  }
+  
+  .entry .desc .divider {
+    color: var(--border);
+    margin: 0 6px;
+  }
+
+  /* right column: resources */
+  .entry .resources {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  
+  .resource-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    background: transparent;
+  }
+  
+  .resource-link .dot {
+    width: 6px; height: 6px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    transition: background 0.15s ease;
+  }
+  
+  .resource-link:hover {
+    color: var(--text-main);
+    background: var(--bg-hover);
+  }
+  
+  .resource-link:hover .dot {
+    background: var(--accent);
+  }
+  
+  .resource-link.is-focus {
+    color: var(--text-main);
+    background: var(--accent);
+    color: var(--bg-main);
+    font-weight: 600;
+  }
+  
+  .resource-link.is-focus .dot {
+    background: var(--bg-main);
+  }
+  
+  .resource-link .arrow {
+    display: none; /* Flechas removidas por limpieza, el hover state es suficiente */
+  }
+
+  /* ---------- ORNAMENTS ---------- */
+  .ornament {
+    display: none; /* Eliminado el ornamento clásico */
+  }
+
+  /* ---------- FOOTER / KBD HINTS ---------- */
+  footer.colophon {
+    margin-top: auto;
+    padding-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .kbd-hints {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* Estilo de teclas mecánicas */
+  .kbd .key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    min-width: 24px;
+    padding: 0 6px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .kbd .label-txt {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .folio-mark {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  
+  .folio-mark .rust { color: var(--text-main); }
+
+  /* ---------- ANIMATIONS ---------- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    animation: fadeUp 0.4s ease forwards;
+    opacity: 0;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .page { padding: 40px 24px; }
+    .masthead { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .masthead-right { text-align: left; }
+    .entry { 
+      grid-template-columns: 1fr; 
+      gap: 16px;
+      padding: 16px;
+    }
+    .entry .folio { display: none; }
+    .entry .resources {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+    footer.colophon { flex-direction: column; gap: 24px; align-items: flex-start; }
+    .kbd-hints { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="masthead reveal" style="animation-delay: 0ms">
+    <div class="masthead-left">
+      <div class="eyebrow">Universidad Diego Portales · Facultad de Ingeniería</div>
+      <h1>Resúmenes <em>&amp;</em> Apuntes</h1>
+    </div>
+    <div class="masthead-right">
+      Volumen I<br>
+      Edición 2026<br>
+      Catálogo
+    </div>
+  </header>
+
+  <div class="meta-strip reveal" style="animation-delay: 50ms">
+    <div>
+      <span class="k">Término</span>
+      <span class="v">Otoño · 2026</span>
+    </div>
+    <div>
+      <span class="k">Asignaturas</span>
+      <span class="v rust">05 registradas</span>
+    </div>
+    <div>
+      <span class="k">Formato</span>
+      <span class="v">Resumen / Cheatsheet / Flashcards</span>
+    </div>
+    <div>
+      <span class="k">Última revisión</span>
+      <span class="v">22 · IV · 2026</span>
+    </div>
+  </div>
+
+  <div class="section-label reveal" style="animation-delay: 100ms">
+    <span class="tag">Índice General</span>
+    <span class="dash"></span>
+    <span class="count">05 entradas</span>
+  </div>
+  <div class="reveal" style="animation-delay: 150ms">
+    <h2 class="section-title">Asignaturas del semestre</h2>
+    <p class="section-sub">Seleccione una asignatura con las flechas ↑↓ y presione Enter para abrir, o elija un recurso.</p>
+  </div>
+
+  <ol class="index" id="index-list" role="listbox" aria-label="Asignaturas">
+
+    <li class="entry reveal" data-slug="economia" data-index="0" style="animation-delay: 200ms">
+      <div class="folio">01</div>
+      <div class="body">
+        <div class="title-row">
+          <span class="name">Introducción a la Economía</span>
+          <span class="code">ECO-1001</span>
+        </div>
+        <p class="desc">Fundamentos de microeconomía y macroeconomía <span class="divider">/</span> oferta y demanda, elasticidad, mercados, política monetaria y fiscal.</p>
+      </div>
+      <div class="resources">
+        <a class="resource-link" data-kind="resumen" href="Introduccion a la Economia/ECO_Resumen_Completo.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">resumen completo</span>
+        </a>
+        <a class="resource-link" data-kind="cheatsheet" href="Introduccion a la Economia/ECO_Cheatsheet.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">cheatsheet</span>
+        </a>
+        <a class="resource-link" data-kind="flashcards" href="Introduccion a la Economia/ECO_Flashcards.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">flashcards</span>
+        </a>
+      </div>
+    </li>
+
+    <li class="entry reveal" data-slug="optimizacion" data-index="1" style="animation-delay: 250ms">
+      <div class="folio">02</div>
+      <div class="body">
+        <div class="title-row">
+          <span class="name">Optimización</span>
+          <span class="code">OPT-2410</span>
+        </div>
+        <p class="desc">Programación lineal, dualidad y método simplex <span class="divider">/</span> optimización no lineal, condiciones KKT, heurísticas y modelado de problemas reales.</p>
+      </div>
+      <div class="resources">
+        <a class="resource-link" data-kind="resumen" href="Optimizacion/OPT_Resumen_Completo.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">resumen completo</span>
+        </a>
+        <a class="resource-link" data-kind="cheatsheet" href="Optimizacion/OPT_Cheatsheet.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">cheatsheet</span>
+        </a>
+        <a class="resource-link" data-kind="flashcards" href="Optimizacion/OPT_Flashcards.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">flashcards</span>
+        </a>
+      </div>
+    </li>
+
+    <li class="entry reveal" data-slug="software" data-index="2" style="animation-delay: 300ms">
+      <div class="folio">03</div>
+      <div class="body">
+        <div class="title-row">
+          <span class="name">Ingeniería de Software</span>
+          <span class="code">ISW-3201</span>
+        </div>
+        <p class="desc">Ciclos de desarrollo, metodologías ágiles y patrones de diseño <span class="divider">/</span> arquitecturas de software, testing, control de versiones y gestión de proyectos.</p>
+      </div>
+      <div class="resources">
+        <a class="resource-link" data-kind="resumen" href="Ingenieria de Software/ISW_Resumen_Completo.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">resumen completo</span>
+        </a>
+        <a class="resource-link" data-kind="cheatsheet" href="Ingenieria de Software/ISW_Cheatsheet.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">cheatsheet</span>
+        </a>
+        <a class="resource-link" data-kind="flashcards" href="Ingenieria de Software/ISW_Flashcards.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">flashcards</span>
+        </a>
+      </div>
+    </li>
+
+    <li class="entry reveal" data-slug="distribuidos" data-index="3" style="animation-delay: 350ms">
+      <div class="folio">04</div>
+      <div class="body">
+        <div class="title-row">
+          <span class="name">Sistemas Distribuidos</span>
+          <span class="code">SDI-4102</span>
+        </div>
+        <p class="desc">Modelos de comunicación, RPC/RMI y middleware <span class="divider">/</span> replicación, consistencia, P2P estructurado y no estructurado, tolerancia a fallas.</p>
+      </div>
+      <div class="resources">
+        <a class="resource-link" data-kind="resumen" href="Sistemas Distribuidos/SD_Resumen_Completo.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">resumen completo</span>
+        </a>
+        <a class="resource-link" data-kind="cheatsheet" href="Sistemas Distribuidos/SD_Cheatsheet.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">cheatsheet</span>
+        </a>
+        <a class="resource-link" data-kind="flashcards" href="Sistemas Distribuidos/SD_Flashcards.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">flashcards</span>
+        </a>
+      </div>
+    </li>
+
+    <li class="entry reveal" data-slug="senales" data-index="4" style="animation-delay: 400ms">
+      <div class="folio">05</div>
+      <div class="body">
+        <div class="title-row">
+          <span class="name">Señales y Sistemas</span>
+          <span class="code">SYS-3305</span>
+        </div>
+        <p class="desc">Señales continuas y discretas, convolución y series de Fourier <span class="divider">/</span> transformadas de Laplace y Z, respuesta en frecuencia, filtros LTI.</p>
+      </div>
+      <div class="resources">
+        <a class="resource-link" data-kind="resumen" href="Senales y Sistemas/SYS_Resumen_Completo.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">resumen completo</span>
+        </a>
+        <a class="resource-link" data-kind="cheatsheet" href="Senales y Sistemas/SYS_Cheatsheet.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">cheatsheet</span>
+        </a>
+        <a class="resource-link" data-kind="flashcards" href="Senales y Sistemas/SYS_Flashcards.html" tabindex="-1">
+          <span class="dot"></span><span class="kind">flashcards</span>
+        </a>
+      </div>
+    </li>
+
+  </ol>
+
+  <footer class="colophon reveal" style="animation-delay: 450ms">
+    <div class="kbd-hints">
+      <span class="kbd"><span class="key">↑</span><span class="key">↓</span><span class="label-txt">Navegar</span></span>
+      <span class="kbd"><span class="key">←</span><span class="key">→</span><span class="label-txt">Recurso</span></span>
+      <span class="kbd"><span class="key">↵</span><span class="label-txt">Abrir</span></span>
+    </div>
+    <div class="folio-mark">
+      <span>— pág.</span> <span class="rust">001</span> <span>de 001 —</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // ==== Keyboard navigation ====
+  const entries = Array.from(document.querySelectorAll('.entry'));
+  const resourceOrder = ['resumen', 'cheatsheet', 'flashcards'];
+  let activeIdx = 0;
+  let resourceIdx = 0;
+
+  function render(){
+    entries.forEach((e, i) => {
+      const isActive = i === activeIdx;
+      e.classList.toggle('is-active', isActive);
+      const links = e.querySelectorAll('.resource-link');
+      links.forEach(l => l.classList.remove('is-focus'));
+      if (isActive) {
+        const kind = resourceOrder[resourceIdx];
+        const focusLink = e.querySelector(`.resource-link[data-kind="${kind}"]`);
+        if (focusLink) focusLink.classList.add('is-focus');
+      }
+    });
+  }
+
+  function moveEntry(delta){
+    activeIdx = (activeIdx + delta + entries.length) % entries.length;
+    render();
+    // Scroll selected into view softly
+    const el = entries[activeIdx];
+    const rect = el.getBoundingClientRect();
+    if (rect.top < 100 || rect.bottom > window.innerHeight - 40) {
+      window.scrollTo({
+        top: window.scrollY + rect.top - 150,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  function moveResource(delta){
+    resourceIdx = (resourceIdx + delta + resourceOrder.length) % resourceOrder.length;
+    render();
+  }
+
+  function openActive(){
+    const kind = resourceOrder[resourceIdx];
+    const link = entries[activeIdx].querySelector(`.resource-link[data-kind="${kind}"]`);
+    if (link && !link.classList.contains('disabled')) {
+      window.location.href = link.getAttribute('href');
+    }
+  }
+
+  document.addEventListener('keydown', (ev) => {
+    switch (ev.key) {
+      case 'ArrowDown':
+      case 'j':
+        ev.preventDefault(); moveEntry(1); break;
+      case 'ArrowUp':
+      case 'k':
+        ev.preventDefault(); moveEntry(-1); break;
+      case 'ArrowRight':
+      case 'l':
+        ev.preventDefault(); moveResource(1); break;
+      case 'ArrowLeft':
+      case 'h':
+        ev.preventDefault(); moveResource(-1); break;
+      case 'Enter':
+        ev.preventDefault(); openActive(); break;
+      case '1': case '2': case '3': case '4': case '5':
+        ev.preventDefault();
+        activeIdx = Math.min(parseInt(ev.key,10) - 1, entries.length - 1);
+        render();
+        break;
+    }
+  });
+
+  // Click to activate row (visual feedback)
+  entries.forEach((e, i) => {
+    e.addEventListener('mouseenter', () => {
+      activeIdx = i; render();
+    });
+  });
+
+  render();
+</script>
+
+</body>
+</html>
