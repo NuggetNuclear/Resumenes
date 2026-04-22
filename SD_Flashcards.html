@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards · Sistemas Distribuidos</title>
+<style>
+  :root{
+    --bg:#0b1020;
+    --bg-2:#121a33;
+    --card:#1a2244;
+    --card-2:#202a55;
+    --text:#e7ecff;
+    --muted:#9aa7d4;
+    --accent:#7c9cff;
+    --accent-2:#a78bfa;
+    --green:#34d399;
+    --red:#f87171;
+    --yellow:#fbbf24;
+    --orange:#fb923c;
+    --border:#2a3566;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:linear-gradient(180deg,var(--bg) 0%,#0d1430 100%);
+    color:var(--text);
+    line-height:1.55;
+    min-height:100vh;
+    font-size:16px;
+  }
+  .app{max-width:720px;margin:0 auto;padding:1rem 1rem 3rem;min-height:100vh;display:flex;flex-direction:column}
+
+  /* HEADER */
+  header{text-align:center;padding:.6rem 0 1rem}
+  header h1{margin:0;font-size:1.3rem;letter-spacing:-.01em}
+  header .sub{color:var(--muted);font-size:.85rem;margin-top:.2rem}
+
+  /* SCREENS */
+  .screen{display:none;flex:1;flex-direction:column}
+  .screen.active{display:flex}
+
+  /* HOME SCREEN */
+  .stats-bar{
+    display:flex;justify-content:space-around;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:.7rem;margin-bottom:1rem;
+  }
+  .stats-bar .stat{text-align:center}
+  .stats-bar .stat b{display:block;font-size:1.2rem;color:var(--accent)}
+  .stats-bar .stat span{font-size:.75rem;color:var(--muted)}
+
+  .section-title{
+    color:var(--accent);font-size:.85rem;
+    text-transform:uppercase;letter-spacing:.08em;
+    margin:1rem 0 .5rem;font-weight:700;
+  }
+
+  .cat-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem;
+  }
+  @media(min-width:500px){.cat-grid{grid-template-columns:1fr 1fr 1fr}}
+  .cat-btn{
+    background:var(--card);border:1px solid var(--border);
+    padding:.8rem .7rem;border-radius:10px;cursor:pointer;
+    text-align:left;color:var(--text);font-size:.88rem;
+    transition:all .15s;position:relative;
+  }
+  .cat-btn:hover,.cat-btn:active{
+    border-color:var(--accent);background:var(--card-2);
+  }
+  .cat-btn .cat-name{font-weight:600;display:block}
+  .cat-btn .cat-count{color:var(--muted);font-size:.75rem;margin-top:.15rem;display:block}
+
+  .main-actions{display:flex;gap:.5rem;margin-top:.5rem}
+  .main-actions button{flex:1}
+
+  button{
+    font-family:inherit;font-size:.95rem;
+    padding:.75rem 1rem;border-radius:10px;
+    border:none;cursor:pointer;font-weight:600;
+    transition:all .12s;
+  }
+  button.primary{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#0b1020;
+  }
+  button.primary:hover{filter:brightness(1.1)}
+  button.ghost{
+    background:transparent;border:1px solid var(--border);color:var(--text);
+  }
+  button.ghost:hover{background:var(--card)}
+  button:active{transform:scale(.97)}
+
+  /* STUDY GUIDE */
+  .guide{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:1rem;margin-bottom:1rem;
+  }
+  .guide summary{
+    cursor:pointer;color:var(--accent);font-weight:600;
+    list-style:none;display:flex;justify-content:space-between;
+  }
+  .guide summary::after{content:"▾";transition:transform .2s}
+  .guide[open] summary::after{transform:rotate(180deg)}
+  .guide .content{margin-top:.8rem;color:var(--muted);font-size:.9rem}
+  .guide h4{color:var(--text);margin:.8rem 0 .3rem;font-size:.95rem}
+  .guide ol,.guide ul{padding-left:1.2rem}
+  .guide li{margin:.25rem 0}
+  .guide strong{color:var(--text)}
+
+  /* STUDY SCREEN */
+  .progress-bar{
+    height:4px;background:var(--border);border-radius:4px;
+    overflow:hidden;margin-bottom:1rem;
+  }
+  .progress-bar .fill{
+    height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width .3s;width:0;
+  }
+  .study-header{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:.8rem;font-size:.85rem;color:var(--muted);
+  }
+  .study-header .category-tag{
+    background:rgba(124,156,255,.15);color:var(--accent);
+    padding:.2rem .6rem;border-radius:99px;
+    border:1px solid rgba(124,156,255,.3);font-weight:600;
+  }
+
+  .flashcard{
+    flex:1;min-height:320px;max-height:520px;
+    perspective:1200px;margin-bottom:1rem;
+  }
+  .flashcard-inner{
+    position:relative;width:100%;height:100%;
+    transition:transform .5s;transform-style:preserve-3d;
+    cursor:pointer;
+  }
+  .flashcard.flipped .flashcard-inner{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:16px;padding:1.5rem 1.3rem;
+    -webkit-backface-visibility:hidden;backface-visibility:hidden;
+    display:flex;flex-direction:column;
+    overflow-y:auto;
+    box-shadow:0 8px 30px rgba(0,0,0,.3);
+  }
+  .face.back{
+    transform:rotateY(180deg);
+    background:linear-gradient(135deg,#1a2244 0%,#2a1f4d 100%);
+    border-color:var(--accent-2);
+  }
+  .face-label{
+    font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:.8rem;
+  }
+  .face.back .face-label{color:var(--accent-2)}
+  .face .q,.face .a{
+    flex:1;display:flex;flex-direction:column;justify-content:center;
+  }
+  .face .q{font-size:1.2rem;font-weight:500;line-height:1.4}
+  .face .a{font-size:.98rem;line-height:1.55}
+  .face .a ul,.face .a ol{padding-left:1.2rem;margin:.4rem 0}
+  .face .a li{margin:.2rem 0}
+  .face .a strong{color:#fff}
+  .face .a code{
+    background:#0b1020;padding:.1rem .35rem;border-radius:4px;
+    color:#ffd97d;font-size:.85em;
+  }
+  .tap-hint{
+    text-align:center;color:var(--muted);font-size:.75rem;
+    margin-top:.5rem;opacity:.6;
+  }
+
+  /* RATING BUTTONS */
+  .rate{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem;
+  }
+  .rate button{padding:.7rem .3rem;font-size:.82rem}
+  .rate .again{background:rgba(248,113,113,.2);color:var(--red);border:1px solid rgba(248,113,113,.4)}
+  .rate .hard{background:rgba(251,191,36,.2);color:var(--yellow);border:1px solid rgba(251,191,36,.4)}
+  .rate .good{background:rgba(52,211,153,.2);color:var(--green);border:1px solid rgba(52,211,153,.4)}
+  .rate button:hover{filter:brightness(1.15)}
+  .rate small{display:block;opacity:.7;font-size:.7rem;margin-top:.15rem;font-weight:500}
+
+  .flip-btn{
+    width:100%;margin-bottom:.5rem;
+    background:var(--card-2);color:var(--text);border:1px solid var(--border);
+  }
+
+  .back-btn{
+    background:transparent;border:none;color:var(--muted);
+    padding:.4rem 0;font-size:.85rem;cursor:pointer;
+    display:inline-flex;align-items:center;gap:.3rem;
+  }
+
+  /* END SCREEN */
+  .end-stats{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:1.5rem;text-align:center;
+    margin-bottom:1rem;
+  }
+  .end-stats .big-num{
+    font-size:3rem;font-weight:800;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin:.3rem 0;
+  }
+  .end-breakdown{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:1rem;
+  }
+  .end-breakdown div{
+    padding:.5rem;border-radius:8px;font-size:.82rem;
+  }
+  .end-breakdown .g{background:rgba(52,211,153,.15);color:var(--green)}
+  .end-breakdown .y{background:rgba(251,191,36,.15);color:var(--yellow)}
+  .end-breakdown .r{background:rgba(248,113,113,.15);color:var(--red)}
+  .end-breakdown b{display:block;font-size:1.3rem}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<header>
+  <h1>Flashcards · Sistemas Distribuidos</h1>
+  <div class="sub">Solemne 1 · UDP</div>
+</header>
+
+<!-- HOME SCREEN -->
+<div class="screen active" id="home">
+
+  <details class="guide">
+    <summary>📖 Cómo estudiar con flashcards (léelo una vez)</summary>
+    <div class="content">
+
+      <h4>1. Active recall — lo más importante</h4>
+      <p>Antes de dar vuelta la tarjeta, <strong>intenta responder en voz alta o por escrito</strong>. No mires "para repasar" — eso es ilusión de aprendizaje. El esfuerzo de recordar es lo que fija la memoria.</p>
+
+      <h4>2. Sé honesto al calificar</hp>
+      <ul>
+        <li><strong style="color:var(--red)">Otra vez</strong>: no la supe o la dudé mucho. Vuelve al poco rato.</li>
+        <li><strong style="color:var(--yellow)">Difícil</strong>: la supe pero me costó. Vuelve pronto.</li>
+        <li><strong style="color:var(--green)">Fácil</strong>: la supe de una. Puede esperar.</li>
+      </ul>
+      <p>Trucho calificar "fácil" cuando no lo fue → no estudias, te mientes.</p>
+
+      <h4>3. Repetición espaciada (Leitner simplificado)</h4>
+      <p>Estudia en <strong>sesiones cortas (20-30 min)</strong> varios días seguidos, no una maratón la noche antes. El cerebro consolida mientras duermes.</p>
+      <ol>
+        <li><strong>Día 1:</strong> pasa todas las cards al menos una vez.</li>
+        <li><strong>Día 2-3:</strong> repite las que marcaste "otra vez" y "difícil". Las "fáciles" las saltas.</li>
+        <li><strong>Día 4+:</strong> mezcla todo, foco en las rojas/amarillas.</li>
+        <li><strong>Día previo:</strong> pasa rápidamente el mazo completo.</li>
+      </ol>
+
+      <h4>4. Interleaving (mezclar temas)</h4>
+      <p>No estudies un solo tema entero. <strong>Mezcla categorías</strong> (cache → RPC → P2P → replicación). Forzar cambios de contexto mejora la capacidad de recuperar bajo presión (como en una prueba).</p>
+
+      <h4>5. Rutina diaria sugerida (a 5-7 días de la prueba)</h4>
+      <ul>
+        <li><strong>Mañana (10 min):</strong> "Aleatorio" con 15 cards.</li>
+        <li><strong>Noche (20 min):</strong> una categoría específica + repaso de las rojas.</li>
+        <li><strong>Fin de semana:</strong> sesión larga mezclando todo + hacer ejercicios V/F del HTML consolidado sin mirar.</li>
+      </ul>
+
+      <h4>6. Qué <em>no</em> hacer</h4>
+      <ul>
+        <li><strong>No</strong> memorizar sin entender — si no entiendes el concepto, vuelve al consolidado.</li>
+        <li><strong>No</strong> usar las cards solo como "lectura" — perdes el valor del recall.</li>
+        <li><strong>No</strong> dejar todo para el último día (spoiler: te va a ir mal).</li>
+      </ul>
+
+      <p style="margin-top:.8rem;padding:.6rem;background:rgba(124,156,255,.1);border-radius:8px;border-left:3px solid var(--accent)">
+        <strong>Meta:</strong> llegar a la Solemne habiendo pasado cada card al menos 3 veces, con todas en verde las últimas 2 pasadas.
+      </p>
+    </div>
+  </details>
+
+  <div class="stats-bar" id="statsBar">
+    <div class="stat"><b id="totalCards">–</b><span>cards totales</span></div>
+    <div class="stat"><b id="sessionSeen">0</b><span>vistas hoy</span></div>
+    <div class="stat"><b id="sessionGood">0</b><span>en verde</span></div>
+  </div>
+
+  <div class="section-title">Modo rápido</div>
+  <div class="main-actions">
+    <button class="primary" onclick="startStudy('all',true)">Aleatorio · todas</button>
+    <button class="ghost" onclick="startStudy('all',false)">Ordenadas · todas</button>
+  </div>
+
+  <div class="section-title">Por categoría</div>
+  <div class="cat-grid" id="catGrid"></div>
+
+</div>
+
+<!-- STUDY SCREEN -->
+<div class="screen" id="study">
+
+  <button class="back-btn" onclick="goHome()">← Volver</button>
+
+  <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+  <div class="study-header">
+    <span id="cardCounter">1 / 10</span>
+    <span class="category-tag" id="currentCat">Fundamentos</span>
+  </div>
+
+  <div class="flashcard" id="flashcard" onclick="flip()">
+    <div class="flashcard-inner">
+      <div class="face front">
+        <div class="face-label">Pregunta</div>
+        <div class="q" id="qText"></div>
+      </div>
+      <div class="face back">
+        <div class="face-label">Respuesta</div>
+        <div class="a" id="aText"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tap-hint">Toca la tarjeta para voltear</div>
+
+  <div id="rateWrapper" style="display:none">
+    <div class="rate">
+      <button class="again" onclick="rate('again')">Otra vez<small>no la supe</small></button>
+      <button class="hard" onclick="rate('hard')">Difícil<small>me costó</small></button>
+      <button class="good" onclick="rate('good')">Fácil<small>la supe</small></button>
+    </div>
+  </div>
+
+  <button class="flip-btn" id="flipBtn" onclick="flip()">Ver respuesta</button>
+
+</div>
+
+<!-- END SCREEN -->
+<div class="screen" id="end">
+  <div class="end-stats">
+    <div style="color:var(--muted);font-size:.85rem">Sesión terminada</div>
+    <div class="big-num" id="endTotal">0</div>
+    <div style="color:var(--muted)">cards estudiadas</div>
+
+    <div class="end-breakdown">
+      <div class="g"><b id="endGood">0</b>Fáciles</div>
+      <div class="y"><b id="endHard">0</b>Difíciles</div>
+      <div class="r"><b id="endAgain">0</b>Otra vez</div>
+    </div>
+  </div>
+
+  <div class="main-actions" style="flex-direction:column;gap:.5rem">
+    <button class="primary" id="reviewFailed" onclick="reviewFailed()">Repasar las que fallé</button>
+    <button class="ghost" onclick="goHome()">Volver al inicio</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ============================================
+// FLASHCARD DATA
+// ============================================
+const CARDS = [
+  // ============== FUNDAMENTOS ==============
+  {cat:"Fundamentos",q:"¿Qué es un Sistema Distribuido según Coulouris?",a:"Un sistema donde componentes de hardware o software ubicados en computadoras en red <strong>se comunican y coordinan sus acciones únicamente mediante paso de mensajes</strong>."},
+  {cat:"Fundamentos",q:"¿Qué es un Sistema Distribuido según Tanenbaum?",a:"Una <strong>colección de computadoras independientes</strong> que aparece a sus usuarios como un <strong>sistema único y coherente</strong>."},
+  {cat:"Fundamentos",q:"Diferencia clave entre SD y red de computadores",a:"<ul><li><strong>SD:</strong> el sistema invoca la acción. Hay middleware. Usuarios ven un sistema único.</li><li><strong>Red:</strong> el usuario invoca la acción directamente. Interactúa con cada máquina separadamente.</li></ul>"},
+  {cat:"Fundamentos",q:"¿Qué es middleware?",a:"Capa de software <strong>entre el SO y las aplicaciones distribuidas</strong>. Oculta la complejidad de la red, ofrece servicios como llamadas remotas, mensajería e invocación de objetos. Ejemplos: sockets, RPC, RMI, pub/sub."},
+  {cat:"Fundamentos",q:"Los 3 componentes esenciales de un SD",a:"<ol><li><strong>Componentes autónomos</strong> (computadores, móviles, impresoras, sensores)</li><li><strong>Paso de mensajes</strong> como único medio de interacción</li><li><strong>Usuarios</strong> (personas o programas) que ven un sistema único</li></ol>"},
+  {cat:"Fundamentos",q:"Las 5 ventajas de un SD",a:"<ol><li>Compartir recursos</li><li>Mejora de desempeño</li><li>Mayor adaptabilidad</li><li>Mayor disponibilidad / fiabilidad</li><li>Escalabilidad</li></ol>"},
+  {cat:"Fundamentos",q:"Los 6 desafíos de un SD",a:"<ol><li>Heterogeneidad del hardware</li><li>Consistencia de la interacción</li><li>Siempre disponible (24/7)</li><li>Usuarios/apps no deben notar caídas</li><li>Seguridad</li><li>Fácil extensión transparente</li></ol>"},
+  {cat:"Fundamentos",q:"¿De qué depende la decisión de distribuir?",a:"De dos factores: <strong>tamaño/escala</strong> del sistema y <strong>infraestructura/recursos</strong> disponibles. No siempre es buena idea distribuir."},
+  {cat:"Fundamentos",q:"Los 4 objetivos de diseño de un SD",a:"<ol><li><strong>Poner recursos a disposición</strong></li><li><strong>Hacer transparente la distribución</strong></li><li><strong>Ser abierto</strong> (reglas estándar, IDL)</li><li><strong>Ser escalable</strong></li></ol>"},
+  {cat:"Fundamentos",q:"¿Qué significa que un SD sea 'abierto'?",a:"Que ofrece servicios bajo <strong>reglas estándar</strong> (sintaxis + semántica). Usa IDL (Interface Definition Language) para definir componentes. Provee <strong>interoperabilidad, portabilidad y fácil extensión</strong>. Ejemplos de IDL: APIs, RPC."},
+
+  // ============== TRANSPARENCIA ==============
+  {cat:"Transparencia",q:"Las 7 dimensiones de transparencia",a:"<ol><li>Acceso</li><li>Ubicación</li><li>Migración</li><li>Re-localización</li><li>Replicación</li><li>Concurrencia</li><li>Falla</li></ol>"},
+  {cat:"Transparencia",q:"Transparencia de Acceso",a:"Oculta <strong>diferencias entre SOs</strong> (nomenclatura de archivos, manejo). Ej: misma llamada funciona en Linux y Windows."},
+  {cat:"Transparencia",q:"Transparencia de Ubicación",a:"Oculta <strong>dónde está físicamente</strong> el recurso. Se usan nombres lógicos. Ej: <code>www.udp.cl</code> en vez de una IP."},
+  {cat:"Transparencia",q:"Transparencia de Migración",a:"El recurso puede <strong>moverse sin afectar su localización lógica</strong>. Ej: reubicar un sitio web de un datacenter a otro sin que el usuario lo note."},
+  {cat:"Transparencia",q:"Transparencia de Re-localización",a:"El recurso <strong>en uso</strong> es movido a otra ubicación sin interrumpir. Ej: FaceTime cambiando de Wi-Fi a 4G mid-call."},
+  {cat:"Transparencia",q:"Transparencia de Replicación",a:"Esconde el hecho de que existen <strong>múltiples copias</strong>. Requiere también transparencia de ubicación. Ej: CDN devolviendo la réplica más cercana."},
+  {cat:"Transparencia",q:"Transparencia de Concurrencia",a:"Dos usuarios accediendo al mismo recurso simultáneamente <strong>no se dan cuenta</strong>. Ej: edición colaborativa en Google Docs."},
+  {cat:"Transparencia",q:"Transparencia de Falla",a:"El usuario <strong>no nota</strong> que el sistema falla ni que se recupera. Ej: failover automático a una réplica."},
+  {cat:"Transparencia",q:"¿Por qué la transparencia total es imposible?",a:"Porque la latencia entre continentes no es nula, y ocultar caídas de red y nodos es teórica y prácticamente imposible (¿servidor lento o caído? ¿hizo lo solicitado?). Además <strong>full transparencia tiene alto costo en rendimiento</strong>."},
+
+  // ============== ESCALABILIDAD ==============
+  {cat:"Escalabilidad",q:"Escalabilidad Horizontal vs Vertical",a:"<ul><li><strong>Horizontal (scaling out):</strong> aumentar la <em>cantidad</em> de recursos (más máquinas).</li><li><strong>Vertical (scaling up):</strong> aumentar las <em>capacidades</em> del recurso (más CPU/RAM/disco).</li></ul>"},
+  {cat:"Escalabilidad",q:"¿Qué requiere la escalabilidad horizontal?",a:"<ul><li>Agregar más nodos de trabajo</li><li><strong>Front-end sin estado</strong> (lo ocurrido antes no influye en decisiones futuras)</li><li>Backend con particionamiento, modelo master/slave</li></ul>"},
+  {cat:"Escalabilidad",q:"¿Qué requiere la escalabilidad vertical?",a:"<ul><li>Agregar CPU, memoria, disco</li><li>Manejar más conexiones/operaciones/usuarios simultáneos</li><li>Buen I/O y modelos de concurrencia (hebras, asincronismo)</li></ul>"},
+  {cat:"Escalabilidad",q:"Las 3 técnicas básicas para escalar",a:"<ol><li><strong>Particionar y distribuir</strong> (vertical u horizontal/sharding)</li><li><strong>Replicar</strong> (copias del recurso en distintos lugares)</li><li><strong>Cache</strong> (subconjunto de recursos de acceso fácil y rápido)</li></ol>"},
+  {cat:"Escalabilidad",q:"¿Qué es el sharding?",a:"Particionamiento <strong>horizontal</strong>: dividir datos por filas/registros en distintos shards. Permite escalar casi ilimitadamente con mayor throughput, capacidad y disponibilidad."},
+  {cat:"Escalabilidad",q:"Los 4 tipos de sharding",a:"<ol><li><strong>Hash-Based:</strong> función hash sobre atributo decide el shard.</li><li><strong>Range:</strong> particiona por rangos ordenados (ej: fechas).</li><li><strong>Geographical:</strong> datos según ubicación/regulaciones.</li><li><strong>Directory / Virtual Bucket:</strong> servicio de lookup centralizado.</li></ol>"},
+  {cat:"Escalabilidad",q:"Desventajas del sharding",a:"<ul><li><strong>Sobrecarga</strong> en una o más particiones (hot-spots con datos muy populares)</li><li><strong>Complejidad</strong> de administración y consistencia</li></ul>"},
+  {cat:"Escalabilidad",q:"¿Qué es resharding y por qué es problemático?",a:"Redistribuir los datos cuando se agregan/quitan shards. Es costoso porque requiere mover datos. Se minimiza con <strong>consistent hashing</strong> (solo se mueven los datos del rango afectado)."},
+
+  // ============== REPLICACIÓN ==============
+  {cat:"Replicación",q:"Las 3 ventajas de replicar",a:"<ol><li><strong>Tolerancia a fallos:</strong> evita puntos únicos de falla.</li><li><strong>Accesos paralelos:</strong> evita cuellos de botella.</li><li><strong>Balance de carga:</strong> distribuye carga entre réplicas.</li></ol>"},
+  {cat:"Replicación",q:"Desventajas de replicar",a:"<ul><li><strong>Costo de la réplica</strong> (infraestructura, almacenamiento).</li><li><strong>Mantener el estado</strong>: costo depende del <em>número de réplicas</em> y la <em>relación read/write</em> del sistema.</li></ul>"},
+  {cat:"Replicación",q:"¿En qué sistemas la replicación es más barata?",a:"En sistemas <strong>read-heavy</strong> (muchas lecturas, pocas escrituras). Si hay muchas escrituras, propagar updates a todas las copias se vuelve muy caro."},
+  {cat:"Replicación",q:"Protocolo Push (replicación)",a:"Cuando el estado cambia, el sistema <strong>notifica activamente</strong> a las réplicas.<br><br><strong>Pro:</strong> actualización más rápida.<br><strong>Contra:</strong> costo innecesario sin demanda; satura la red.<br><strong>Ej:</strong> mail, bases de datos relacionales."},
+  {cat:"Replicación",q:"Protocolo Pull (replicación)",a:"Las réplicas <strong>consultan activamente (polling)</strong> si hay updates.<br><br><strong>Pro:</strong> no hay costo si nadie consulta.<br><strong>Contra:</strong> si están ocupadas pueden <em>perder updates</em> → inconsistencia.<br><strong>Ej:</strong> Google, Yahoo, HDFS."},
+  {cat:"Replicación",q:"Ejemplos de sistemas que usan replicación",a:"OceanStore, <strong>GFS</strong> (Google File System), <strong>HDFS</strong> (Hadoop), <strong>Amazon S3</strong>."},
+
+  // ============== CACHE ==============
+  {cat:"Cache",q:"¿Qué es un cache y qué busca?",a:"Espacio reducido que almacena información de manera <strong>temporal y de acceso rápido</strong>. Busca reducir <strong>latencia</strong> y <strong>carga del backend</strong>."},
+  {cat:"Cache",q:"Los 2 tipos de localidad que explota el cache",a:"<ul><li><strong>Temporal:</strong> datos usados recientemente tienen alta probabilidad de volver a usarse pronto.</li><li><strong>Espacial:</strong> si se accede a un dato, es probable acceder a datos cercanos.</li></ul>"},
+  {cat:"Cache",q:"Políticas de remoción (eviction) de cache",a:"<ul><li><strong>LRU</strong> - Least Recently Used</li><li><strong>FIFO</strong> - First-In First-Out</li><li><strong>Random</strong>, Harmonic</li><li><strong>MRU</strong> - Most Recently Used</li><li><strong>SIZE</strong></li><li>Variaciones LRU-C, LRU-S</li></ul>"},
+  {cat:"Cache",q:"¿Por qué no se usa LFU con frecuencia?",a:"Porque es <strong>muy costoso</strong>: requiere mantener contadores de frecuencia para cada entrada y ordenar, lo que tiene alto overhead de cómputo y memoria."},
+  {cat:"Cache",q:"¿Qué es el TTL en un cache?",a:"<strong>Time-To-Live:</strong> tiempo que una entrada permanece en cache. Al expirar, se elimina automáticamente. Ayuda a controlar la <strong>obsolescencia</strong>."},
+  {cat:"Cache",q:"Políticas de ingreso (admission policies)",a:"Mecanismos de <strong>control de ingreso</strong> al cache. ¡No todo sirve! Se basan en <strong>análisis histórico</strong> (frecuencia, caracteres, palabras). Si cumple → entra; si no → se evalúa. Útiles por la <strong>ley de potencias</strong>."},
+  {cat:"Cache",q:"¿Cuándo sirve el análisis histórico para políticas de ingreso?",a:"Solo en <strong>sistemas estacionarios</strong> (comportamiento de consultas estable en el tiempo). En ambientes muy dinámicos pierde utilidad."},
+  {cat:"Cache",q:"¿Qué es SDC (cache de 2 niveles)?",a:"<strong>Static Dynamic Caching:</strong> combina un conjunto <strong>estático</strong> (consultas frecuentes históricas, bloqueadas) con uno <strong>dinámico</strong> (política de reemplazo, picos inesperados)."},
+  {cat:"Cache",q:"Ventajas del cache de 2 niveles (SDC)",a:"<ol><li>El estático asegura acceso rápido a consultas frecuentes (sin sincronización → multi-thread eficiente).</li><li>El dinámico cubre picos de popularidad inesperados.</li><li>Mejora throughput, especialmente con muchos hilos concurrentes.</li></ol>"},
+  {cat:"Cache",q:"Flujo de consulta en cache de 2 niveles",a:"<ol><li>Buscar q en <strong>conjunto estático</strong>. Si está → hit inmediato.</li><li>Si no → buscar en <strong>dinámico</strong>. Si está → hit.</li><li>Si no → cache miss → consultar backend y eventualmente reemplazar entrada en el dinámico.</li></ol>"},
+
+  // ============== COMUNICACIÓN ==============
+  {cat:"Comunicación",q:"Fórmula del tiempo de transmitir un mensaje",a:"<div style='text-align:center;font-size:1.2rem;background:#0b1020;padding:.8rem;border-radius:8px;color:#ffd97d;font-family:monospace'>T<sub>m</sub> = t<sub>L</sub> + b / t<sub>T</sub></div><br>Donde <code>t<sub>L</sub></code> = latencia, <code>b</code> = bits del mensaje, <code>t<sub>T</sub></code> = tasa de transferencia."},
+  {cat:"Comunicación",q:"¿Qué es la latencia (t_L)?",a:"Tiempo de transmitir un <strong>mensaje vacío</strong>. Afectada por: sobrecarga de software, ruteo, carga de acceso al canal."},
+  {cat:"Comunicación",q:"¿Qué es la tasa de transferencia (BW)?",a:"Velocidad de transmisión de datos (<strong>bit/seg</strong>). Afectada por las características físicas de la red."},
+  {cat:"Comunicación",q:"¿Qué es el jitter y dónde importa?",a:"Variación del tiempo que toma entregar una <strong>serie de mensajes</strong>. Relevante en <strong>datos multimedia</strong> y aplicaciones real-time."},
+  {cat:"Comunicación",q:"Tipos de red (LAN/MAN/WAN)",a:"<ul><li><strong>LAN:</strong> local, alta velocidad, en segmentos.</li><li><strong>MAN:</strong> metropolitana, alta velocidad en regiones más grandes.</li><li><strong>WAN:</strong> amplia, velocidad menor, conecta organizaciones distantes, latencia depende de la ruta.</li></ul>"},
+
+  // ============== PROTOCOLO Y MIDDLEWARE ==============
+  {cat:"Protocolo",q:"¿Qué es un protocolo?",a:"Conjunto de <strong>reglas y estándares</strong> que controlan la secuencia de mensajes en una red. Define codificación, inicio/fin del mensaje, detección de errores, representación de datos (endianness, tipos)."},
+  {cat:"Protocolo",q:"Stack de comunicación (capas)",a:"<ol><li><strong>Distributed Applications</strong></li><li><strong>Middleware</strong> (remote calls, object invocation, messages)</li><li><strong>OS Comms</strong> (sockets, IP, TCP, UDP)</li><li><strong>Network</strong> (packets, bits)</li></ol>"},
+  {cat:"Protocolo",q:"Los 3 paradigmas de comunicación entre procesos",a:"<ol><li><strong>Interprocess Communication (IPC):</strong> directa, bajo nivel (sockets, MPI).</li><li><strong>Remote Invocation:</strong> bidireccional request/reply (RPC, RMI).</li><li><strong>Indirect Communication:</strong> tercera parte intermediaria (Pub/Sub, MQ).</li></ol>"},
+  {cat:"Protocolo",q:"¿Qué ofrece la comunicación indirecta?",a:"<ul><li><strong>Space uncoupling:</strong> emisor y receptor no se conocen.</li><li><strong>Time uncoupling:</strong> no necesitan existir al mismo tiempo.</li></ul>Ejemplos: Pub/Sub, Message Queues, Group Communication."},
+
+  // ============== RPC ==============
+  {cat:"RPC",q:"¿Qué es RPC?",a:"<strong>Remote Procedure Call</strong> (Birrel & Nelson, 1984). Protocolo que permite invocar un procedimiento en otra máquina <strong>sin conocer los detalles de la red</strong>. Modelo cliente/servidor."},
+  {cat:"RPC",q:"Las 4 propiedades del RPC",a:"<ol><li><strong>Nivel de lenguaje:</strong> llamada a función fácil.</li><li><strong>Request/reply síncrono</strong> (cliente bloqueado).</li><li><strong>Distribución transparente</strong> al programador.</li><li><strong>Garantía parcial ante fallas</strong> (retry).</li></ol>"},
+  {cat:"RPC",q:"Función del Stub Cliente",a:"<ul><li>Hacer la llamada remota <strong>igual a una local</strong>.</li><li><strong>Empaqueta (marshalling)</strong> los parámetros.</li><li>Los envía por la red.</li><li>Al recibir respuesta, <strong>desempaqueta</strong> el resultado.</li></ul>"},
+  {cat:"RPC",q:"Función del Stub Servidor",a:"<ul><li>Recibe el mensaje y lo <strong>transforma a llamadas locales</strong>.</li><li>Se <strong>bloquea esperando</strong> la invocación.</li><li><strong>Desempaqueta (unmarshalling)</strong> los parámetros.</li><li>Llama al procedimiento local.</li><li>Retorna el resultado al cliente.</li></ul>"},
+  {cat:"RPC",q:"¿Qué es marshalling?",a:"Transformación de los datos al <strong>formato adecuado para transmisión</strong> en la red. También llamado <em>serialización</em> en Java. Es el proceso de empaquetar parámetros para enviarlos por la red."},
+  {cat:"RPC",q:"Paso por valor vs por referencia en RPC",a:"<ul><li><strong>Valor:</strong> se envía copia. Problemas: representación (ASCII vs EBCDIC), endianness.</li><li><strong>Referencia:</strong> las referencias solo tienen sentido localmente. <strong>Solución:</strong> copiar el arreglo completo, enviarlo, el servidor lo referencia en su espacio, se retorna modificado.</li></ul>"},
+  {cat:"RPC",q:"Desventajas del RPC",a:"<ul><li>Atado al modelo <strong>C/S</strong></li><li><strong>Síncrono</strong> (cliente bloqueado)</li><li>Overhead de <strong>marshalling/unmarshalling</strong></li><li>Sin transparencia total</li><li>No es OO (funciones, no métodos sobre objetos)</li></ul>"},
+  {cat:"RPC",q:"Tipos de fallas en RPC",a:"<ol><li>Congestión de red o servidor</li><li>Caída del cliente durante la llamada</li><li>Caída del servidor durante la ejecución</li><li>Falla de red entre C/S</li></ol><strong>Manejo:</strong> el error se delega al programador (retry)."},
+  {cat:"RPC",q:"RPC Síncrono vs Asíncrono",a:"<ul><li><strong>Síncrono:</strong> cliente espera reply completo. Sencillo pero ineficiente.</li><li><strong>Asíncrono:</strong> servidor envía ACK inmediato, cliente no se bloquea. Multi-threading. Mayor rendimiento y escalabilidad.</li></ul>"},
+  {cat:"RPC",q:"¿Qué es Java RMI?",a:"<strong>Remote Method Invocation</strong>: RPC <strong>orientado a objetos</strong> en Java (OOM). Objetos remotos con interfaces remotas. <strong>Stub</strong> en cliente, <strong>Skeleton</strong> en servidor. Enmascara objetos remotos con un <strong>proxy</strong>."},
+  {cat:"RPC",q:"Stub vs Skeleton en RMI",a:"<ul><li><strong>Stub:</strong> en el <strong>cliente</strong>, actúa como proxy del objeto remoto.</li><li><strong>Skeleton:</strong> en el <strong>servidor</strong>, recibe las llamadas y las transforma a invocaciones locales sobre el objeto real.</li></ul>"},
+
+  // ============== MQ Y PUB/SUB ==============
+  {cat:"MQ/PubSub",q:"¿Qué es una Message Queue?",a:"Comunicación indirecta donde un servicio <strong>delega trabajo</strong> a otro. <strong>Sin orden garantizado</strong>. Si un consumidor cae, otro toma el mensaje. Ideal para distribuir trabajo entre workers. Ej: RabbitMQ."},
+  {cat:"MQ/PubSub",q:"¿Qué es Pub/Sub?",a:"Comunicación indirecta donde <strong>todos los suscriptores</strong> reciben al menos 1 copia del mensaje en el <strong>mismo orden</strong>. Cada suscriptor tiene su propia cola. Al recuperarse, consume eventos pendientes. Ej: Kafka."},
+  {cat:"MQ/PubSub",q:"Diferencia clave entre MQ y Pub/Sub",a:"<ul><li><strong>MQ:</strong> un mensaje → <em>un</em> consumidor (trabajo distribuido, sin orden).</li><li><strong>Pub/Sub:</strong> un mensaje → <em>todos</em> los suscriptores (difusión, con orden).</li></ul>"},
+  {cat:"MQ/PubSub",q:"RabbitMQ vs Kafka",a:"<ul><li><strong>RabbitMQ:</strong> broker tradicional MQ, mensajes se borran al consumir, un consumidor por mensaje.</li><li><strong>Kafka:</strong> log distribuido Pub/Sub, log persistente, múltiples consumidores leen el mismo log, orden por partición.</li></ul>"},
+
+  // ============== ARQUITECTURAS ==============
+  {cat:"Arquitecturas",q:"Los 3 tipos de arquitecturas distribuidas",a:"<ol><li><strong>Centralizadas:</strong> Cliente/Servidor.</li><li><strong>Descentralizadas:</strong> Peer-to-Peer (P2P).</li><li><strong>Híbridas:</strong> Edge.</li></ol>"},
+  {cat:"Arquitecturas",q:"Características de la arquitectura Cliente/Servidor",a:"<ul><li>Escalamiento <strong>vertical</strong></li><li>Posibles <strong>cuellos de botella</strong></li><li><strong>Modelo seguro</strong></li><li>Recursos dedicados</li><li>Interacción <strong>request-reply</strong></li></ul>"},
+  {cat:"Arquitecturas",q:"Fat client vs Thin client",a:"<ul><li><strong>Fat client:</strong> cliente con mucho procesamiento. Más sensible a errores, más difícil de mantener.</li><li><strong>Thin client:</strong> cliente liviano, procesamiento en servidor. Preferido hoy.</li></ul>Tendencia: mantener el procesamiento en el servidor."},
+  {cat:"Arquitecturas",q:"Cliente/Servidor 2-tier vs 3-tier",a:"<ul><li><strong>2-tier:</strong> solo cliente y servidor.</li><li><strong>3-tier:</strong> un servidor puede <strong>actuar como cliente</strong> de otro (ej: servidor de app consulta al servidor de BD).</li></ul>"},
+  {cat:"Arquitecturas",q:"¿Qué es Edge computing?",a:"Arquitectura <strong>híbrida</strong> donde el procesamiento se acerca a los <strong>usuarios finales</strong>. End-users se conectan a <strong>edge servers</strong>. Objetivo: reducir latencia y mejorar eficacia. Ej: Akamai, Netflix Open Connect, nanodatacenters (Set-Top-Boxes)."},
+
+  // ============== COMPUTACIÓN DISTRIBUIDA ==============
+  {cat:"Cómputo dist.",q:"Cluster: características clave",a:"<ul><li>Nodos <strong>homogéneos</strong></li><li>Red <strong>rápida</strong></li><li>Hardware uniforme</li><li>Tradicionalmente para <strong>apps paralelas</strong> (un programa corriendo en paralelo)</li><li>Económicamente mejor opción que supercomputador</li></ul>"},
+  {cat:"Cómputo dist.",q:"Grid: características clave",a:"<ul><li>Nodos <strong>heterogéneos</strong></li><li>Red compartida bajo <strong>varias administraciones</strong></li><li>Entidades distribuidas geográficamente</li><li>Reutilizan recursos de cada organización</li><li>NO usan redes abiertas (seguro y confiable)</li><li>Recursos <strong>completamente configurables</strong> (SO, software, nodos)</li></ul>"},
+  {cat:"Cómputo dist.",q:"Grid vs Cloud",a:"<ul><li><strong>Cloud:</strong> C/S, centralizado, servicio (IaaS/PaaS/SaaS), alta escalabilidad, gestión por proveedor.</li><li><strong>Grid:</strong> distribuido, descentralizado, aplicación, escalabilidad normal, <em>bare-metal as a service</em> — todo reconfigurable.</li></ul>"},
+  {cat:"Cómputo dist.",q:"P2P: características clave",a:"<ul><li>Nodos <strong>heterogéneos</strong></li><li>Red <strong>completamente abierta</strong></li><li>Cada peer <strong>entrega y consume</strong> recursos</li><li><strong>100% descentralizado</strong> (sin cuellos de botella)</li><li><strong>Auto-organizado</strong>, participantes autónomos</li><li>Escalabilidad <strong>lineal</strong></li><li>Conexiones <strong>no confiables</strong></li></ul>"},
+  {cat:"Cómputo dist.",q:"¿Qué es BOINC y ejemplos?",a:"<strong>Berkeley Open Infrastructure for Network Computing</strong>. Cómputo voluntario P2P usando tiempo idle de usuarios. Ejemplos: <strong>SETI@home</strong> (radio-astronomía), <strong>Folding@home</strong> (proteínas, Alzheimer/cáncer), LHC@home, Universe@home."},
+
+  // ============== P2P ESTRUCTURADO ==============
+  {cat:"P2P Estruct.",q:"¿Qué es un overlay?",a:"Red de computadores construida <strong>sobre otra red</strong>. Organización <strong>lógica</strong> sobre la red <strong>física</strong>. Un vecino cercano en el overlay puede estar físicamente lejos."},
+  {cat:"P2P Estruct.",q:"P2P estructurado: características",a:"<ul><li>Construido con proceso <strong>determinístico</strong></li><li>Usa <strong>DHT</strong> (SHA-1 o MD5)</li><li>Escala a <strong>cientos de millones</strong> de participantes</li><li>Búsquedas <strong>completas y puntuales</strong></li><li>Usa <strong>KBR</strong> (Key-Based Routing)</li><li>Búsqueda eficiente <strong>O(log N)</strong></li></ul>"},
+  {cat:"P2P Estruct.",q:"Desventajas del P2P estructurado",a:"<ul><li><strong>Alta latencia</strong> en búsquedas (nodos cercanos en overlay ≠ físicamente cercanos)</li><li><strong>No seguro</strong></li><li>Solo <strong>búsquedas puntuales/exactas</strong></li><li><strong>Alto dinamismo</strong> (churn)</li></ul>"},
+  {cat:"P2P Estruct.",q:"¿Qué es una DHT?",a:"<strong>Distributed Hash Table:</strong> función hash que toma una clave y produce un ID numérico en un rango fijo. Organiza nodos por posición <strong>lógica</strong> (no física). Almacena pares llave-valor. Solución: <strong>consistent hashing</strong>."},
+  {cat:"P2P Estruct.",q:"¿Qué es consistent hashing?",a:"Técnica que asigna claves a nodos minimizando el <strong>resharding</strong>: cuando un nodo entra/sale, solo se mueven los datos del rango afectado, no toda la tabla."},
+  {cat:"P2P Estruct.",q:"¿Qué pasa cuando un peer se desconecta en DHT?",a:"<ul><li>Solo se afectan los pares llave-valor del nodo desconectado</li><li>Otro nodo (ID más cercano) <strong>toma la responsabilidad</strong> de esos datos</li><li>Se previene pérdida replicando en los <strong>S sucesores más cercanos</strong></li></ul>"},
+  {cat:"P2P Estruct.",q:"Método de búsqueda en DHT",a:"<ol><li>Un nodo recibe la consulta.</li><li>Comprueba si tiene la clave.</li><li>Si no, calcula el <strong>vecino más cercano</strong> (distancia lógica) y reenvía.</li><li>Cada nodo repite hasta encontrar la clave.</li><li>La clave encontrada se devuelve al solicitante.</li></ol>"},
+  {cat:"P2P Estruct.",q:"Chord: características",a:"<ul><li>Organización en <strong>anillo</strong> de 0 a 2^m</li><li>ID por peer = SHA-1(IP+puerto)</li><li>ID recurso = SHA(recurso)</li><li>Asignación al <strong>sucesor</strong> (sentido horario)</li><li>Ruteo tipo árbol</li><li>Mantenimiento O((log N)²)</li><li>Caídas detectadas por <strong>heartbeats</strong></li></ul>"},
+  {cat:"P2P Estruct.",q:"¿Qué es la finger table en Chord?",a:"Tabla con info de <strong>log m</strong> peers. Permite <strong>saltar peers</strong> y acercarse más rápido al responsable (en vez de seguir sucesor por sucesor). Mejora búsqueda de O(N) a O(log N)."},
+  {cat:"P2P Estruct.",q:"Pastry: características",a:"<ul><li>Anillo con ruteo <strong>Plaxon-Tree</strong></li><li>Ruteo por <strong>prefijo</strong></li><li>ID de <strong>128 bits</strong> con SHA-1</li><li>Espacio 0 a 2^128</li><li>Ruteo <strong>O(log N)</strong> saltos</li></ul>"},
+  {cat:"P2P Estruct.",q:"Las 3 tablas de ruteo de Pastry",a:"<ol><li><strong>Leafset:</strong> L peers vecinos en el anillo (-L/2 y L/2). Para balance, tolerancia a fallos, réplicas, multi-path.</li><li><strong>Routing Table:</strong> organizada por prefijo. Fila i = peers con prefijo de tamaño i.</li><li><strong>Neighbours Set:</strong> peers cercanos en <strong>latencia</strong>.</li></ol>"},
+
+  // ============== P2P NO ESTRUCTURADO ==============
+  {cat:"P2P No Estruct.",q:"P2P no estructurado: características",a:"<ul><li><strong>Estructura aleatoria</strong></li><li>Solo <strong>conocimiento local</strong></li><li>Búsqueda basada en <strong>flooding</strong></li><li>Gran autonomía</li><li>No garantiza encontrar el recurso</li></ul>"},
+  {cat:"P2P No Estruct.",q:"¿Qué es un bootstrap node?",a:"Nodo al que un nuevo peer se conecta para <strong>entrar a la red</strong> P2P. Se localiza vía listas preexistentes o bootstrap cache. Problema: limitar conexiones para balancear carga."},
+  {cat:"P2P No Estruct.",q:"Flooding como método de búsqueda",a:"Mensaje enviado a <strong>todos los vecinos conocidos</strong>. <strong>Poco eficiente</strong>, problemas de escalabilidad. Trade-off: calidad de resultados vs número de mensajes. Poco realista en redes de millones."},
+  {cat:"P2P No Estruct.",q:"BFS (Breadth First Search)",a:"<strong>Flooding controlado</strong> por TTL o routing hops. Se hace forward si no hay resultados; proceso se repite TTL veces. Problema: <strong>mensajes duplicados</strong>, gran overhead."},
+  {cat:"P2P No Estruct.",q:"Iterative Deepening (Expanding Ring)",a:"Múltiples BFS <strong>secuenciales</strong>. Comienza con búsquedas poco profundas; si no encuentra, itera con mayor profundidad. Optimización: nodos cachean la pregunta por un tiempo para evitar mensajes repetidos."},
+  {cat:"P2P No Estruct.",q:"Random Walks",a:"Mensaje enviado a <strong>un solo vecino aleatorio</strong>. Si hit → retorna. Si no → repite hasta TTL. <strong>Ciego y sin memoria</strong>.<br><br><strong>Pro:</strong> menos mensajes.<br><strong>Contra:</strong> mayor latencia."},
+  {cat:"P2P No Estruct.",q:"K-Random Walks",a:"<strong>Múltiples random walks en paralelo</strong>. Disminuye latencia vs random walk simple. Variantes: <strong>APS</strong> (Adaptative Probabilistic), Id-based, Two-Level Random Walk."},
+  {cat:"P2P No Estruct.",q:"Directed BFS",a:"Se elige un <strong>subconjunto de vecinos</strong> más probables de responder (random, menos saltos, menor latencia, más vecinos). Trata de adivinar mejor vecino → menos latencia, pero más mensajes recibidos."},
+
+  // ============== P2P HÍBRIDO ==============
+  {cat:"P2P Híbrido",q:"¿Qué es un Super-Peer?",a:"Peer con <strong>mayores capacidades o roles especiales</strong> (más procesamiento, ancho de banda, estabilidad). Actúa como <strong>índice o broker</strong>. Se pierde la simetría del P2P clásico."},
+  {cat:"P2P Híbrido",q:"Organización jerárquica con Super-Peers",a:"Peers regulares se conectan a un SP. <strong>Toda la comunicación pasa por el SP</strong>. Relación estable, sesiones largas, alta disponibilidad del SP."},
+  {cat:"P2P Híbrido",q:"¿Conviene siempre conectarse al mismo SP?",a:"<strong>No siempre</strong>. Consideraciones:<ul><li>Anonimato (ej: file-sharing)</li><li>Asignación dinámica a SP según tipo de contenido buscado</li><li>Algoritmos de elección de SPs candidatos</li></ul>Ejemplo clásico: <strong>Skype</strong>."},
+];
+
+// ============================================
+// STATE
+// ============================================
+let state = {
+  deck:[],
+  index:0,
+  flipped:false,
+  results:{again:0, hard:0, good:0},
+  seenInSession:new Set(),
+  goodInSession:new Set(),
+  failedIds:[],
+};
+
+// ============================================
+// INIT
+// ============================================
+function init(){
+  document.getElementById('totalCards').textContent = CARDS.length;
+  renderCategoryGrid();
+}
+
+function renderCategoryGrid(){
+  const grid = document.getElementById('catGrid');
+  const cats = {};
+  CARDS.forEach((c,i) => {
+    if(!cats[c.cat]) cats[c.cat] = [];
+    cats[c.cat].push(i);
+  });
+  grid.innerHTML = '';
+  Object.entries(cats).forEach(([name, idxs]) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn';
+    btn.innerHTML = `<span class="cat-name">${name}</span><span class="cat-count">${idxs.length} cards</span>`;
+    btn.onclick = () => startStudy(name, true);
+    grid.appendChild(btn);
+  });
+}
+
+// ============================================
+// STUDY FLOW
+// ============================================
+function startStudy(category, shuffle){
+  state.deck = category === 'all'
+    ? CARDS.map((_,i) => i)
+    : CARDS.map((c,i) => c.cat === category ? i : null).filter(x => x !== null);
+
+  if(shuffle) state.deck = shuffleArray(state.deck);
+
+  state.index = 0;
+  state.flipped = false;
+  state.results = {again:0, hard:0, good:0};
+  state.failedIds = [];
+
+  showScreen('study');
+  renderCard();
+}
+
+function renderCard(){
+  if(state.index >= state.deck.length){
+    showEndScreen();
+    return;
+  }
+
+  const card = CARDS[state.deck[state.index]];
+  document.getElementById('qText').innerHTML = card.q;
+  document.getElementById('aText').innerHTML = card.a;
+  document.getElementById('currentCat').textContent = card.cat;
+  document.getElementById('cardCounter').textContent = `${state.index + 1} / ${state.deck.length}`;
+  document.getElementById('progressFill').style.width = `${(state.index / state.deck.length) * 100}%`;
+
+  state.flipped = false;
+  const fc = document.getElementById('flashcard');
+  fc.classList.remove('flipped');
+  document.getElementById('rateWrapper').style.display = 'none';
+  document.getElementById('flipBtn').style.display = 'block';
+}
+
+function flip(){
+  if(state.flipped) return;
+  state.flipped = true;
+  document.getElementById('flashcard').classList.add('flipped');
+  document.getElementById('rateWrapper').style.display = 'block';
+  document.getElementById('flipBtn').style.display = 'none';
+}
+
+function rate(level){
+  if(!state.flipped) return;
+
+  state.results[level]++;
+  const cardIdx = state.deck[state.index];
+  state.seenInSession.add(cardIdx);
+
+  if(level === 'good'){
+    state.goodInSession.add(cardIdx);
+  } else {
+    state.failedIds.push(cardIdx);
+  }
+
+  updateStatsBar();
+
+  state.index++;
+  renderCard();
+}
+
+function updateStatsBar(){
+  document.getElementById('sessionSeen').textContent = state.seenInSession.size;
+  document.getElementById('sessionGood').textContent = state.goodInSession.size;
+}
+
+// ============================================
+// END SCREEN
+// ============================================
+function showEndScreen(){
+  document.getElementById('endTotal').textContent = state.results.again + state.results.hard + state.results.good;
+  document.getElementById('endGood').textContent = state.results.good;
+  document.getElementById('endHard').textContent = state.results.hard;
+  document.getElementById('endAgain').textContent = state.results.again;
+
+  const failedBtn = document.getElementById('reviewFailed');
+  failedBtn.style.display = state.failedIds.length > 0 ? 'block' : 'none';
+
+  showScreen('end');
+}
+
+function reviewFailed(){
+  state.deck = [...state.failedIds];
+  state.deck = shuffleArray(state.deck);
+  state.index = 0;
+  state.results = {again:0, hard:0, good:0};
+  state.failedIds = [];
+  showScreen('study');
+  renderCard();
+}
+
+// ============================================
+// HELPERS
+// ============================================
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function goHome(){
+  showScreen('home');
+}
+
+function shuffleArray(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// KEYBOARD SHORTCUTS
+document.addEventListener('keydown', (e) => {
+  if(!document.getElementById('study').classList.contains('active')) return;
+  if(e.code === 'Space' || e.code === 'Enter'){
+    e.preventDefault();
+    if(!state.flipped) flip();
+  }
+  if(state.flipped){
+    if(e.key === '1') rate('again');
+    if(e.key === '2') rate('hard');
+    if(e.key === '3') rate('good');
+  }
+});
+
+init();
+</script>
+
+</body>
+</html>

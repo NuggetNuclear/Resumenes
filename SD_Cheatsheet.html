@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheatsheet · Sistemas Distribuidos</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:#0b1020;
+    color:#e7ecff;
+    padding:1rem;
+    line-height:1.35;
+    font-size:13px;
+  }
+  .page{
+    max-width:1200px;margin:0 auto;
+    background:#fff;color:#111;
+    padding:14px 16px;border-radius:8px;
+    box-shadow:0 8px 30px rgba(0,0,0,.4);
+  }
+  header{
+    text-align:center;border-bottom:2px solid #000;
+    padding-bottom:6px;margin-bottom:8px;
+  }
+  header h1{font-size:17px;letter-spacing:-.01em}
+  header .sub{font-size:10px;color:#555;margin-top:2px}
+
+  .grid{
+    display:grid;gap:8px;
+    grid-template-columns:1fr 1fr 1fr;
+  }
+  @media print{
+    body{background:#fff;padding:0;font-size:9pt}
+    .page{box-shadow:none;padding:8px 10px;max-width:none}
+    .grid{gap:5px}
+    .controls{display:none}
+    @page{size:A4;margin:8mm}
+    header h1{font-size:13pt}
+    header .sub{font-size:7pt}
+  }
+
+  .box{
+    border:1px solid #333;
+    border-radius:5px;
+    padding:5px 7px;
+    background:#fafafa;
+    break-inside:avoid;
+  }
+  .box.accent{background:#eef2ff;border-color:#4338ca}
+  .box.warn{background:#fef3c7;border-color:#d97706}
+  .box.green{background:#d1fae5;border-color:#059669}
+  .box.red{background:#fee2e2;border-color:#dc2626}
+
+  h2{
+    font-size:11px;text-transform:uppercase;
+    letter-spacing:.06em;margin-bottom:3px;
+    color:#1e3a8a;font-weight:800;
+    border-bottom:1px solid #cbd5e1;padding-bottom:2px;
+  }
+  h3{font-size:10.5px;margin-top:4px;color:#3730a3;font-weight:700}
+
+  ul,ol{padding-left:14px;margin:2px 0}
+  li{margin:1px 0;font-size:11px}
+  p{margin:2px 0;font-size:11px}
+  strong{font-weight:700}
+
+  .formula{
+    background:#111;color:#ffd97d;
+    padding:4px 8px;border-radius:4px;
+    text-align:center;font-family:"Courier New",monospace;
+    font-size:12px;margin:3px 0;font-weight:700;
+  }
+
+  table{
+    width:100%;border-collapse:collapse;font-size:10px;margin:2px 0;
+  }
+  th,td{
+    border:1px solid #94a3b8;padding:2px 4px;
+    text-align:left;vertical-align:top;
+  }
+  th{background:#1e3a8a;color:#fff;font-size:9.5px;font-weight:700}
+
+  code{
+    background:#111;color:#ffd97d;
+    padding:0 3px;border-radius:2px;font-size:10px;
+    font-family:"Courier New",monospace;
+  }
+
+  .inline-list{list-style:none;padding:0}
+  .inline-list li{display:inline-block;margin:1px 3px 1px 0;padding:1px 5px;background:#e0e7ff;border-radius:3px;font-size:10px}
+
+  .tip{
+    background:#fff7ed;border-left:3px solid #ea580c;
+    padding:3px 6px;margin:3px 0;font-size:10px;
+  }
+
+  .controls{
+    max-width:1200px;margin:0 auto 8px;
+    display:flex;gap:6px;justify-content:flex-end;
+  }
+  .controls button{
+    padding:6px 12px;border:none;border-radius:5px;
+    background:#7c9cff;color:#0b1020;font-weight:700;
+    cursor:pointer;font-size:12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+</div>
+
+<div class="page">
+
+<header>
+  <h1>SISTEMAS DISTRIBUIDOS · Cheatsheet Solemne 1</h1>
+  <div class="sub">UDP · Prof. Nicolás Hidalgo</div>
+</header>
+
+<div class="grid">
+
+<!-- ============ COLUMNA 1 ============ -->
+<div>
+
+<div class="box accent">
+  <h2>¿Qué es un SD?</h2>
+  <p><strong>Coulouris:</strong> componentes en red que se coordinan <em>solo por paso de mensajes</em>.</p>
+  <p><strong>Tanenbaum:</strong> colección de máquinas independientes que aparecen como <em>sistema único y coherente</em>.</p>
+  <p><strong>SD ≠ Red:</strong> en SD el <em>sistema</em> invoca la acción (hay middleware). En red, el <em>usuario</em> interactúa con cada máquina.</p>
+</div>
+
+<div class="box">
+  <h2>4 Objetivos de Diseño</h2>
+  <ol>
+    <li><strong>Poner recursos a disposición</strong> (compartir + seguridad)</li>
+    <li><strong>Transparencia</strong> (7 tipos)</li>
+    <li><strong>Ser abierto</strong> (IDL, API, RPC — interop, portabilidad, extensión)</li>
+    <li><strong>Escalabilidad</strong></li>
+  </ol>
+</div>
+
+<div class="box">
+  <h2>7 Transparencias</h2>
+  <ul class="inline-list">
+    <li>Acceso</li><li>Ubicación</li><li>Migración</li><li>Re-localización</li><li>Replicación</li><li>Concurrencia</li><li>Falla</li>
+  </ul>
+  <p style="font-size:10px;color:#555;margin-top:3px"><em>Full transparencia imposible (latencia, fallas) y tiene alto costo.</em></p>
+</div>
+
+<div class="box green">
+  <h2>Escalabilidad</h2>
+  <table>
+    <tr><th>Horizontal (out)</th><th>Vertical (up)</th></tr>
+    <tr><td>+ máquinas<br>Front-end sin estado<br>Backend particionado</td><td>+ CPU/RAM/disco<br>Modelos concurrencia<br>Buen I/O</td></tr>
+  </table>
+  <p><strong>3 técnicas:</strong> Particionar · Replicar · Cache</p>
+</div>
+
+<div class="box">
+  <h2>Sharding (partición horizontal)</h2>
+  <ol>
+    <li><strong>Hash-Based:</strong> hash sobre atributo. Balance uniforme.</li>
+    <li><strong>Range:</strong> por rangos ordenados (fechas, IDs).</li>
+    <li><strong>Geographical:</strong> por región (latencia, regulación).</li>
+    <li><strong>Directory/Virtual Bucket:</strong> lookup centralizado.</li>
+  </ol>
+  <p><strong>Contras:</strong> hot-spots, complejidad, resharding caro.</p>
+  <p class="tip"><strong>Ojo V/F:</strong> las particiones NO necesitan tener recursos similares — depende de la distribución de consultas.</p>
+</div>
+
+<div class="box">
+  <h2>Replicación</h2>
+  <p><strong>Pros:</strong> fault-tolerance · accesos paralelos · balance de carga.</p>
+  <p><strong>Contras:</strong> costo + mantener estado (depende de <em>N réplicas</em> y <em>ratio read/write</em>).</p>
+  <table>
+    <tr><th>PUSH</th><th>PULL</th></tr>
+    <tr><td>Sistema notifica<br>Rápido<br>Puede saturar red<br>Mail, BD</td><td>Réplica pregunta (polling)<br>Si ocupada → pierde updates<br>Google, HDFS</td></tr>
+  </table>
+</div>
+
+</div>
+
+<!-- ============ COLUMNA 2 ============ -->
+<div>
+
+<div class="box warn">
+  <h2>Cache</h2>
+  <p><strong>Localidad:</strong> temporal + espacial. Lucha: <strong>Hit vs Miss</strong>.</p>
+  <h3>Políticas de remoción</h3>
+  <p>LRU · FIFO · Random · MRU · SIZE · (LFU muy costoso — poco usado)</p>
+  <h3>Políticas de ingreso</h3>
+  <p>Análisis histórico (frecuencia, caracteres). Solo útil en sistemas estacionarios.</p>
+  <h3>TTL</h3>
+  <p>Tiempo de vida de la entrada. Controla obsolescencia.</p>
+</div>
+
+<div class="box">
+  <h2>Cache 2 Niveles (SDC)</h2>
+  <table>
+    <tr><th>Estático</th><th>Dinámico</th></tr>
+    <tr><td>Frecuentes histórico<br>Bloqueadas<br>Sin sincronización<br>Multi-thread eficiente</td><td>Reemplazo dinámico<br>Picos inesperados<br>LRU, LRU/2, FBR...</td></tr>
+  </table>
+  <p><strong>Flujo:</strong> q → estático (hit?) → dinámico (hit?) → backend.</p>
+</div>
+
+<div class="box accent">
+  <h2>Red: Performance</h2>
+  <div class="formula">T<sub>m</sub> = t<sub>L</sub> + b / t<sub>T</sub></div>
+  <ul>
+    <li><strong>t<sub>L</sub> (latencia):</strong> msg vacío. Sw overhead, ruteo, carga.</li>
+    <li><strong>t<sub>T</sub> (BW):</strong> bit/s. Características físicas.</li>
+    <li><strong>Jitter:</strong> variación de tiempo. Clave en multimedia.</li>
+  </ul>
+  <p><strong>Redes:</strong> LAN (alta vel) · MAN (regional) · WAN (lenta, distante) · Wireless · Internetworks.</p>
+</div>
+
+<div class="box">
+  <h2>Stack de Comunicación</h2>
+  <p>App ↓ <strong>Middleware</strong> (RPC, mensajes) ↓ OS Comms (sockets, TCP/UDP) ↓ Network (bits).</p>
+  <p><strong>Protocolo:</strong> reglas de codificación, inicio/fin, detección de errores, representación (endianness).</p>
+</div>
+
+<div class="box">
+  <h2>3 Paradigmas de Comunicación</h2>
+  <ol>
+    <li><strong>IPC</strong> (Interprocess): directa, bajo nivel. Sockets, MPI.</li>
+    <li><strong>Remote Invocation:</strong> request/reply bidireccional. RPC, RMI.</li>
+    <li><strong>Indirect:</strong> tercera parte. Space + time uncoupling. Pub/Sub, MQ.</li>
+  </ol>
+</div>
+
+<div class="box green">
+  <h2>RPC</h2>
+  <p>Invocar procedimiento remoto sin conocer la red. <strong>Modelo C/S, síncrono</strong>.</p>
+  <h3>Stubs</h3>
+  <ul>
+    <li><strong>Cliente:</strong> marshalling → envía → recibe → unmarshalling.</li>
+    <li><strong>Servidor:</strong> recibe → unmarshalling → llama local → retorna.</li>
+  </ul>
+  <p><strong>Marshalling:</strong> transformar datos a formato de red (serialización).</p>
+  <h3>Parámetros</h3>
+  <p>Por valor (endianness, ASCII/EBCDIC) · Por referencia (copiar array completo).</p>
+  <h3>Async</h3>
+  <p>Servidor envía ACK inmediato → cliente no se bloquea (multi-thread).</p>
+  <p class="tip"><strong>V/F trampa:</strong> RPC NO es asíncrono por defecto. Es síncrono, C/S, por paso de mensajes.</p>
+</div>
+
+<div class="box">
+  <h2>RMI (Java)</h2>
+  <p>RPC orientado a objetos (OOM). <strong>Stub</strong> (cliente) + <strong>Skeleton</strong> (servidor). Enmascara objeto remoto con proxy.</p>
+</div>
+
+</div>
+
+<!-- ============ COLUMNA 3 ============ -->
+<div>
+
+<div class="box">
+  <h2>MQ vs Pub/Sub</h2>
+  <table>
+    <tr><th>Message Queue</th><th>Pub/Sub</th></tr>
+    <tr><td>Delegar trabajo<br>Sin orden<br>Si cae → otro toma<br><strong>RabbitMQ</strong></td><td>Todos suscriptores<br>Mismo orden<br>Cola por suscriptor<br><strong>Kafka</strong></td></tr>
+  </table>
+</div>
+
+<div class="box accent">
+  <h2>Arquitecturas</h2>
+  <p><strong>Centralizada (C/S):</strong> request-reply, escalamiento vertical, cuellos de botella, seguro, recursos dedicados.</p>
+  <p><strong>Descentralizada (P2P):</strong> simétrica, directa, escalabilidad alta.</p>
+  <p><strong>Híbrida (Edge):</strong> procesamiento cerca del usuario. Akamai, Open Connect.</p>
+  <h3>C/S: 2-tier vs 3-tier</h3>
+  <p>3-tier: servidor puede actuar como cliente de otro. <strong>Thin client</strong> &gt; fat client (más mantenible).</p>
+</div>
+
+<div class="box">
+  <h2>Cómputo Distribuido HPC</h2>
+  <table>
+    <tr><th></th><th>Cluster</th><th>Grid</th><th>P2P</th></tr>
+    <tr><td>Hw</td><td>Homogéneo</td><td>Heterogéneo</td><td>Heterogéneo</td></tr>
+    <tr><td>Red</td><td>Rápida local</td><td>Compartida</td><td>Abierta</td></tr>
+    <tr><td>Admin</td><td>Única</td><td>Varias orgs</td><td>Sin central</td></tr>
+  </table>
+  <p><strong>Grid vs Cloud:</strong> Grid = bare-metal configurable (SO, nodos), app-oriented. Cloud = service-oriented (IaaS/PaaS/SaaS), centralizado, C/S.</p>
+</div>
+
+<div class="box green">
+  <h2>P2P Estructurado</h2>
+  <ul>
+    <li>Determinístico · <strong>DHT</strong> (SHA-1/MD5)</li>
+    <li>KBR (Key-Based Routing) · O(log N)</li>
+    <li>Escala a 100M+ · búsquedas <strong>puntuales</strong></li>
+  </ul>
+  <p><strong>Contras:</strong> alta latencia, no seguro, solo búsqueda exacta, churn.</p>
+  <h3>Chord</h3>
+  <p>Anillo 0..2^m · ID=SHA(IP+puerto) · asigna al sucesor · <strong>finger table</strong> = log m peers → salta peers.</p>
+  <h3>Pastry</h3>
+  <p>128 bits · ruteo <strong>por prefijo</strong> (Plaxon-Tree) · 3 tablas: <strong>leafset</strong> + routing table + neighbours.</p>
+  <h3>Peer cae</h3>
+  <p>Solo se afectan sus pares; sucesor toma responsabilidad. Réplicas en S sucesores.</p>
+</div>
+
+<div class="box red">
+  <h2>P2P No Estructurado</h2>
+  <p>Aleatorio · conocimiento local · sin garantía de encontrar.</p>
+  <h3>Búsquedas</h3>
+  <ul>
+    <li><strong>Flooding:</strong> a todos. No escala.</li>
+    <li><strong>BFS:</strong> flooding + TTL. Muchos duplicados.</li>
+    <li><strong>Iterative Deepening:</strong> BFS secuenciales, profundidad creciente. Caché intermedio.</li>
+    <li><strong>Directed BFS:</strong> subset de vecinos elegido.</li>
+    <li><strong>Random Walk:</strong> 1 vecino random. Ciego, baja msg, alta latencia.</li>
+    <li><strong>K-Random Walks:</strong> paralelo. APS, Id-based, Two-Level.</li>
+  </ul>
+</div>
+
+<div class="box warn">
+  <h2>P2P Híbrido — Super-Peers</h2>
+  <p>Peers con más capacidad = índices/brokers. Jerarquía. Peers regulares → SP. <strong>Se pierde simetría</strong>. Ej: Skype.</p>
+</div>
+
+<div class="box">
+  <h2>Acrónimos clave</h2>
+  <p style="font-size:9.5px">DHT · KBR · RPC · RMI · IDL · MOM · OOM · SOA · GFS/HDFS · ACID · IPC · MPI · CDN · TTL · SDC · LSH · PHT · OSI · BW · API · MQ · P2P · SP · HPC · BOINC</p>
+</div>
+
+</div>
+
+</div><!-- /grid -->
+
+</div><!-- /page -->
+
+</body>
+</html>
