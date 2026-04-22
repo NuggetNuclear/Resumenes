@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apuntes · Ingeniería de Software · UDP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,400..700&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:      #f4efe6;
+    --paper-dim:  #ebe4d4;
+    --ink:        #1a1a1a;
+    --ink-soft:   #3d3d3d;
+    --ink-muted:  #6b6458;
+    --accent:     #8b1e3f;
+    --accent-dim: #b85450;
+    --ochre:      #c47f17;
+    --sage:       #5c7a4a;
+    --rule:       #d4c8b0;
+    --card:       #fbf8f1;
+    --highlight:  #f7e89a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 15.5px;
+    line-height: 1.65;
+    background-image:
+      radial-gradient(at 10% 0%, rgba(139, 30, 63, 0.04) 0px, transparent 50%),
+      radial-gradient(at 90% 100%, rgba(196, 127, 23, 0.05) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* ========== Layout ========== */
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 0;
+  }
+
+  aside {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 40px 28px 40px 40px;
+    border-right: 1px solid var(--rule);
+    overflow-y: auto;
+    background: var(--paper);
+  }
+
+  aside::-webkit-scrollbar { width: 4px; }
+  aside::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+
+  main {
+    padding: 60px 60px 120px 60px;
+    max-width: 920px;
+  }
+
+  /* ========== Sidebar ========== */
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .brand em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+  .brand-sub {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-muted);
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .toc-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ink-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  nav ol {
+    list-style: none;
+    counter-reset: clase;
+  }
+  nav ol li {
+    counter-increment: clase;
+    margin-bottom: 4px;
+  }
+  nav ol li a {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 10px 7px 0;
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 13.5px;
+    line-height: 1.4;
+    border-left: 2px solid transparent;
+    padding-left: 12px;
+    margin-left: -12px;
+    transition: all 0.2s ease;
+  }
+  nav ol li a::before {
+    content: "0" counter(clase);
+    font-family: 'Fraunces', serif;
+    font-size: 11px;
+    color: var(--ochre);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    min-width: 20px;
+  }
+  nav ol li a:hover {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(139, 30, 63, 0.03);
+  }
+
+  /* ========== Main Header ========== */
+  .header-eyebrow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--ink-muted);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-eyebrow::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(42px, 5vw, 64px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+  h1.title em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 300;
+  }
+
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 640px;
+    margin-bottom: 12px;
+    font-weight: 400;
+  }
+  .lead-meta {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 48px;
+    font-style: italic;
+  }
+
+  .prof-card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    padding: 18px 24px;
+    margin-bottom: 60px;
+    border-left: 3px solid var(--ochre);
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .prof-card > div { font-size: 13px; }
+  .prof-card strong {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-muted);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  /* ========== Section ========== */
+  section.clase {
+    margin-bottom: 96px;
+    scroll-margin-top: 20px;
+  }
+
+  .clase-header {
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--ink);
+    position: relative;
+  }
+  .clase-header::before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .clase-number {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 14px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 36px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 36px 0 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  h3::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  h4 {
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ochre);
+    margin: 24px 0 10px;
+  }
+
+  /* ========== Paragraphs & Lists ========== */
+  p { margin-bottom: 14px; color: var(--ink-soft); }
+
+  ul, ol { margin: 12px 0 18px 22px; }
+  li { margin-bottom: 7px; color: var(--ink-soft); }
+  li::marker { color: var(--accent); }
+
+  strong { color: var(--ink); font-weight: 600; }
+  em { font-style: italic; }
+
+  /* ========== Key term ========== */
+  .k {
+    background: linear-gradient(180deg, transparent 55%, var(--highlight) 55%);
+    padding: 0 2px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ========== Definition box ========== */
+  .def {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--accent);
+    padding: 18px 24px;
+    margin: 20px 0;
+    font-size: 14.5px;
+  }
+  .def-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  /* ========== Warning / Key Point ========== */
+  .key {
+    background: #fdf6d8;
+    border: 1px solid #e8d57a;
+    border-left: 4px solid var(--ochre);
+    padding: 16px 22px;
+    margin: 20px 0;
+    font-size: 14.5px;
+  }
+  .key-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #8a5a0b;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  /* ========== Info boxes side by side ========== */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 20px 0;
+  }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .box {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    padding: 18px 22px;
+    font-size: 14.5px;
+  }
+  .box h5 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .box.pro { border-left: 3px solid var(--sage); }
+  .box.con { border-left: 3px solid var(--accent-dim); }
+  .box.pro h5 { color: var(--sage); }
+  .box.con h5 { color: var(--accent-dim); }
+
+  /* ========== Tables ========== */
+  .table-wrap {
+    margin: 20px 0 28px;
+    border: 1px solid var(--rule);
+    background: var(--card);
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 12px 16px;
+    background: var(--paper-dim);
+    color: var(--ink);
+    border-bottom: 2px solid var(--ink);
+    vertical-align: top;
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-soft);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--ink); }
+
+  /* ========== Code / Template ========== */
+  .template {
+    font-family: 'JetBrains Mono', monospace;
+    background: #2a2724;
+    color: #e8dfc8;
+    padding: 18px 22px;
+    border-radius: 2px;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .template .kw { color: #e8b26b; }
+  .template .str { color: #a6c879; }
+
+  /* ========== Numbered steps ========== */
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    margin: 20px 0;
+  }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 50px;
+    margin-bottom: 18px;
+  }
+  .steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: -2px;
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--accent);
+    font-style: italic;
+  }
+  .steps li strong {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--ink);
+  }
+
+  /* ========== Pill tags ========== */
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0 14px;
+  }
+  .pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+  }
+  .pill.accent { background: var(--accent); color: white; border-color: var(--accent); }
+  .pill.ochre  { background: var(--ochre);  color: white; border-color: var(--ochre); }
+  .pill.sage   { background: var(--sage);   color: white; border-color: var(--sage); }
+
+  /* ========== Roles / Concepts card grid ========== */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .concept {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    padding: 16px 18px;
+    position: relative;
+  }
+  .concept-term {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--accent);
+    margin-bottom: 4px;
+    display: block;
+  }
+  .concept-def {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  /* ========== INVEST / SMART mnemonic ========== */
+  .mnemonic {
+    display: grid;
+    gap: 8px;
+    margin: 18px 0;
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--accent);
+  }
+  .mnemonic-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 14px;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .mnemonic-row:last-child { border-bottom: none; }
+  .mnemonic-letter {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .mnemonic-letter span { color: var(--ink); font-weight: 400; }
+  .mnemonic-text { font-size: 14px; color: var(--ink-soft); }
+  .mnemonic-text strong { color: var(--ink); }
+
+  /* ========== Printable ========== */
+  @media print {
+    aside { display: none; }
+    .layout { grid-template-columns: 1fr; }
+    main { padding: 20px; max-width: 100%; }
+    body { background: white; font-size: 11pt; }
+    section.clase { page-break-inside: avoid; margin-bottom: 40px; }
+  }
+
+  /* ========== Mobile ========== */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    aside {
+      position: static;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+      padding: 24px;
+    }
+    main { padding: 40px 24px 80px; }
+    h1.title { font-size: 40px; }
+    h2 { font-size: 28px; }
+  }
+
+  /* ========== Special: ceremonies timeline ========== */
+  .timeline {
+    margin: 22px 0;
+    padding-left: 16px;
+    border-left: 2px solid var(--rule);
+  }
+  .timeline-item {
+    position: relative;
+    padding: 8px 0 14px 22px;
+  }
+  .timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -22px;
+    top: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--accent);
+    transform: translateX(-3px);
+  }
+  .timeline-item strong {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  /* ========== Quote ========== */
+  blockquote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    padding: 14px 0 14px 26px;
+    border-left: 3px solid var(--accent);
+    margin: 20px 0;
+  }
+
+  /* ========== Footer ========== */
+  footer {
+    margin-top: 80px;
+    padding-top: 30px;
+    border-top: 1px solid var(--rule);
+    font-size: 12px;
+    color: var(--ink-muted);
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* ========== Fibonacci sequence viz ========== */
+  .fib {
+    display: flex;
+    gap: 8px;
+    margin: 14px 0;
+    flex-wrap: wrap;
+  }
+  .fib-num {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .fib-num.big { background: var(--accent); color: white; border-color: var(--accent); }
+
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<aside>
+  <div class="brand"><em>Ingeniería</em><br>de Software</div>
+  <div class="brand-sub">Apuntes · Prueba</div>
+
+  <div class="toc-label">Contenido</div>
+  <nav>
+    <ol>
+      <li><a href="#c1">Introducción a la IS</a></li>
+      <li><a href="#c2">Modelos & Procesos · RUP</a></li>
+      <li><a href="#c3">Metodologías Ágiles · XP · SCRUM</a></li>
+      <li><a href="#c4">SCRUM & Kanban</a></li>
+      <li><a href="#c5">Requerimientos FR y NFR</a></li>
+      <li><a href="#c6">Levantamiento de Requerimientos</a></li>
+      <li><a href="#c7">Roadmap & User Story Mapping</a></li>
+      <li><a href="#c8">Priorización & Estimación</a></li>
+      <li><a href="#c9">Arquitectura de Software</a></li>
+      <li><a href="#cheat">Cheatsheet final</a></li>
+    </ol>
+  </nav>
+</aside>
+
+<main>
+
+  <div class="header-eyebrow">Universidad Diego Portales · Prof. Jordan Barría Pineda</div>
+  <h1 class="title">Apuntes completos<br><em>Ingeniería de Software</em></h1>
+  <p class="lead">Resumen estructurado de las 9 clases del semestre: desde la definición de la disciplina y sus modelos de proceso, hasta metodologías ágiles, requerimientos, roadmaps, estimación y arquitectura.</p>
+  <p class="lead-meta">Todo lo necesario para responder la solemne. Lee con el índice a la vista.</p>
+
+  <div class="prof-card">
+    <div><strong>Profesor</strong>Jordan Barría Pineda</div>
+    <div><strong>Material base</strong>Diapositivas de la Prof. Claudia Buchhorst</div>
+    <div><strong>Total</strong>9 clases / 244 slides</div>
+    <div><strong>Evaluación clave</strong>Solemnes (caso, respuesta abierta, individual)</div>
+  </div>
+
+  <!-- ========== CLASE 1 ========== -->
+  <section class="clase" id="c1">
+    <div class="clase-header">
+      <div class="clase-number">Clase I</div>
+      <h2>Introducción a la Ingeniería de Software</h2>
+    </div>
+
+    <div class="def">
+      <div class="def-label">Esencia de la IS</div>
+      <strong>Modelación:</strong> transformación del concepto → requerimientos → diseño → código fuente → código ejecutable.<br>
+      <strong>Diseño:</strong> encontrar la mejor solución que responda a los requisitos sujeto a restricciones.<br>
+      <strong>Optimización:</strong> encontrar las transformaciones de mejor calidad y más económicas.
+    </div>
+
+    <h3>Código ≠ Ingeniería de Software</h3>
+    <p>Un programador individual escribe código; la IS agrega capas que son indispensables cuando el software se usa en contextos reales:</p>
+    <ul>
+      <li><strong>Equipo</strong> — no es trabajo solitario, hay coordinación.</li>
+      <li><strong>Planificación</strong> — hay fechas, entregas, presupuesto.</li>
+      <li><strong>Preparación</strong> — levantamiento, análisis, diseño previo.</li>
+      <li><strong>Metodología</strong> — se sigue un proceso, no improvisación.</li>
+      <li><strong>Revisión</strong> — code review, pair programming, QA.</li>
+      <li><strong>Controles de calidad</strong> — tests, aseguramiento, métricas.</li>
+    </ul>
+
+    <h3>Software profesional: genérico vs personalizado</h3>
+    <p>Los productos de software se dividen en dos tipos:</p>
+    <div class="grid-2">
+      <div class="box pro">
+        <h5>Productos genéricos (SaaS)</h5>
+        <p>Sistemas independientes producidos por una organización y vendidos en el mercado abierto. La organización desarrolladora <strong>controla la especificación</strong>.</p>
+      </div>
+      <div class="box con">
+        <h5>Productos personalizados (In-house)</h5>
+        <p>Destinados a un cliente en particular. La organización que <strong>compra</strong> el software generalmente desarrolla y controla la especificación.</p>
+      </div>
+    </div>
+
+    <h3>¿Qué se espera del software?</h3>
+    <p>Que responda a las <span class="k">necesidades del usuario</span>, es decir, que resuelva una problemática. Los atributos clave:</p>
+    <ul>
+      <li><strong>Eficiencia</strong> — uso óptimo de recursos.</li>
+      <li><strong>Confiabilidad</strong> — funciona como se espera, sin fallos críticos.</li>
+      <li><strong>Delivery / Time to Market</strong> — velocidad con que el producto llega al mercado.</li>
+    </ul>
+
+    <h3>Factores críticos de éxito o fracaso</h3>
+    <ul>
+      <li><strong>Requisitos</strong> — qué es lo que realmente se quiere.</li>
+      <li><strong>Costos dominantes</strong> — los costos superan muchas veces la estimación inicial.</li>
+      <li><strong>Plazos de entrega</strong> — los desarrolladores tienden a subestimar el trabajo; el área comercial presiona por plazos más cortos.</li>
+      <li><strong>Costos de mantención</strong> — pueden superar ampliamente la inversión inicial. Mejora continua (Run–Maintenance) es un proceso permanente.</li>
+      <li><strong>Bugs</strong> — un bug no detectado o no solucionado genera costos crecientes en el tiempo.</li>
+    </ul>
+
+    <div class="key">
+      <div class="key-label">Idea clave</div>
+      En la actualidad los productos de software <strong>no mueren</strong>: tienen un ciclo de vida evolutivo y continuo. El desarrollo no termina con el release, sigue con la mantención y mejora continua.
+    </div>
+
+    <h3>La IS hoy</h3>
+    <p>La Ingeniería de Software contemporánea se caracteriza por ser:</p>
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Compleja</span><div class="concept-def">Por la cantidad de sistemas y frameworks que interactúan entre sí.</div></div>
+      <div class="concept"><span class="concept-term">Dinámica</span><div class="concept-def">Lo que usaste hoy puede quedar obsoleto rápidamente.</div></div>
+      <div class="concept"><span class="concept-term">Flexible</span><div class="concept-def">Debe adaptarse a muchas realidades distintas.</div></div>
+    </div>
+
+    <h3>IS y el Cloud</h3>
+    <p>La web es un lugar donde conviven aplicaciones que también requieren IS. Servicios como <strong>AWS, Firebase, Azure</strong> facilitan añadir funcionalidades, reducen time to market y mejoran observabilidad/monitoreo. La nube permite <strong>almacenar, ejecutar y procesar</strong>.</p>
+
+    <h3>Reutilización: el gran paradigma</h3>
+    <ol>
+      <li>El mayor paradigma de la IS web es la <span class="k">reutilización</span>.</li>
+      <li>El éxito de los lenguajes se mide en parte por los <strong>paquetes</strong> (conjuntos de funcionalidades) disponibles.</li>
+      <li>Permite asegurar calidad: funcionamiento, disponibilidad, escalabilidad, usabilidad.</li>
+    </ol>
+
+    <h3>Ética en la Ingeniería de Software</h3>
+    <p>La IS implica <strong>responsabilidades más amplias</strong> que la simple aplicación de habilidades técnicas. El comportamiento ético es más que cumplir la ley: implica seguir principios moralmente correctos. Existen dos códigos de referencia:</p>
+    <div class="pills">
+      <span class="pill accent">Código de Ética IEEE/ACM</span>
+      <span class="pill ochre">Código de Ética y Conducta Profesional ACM</span>
+    </div>
+
+    <h4>Los 4 estándares éticos</h4>
+    <div class="grid-2">
+      <div class="box">
+        <h5>Confidencialidad</h5>
+        <p>Respetar la confidencialidad de empleadores o clientes, se haya firmado o no un acuerdo formal.</p>
+      </div>
+      <div class="box">
+        <h5>Competencia</h5>
+        <p>No desvirtuar su nivel de competencia. No aceptar trabajo que esté fuera de su competencia intencionalmente.</p>
+      </div>
+      <div class="box">
+        <h5>Propiedad Intelectual</h5>
+        <p>Conocer las leyes locales sobre patentes y copyright. Proteger la propiedad intelectual de empleadores y clientes.</p>
+      </div>
+      <div class="box">
+        <h5>Mal uso de computadoras</h5>
+        <p>No usar habilidades técnicas para emplear mal los ordenadores de otras personas, desde trivial (jugar en el trabajo) hasta grave (difusión de virus).</p>
+      </div>
+    </div>
+
+    <blockquote>Caso de estudio: el accidente aéreo LATAM en el aeropuerto Jorge Chávez ilustra la importancia de los datos, el sistema y la ética de los trabajadores.</blockquote>
+  </section>
+
+  <!-- ========== CLASE 2 ========== -->
+  <section class="clase" id="c2">
+    <div class="clase-header">
+      <div class="clase-number">Clase II</div>
+      <h2>Modelos y Procesos de Desarrollo · RUP</h2>
+    </div>
+
+    <div class="def">
+      <div class="def-label">Proceso de Software</div>
+      Una <strong>serie de actividades relacionadas</strong> que conduce a la elaboración de un producto de software.
+    </div>
+
+    <h3>Las 4 actividades fundamentales</h3>
+    <p>Todo proceso de software, sin importar el modelo, debe incluir estas cuatro actividades:</p>
+    <ol class="steps">
+      <li><strong>Especificación del software</strong>Funcionales requeridas y restricciones.</li>
+      <li><strong>Diseño e implementación</strong>UX/UI, desarrollo (lenguaje), infraestructura requerida.</li>
+      <li><strong>Validación</strong>Cumple con lo que el cliente solicita o requiere.</li>
+      <li><strong>Evolución</strong>El software evoluciona para seguir satisfaciendo las necesidades ante cambios.</li>
+    </ol>
+
+    <h3>Modelos de proceso</h3>
+    <p>Un <strong>modelo de proceso</strong> es una representación simplificada del proceso, que ofrece información parcial sobre éste. Los modelos explican diferentes enfoques y son <em>marcos</em> que se adaptan.</p>
+    <div class="key">
+      <div class="key-label">Importante</div>
+      Los modelos <strong>no son mutuamente excluyentes</strong>. En la actualidad son utilizados en conjunto para dar solución al desarrollo de software.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Modelo</th><th>Característica</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cascada</strong></td><td>Ciclo de vida lineal y secuencial; cada fase se completa antes de iniciar la siguiente.</td></tr>
+          <tr><td><strong>Incremental</strong></td><td>Desarrollo en incrementos funcionales sucesivos que se van agregando.</td></tr>
+          <tr><td><strong>Reutilización</strong></td><td>Basado en Servicios Web, objetos/paquetes existentes, sistemas de software configurables.</td></tr>
+          <tr><td><strong>Espiral</strong></td><td>Evaluación periódica del riesgo, sin número definido de iteraciones. Ciclos de 4 fases.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>Modelo en Espiral · 4 fases por ciclo</h4>
+    <ol>
+      <li><strong>Planificación</strong> — definición de objetivos, alternativas, restricciones.</li>
+      <li><strong>Análisis de Riesgos</strong> — identificación, análisis y gestión.</li>
+      <li><strong>Ingeniería</strong> — desarrollo y validación del producto y su siguiente nivel.</li>
+      <li><strong>Evaluación del cliente</strong> — evaluación con stakeholders, planificación del siguiente ciclo.</li>
+    </ol>
+
+    <h3>Actividades del proceso de desarrollo</h3>
+    <p>Secuencias de actividades entrelazadas con la meta de especificar, diseñar, implementar y probar un sistema:</p>
+    <ul>
+      <li>Estudios de factibilidad (precio, riesgo, necesidad)</li>
+      <li>Levantamiento de requerimientos</li>
+      <li>UX/UI (Experiencia de Usuario)</li>
+      <li>Infraestructura</li>
+      <li>Diseño</li>
+      <li>Desarrollo: programación, testing, QA</li>
+      <li>Delivery</li>
+      <li>Mejora continua</li>
+      <li>Documentación</li>
+      <li>Gestión de proyecto/producto</li>
+    </ul>
+
+    <h4>Ingeniería de requerimientos (4 actividades)</h4>
+    <ul>
+      <li>Estudio de factibilidad</li>
+      <li>Obtención y análisis de requerimientos</li>
+      <li>Especificación de requerimientos</li>
+      <li>Validación de requerimientos</li>
+    </ul>
+
+    <h4>Diseño e implementación</h4>
+    <p>Descripción de la estructura de software a implementar, modelos, datos, algoritmos:</p>
+    <ul>
+      <li>Diseño de arquitectura</li>
+      <li>Diseño de interfaz</li>
+      <li>Diseño de componentes</li>
+      <li>Diseño de base de datos</li>
+    </ul>
+
+    <h4>Validación y verificación</h4>
+    <p>Muestran que el sistema cumple las especificaciones y expectativas del cliente:</p>
+    <ul>
+      <li><strong>Pruebas de desarrollo / unitarias</strong></li>
+      <li><strong>Pruebas de sistema / integración</strong></li>
+      <li><strong>Pruebas de aceptación</strong></li>
+    </ul>
+
+    <h4>Evolución del software</h4>
+    <ul>
+      <li>Flexibilidad y cambios a lo largo del ciclo de vida.</li>
+      <li>Existe diferencia significativa entre desarrollo y mantención (más atractivo el desarrollo).</li>
+      <li>Los costos de mantener pueden <strong>superar la inversión inicial</strong>.</li>
+      <li>Los productos actuales no mueren: ciclo evolutivo continuo.</li>
+    </ul>
+
+    <h3>RUP · Proceso Unificado Racional</h3>
+    <div class="def">
+      <div class="def-label">RUP</div>
+      Modelo de proceso <strong>híbrido</strong> (Krutchen, 2003). Se describe desde 3 perspectivas y considera 4 fases.
+    </div>
+
+    <h4>Las 3 perspectivas</h4>
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Dinámica</span><div class="concept-def">Fases del modelo a través del tiempo.</div></div>
+      <div class="concept"><span class="concept-term">Estática</span><div class="concept-def">Actividades del proceso.</div></div>
+      <div class="concept"><span class="concept-term">Perspectiva</span><div class="concept-def">Buenas prácticas utilizadas durante el proceso.</div></div>
+    </div>
+
+    <h4>Las 4 fases</h4>
+    <ol class="steps">
+      <li><strong>Concepción (Incepción o Inicio)</strong>Se definen: objetivos, personas involucradas (equipo, stakeholders, business owners, arquitectos), visión del producto (roadmap / user story mapping), requisitos de alto nivel (<em>épicas</em>), y preliminarmente: estimación por requerimiento, recursos, riesgos y skills del equipo.</li>
+      <li><strong>Elaboración</strong>Análisis de requerimientos, elaboración de arquitectura de software, análisis de riesgos, prototipo inicial. Entregas: documento de requerimientos, diagrama de arquitectura, prototipo, plan de proyecto.</li>
+      <li><strong>Construcción</strong>Implementación, pruebas para garantizar requerimientos, pruebas de integración, preparación para lanzamiento. Entregas: código fuente, pruebas unitarias, manual de usuario, manual de instalación.</li>
+      <li><strong>Transición</strong>Entrega del producto al cliente/usuario final, soporte y mantenimiento, lecciones aprendidas. Entregas: producto terminado en producción, documentación de mantenimiento, plan de soporte.</li>
+    </ol>
+
+    <h4>Mejores prácticas de RUP</h4>
+    <ul>
+      <li><strong>Desarrollo iterativo</strong> — desarrollar oportunamente características de mayor prioridad, incrementar según prioridades del cliente.</li>
+      <li><strong>Gestión de requerimientos</strong> — documentar explícitamente, tracking de cambios, análisis del impacto.</li>
+      <li><strong>Arquitectura basada en componentes</strong>.</li>
+      <li><strong>Software modelado visualmente (UML)</strong>.</li>
+      <li><strong>Verificación de calidad</strong> — cumplir estándares de la organización.</li>
+      <li><strong>Controlar los cambios</strong> — sistema de administración de cambios.</li>
+    </ul>
+  </section>
+
+  <!-- ========== CLASE 3 ========== -->
+  <section class="clase" id="c3">
+    <div class="clase-header">
+      <div class="clase-number">Clase III</div>
+      <h2>Metodologías Ágiles · XP · SCRUM</h2>
+    </div>
+
+    <p>El contexto actual es <strong>dinámico y de constante cambio</strong>. Los requerimientos tienen alta probabilidad de cambio o repriorización; el feedback inmediato marca la pauta. Los modelos tradicionales pueden no ser lo suficientemente rápidos → surgen los <span class="k">frameworks ágiles</span>.</p>
+
+    <h3>Características de las metodologías ágiles</h3>
+    <ul>
+      <li>Especificación, diseño e implementación <strong>mezclados</strong>.</li>
+      <li>Desarrollo incremental por etapas.</li>
+      <li>Liberaciones o entrega de valor en <strong>cada ciclo</strong>.</li>
+      <li>Cada ciclo dura <strong>2 a 3 semanas</strong>.</li>
+      <li>Se apoyan en herramientas específicas para testing, configuraciones, integraciones de sistema, UI.</li>
+      <li>Clientes/usuarios de negocio <strong>involucrados durante todo el proceso</strong>.</li>
+      <li>Se <strong>minimiza la documentación</strong>; comunicación directa con el equipo.</li>
+    </ul>
+
+    <h3>El Manifiesto Ágil</h3>
+    <div class="def">
+      <div class="def-label">Declaración de valores</div>
+      Estamos descubriendo mejores formas de desarrollar software. Hemos aprendido a valorar:
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Individuos e interacciones</span><div class="concept-def">sobre procesos y herramientas</div></div>
+      <div class="concept"><span class="concept-term">Software funcionando</span><div class="concept-def">sobre documentación extensiva</div></div>
+      <div class="concept"><span class="concept-term">Colaboración con el cliente</span><div class="concept-def">sobre negociación contractual</div></div>
+      <div class="concept"><span class="concept-term">Respuesta ante el cambio</span><div class="concept-def">sobre seguir un plan</div></div>
+    </div>
+
+    <h4>Los 12 principios del Manifiesto Ágil</h4>
+    <ol>
+      <li>Satisfacer al cliente mediante la <strong>entrega temprana y continua</strong> de valor.</li>
+      <li>Aceptar que los requisitos cambien, incluso en etapas tardías.</li>
+      <li>Entregar software funcionando entre <strong>2 semanas y 2 meses</strong> (preferencia al más corto).</li>
+      <li>Responsables de negocio y desarrollo trabajan juntos cotidianamente.</li>
+      <li>Proyectos en torno a <strong>individuos motivados</strong>; dar apoyo y confianza.</li>
+      <li>La <strong>conversación cara a cara</strong> es el método más eficiente de comunicación.</li>
+      <li>Software funcionando es la medida principal de progreso.</li>
+      <li>Promover el <strong>desarrollo sostenible</strong>: ritmo constante e indefinido.</li>
+      <li>Atención continua a la <strong>excelencia técnica</strong> y al buen diseño.</li>
+      <li>La simplicidad es esencial.</li>
+      <li>Las mejores arquitecturas emergen de <strong>equipos auto-organizados</strong>.</li>
+      <li>A intervalos regulares el equipo reflexiona para ajustar su comportamiento.</li>
+    </ol>
+
+    <h3>Principales dificultades de lo ágil</h3>
+    <ul>
+      <li>Éxito depende del tiempo e involucramiento del usuario de negocio.</li>
+      <li>Conflictos culturales y de lenguaje en equipos grandes.</li>
+      <li>Priorización de cambios, cambio de alcance y presupuesto.</li>
+      <li>Equipos que no entregan valor en cada ciclo.</li>
+      <li>Cultura organizacional y burocracia.</li>
+      <li>Desarrollos enfocados al <strong>output</strong> y no al <strong>outcome</strong> — <em>HiPPO (Highest Paid Person's Opinion)</em>.</li>
+    </ul>
+
+    <h3>Extreme Programming (XP)</h3>
+    <p>Metodología ágil enfocada en mejorar la <strong>calidad del software</strong> y la capacidad de responder al cambio de requerimientos.</p>
+
+    <h4>Los 5 principios claves de XP</h4>
+    <div class="pills">
+      <span class="pill accent">Comunicación</span>
+      <span class="pill accent">Simplicidad</span>
+      <span class="pill accent">Retroalimentación</span>
+      <span class="pill accent">Coraje</span>
+      <span class="pill accent">Respeto</span>
+    </div>
+
+    <h4>Prácticas de XP</h4>
+    <div class="timeline">
+      <div class="timeline-item"><strong>Incremental</strong>Requerimientos en <em>Story Cards</em>. Historias determinadas por tiempo y prioridad. Desarrolladores desglosan en tareas. <em>Spike:</em> incremento sin programación (diseño arq. o documentación).</div>
+      <div class="timeline-item"><strong>Liberaciones pequeñas</strong>Versiones funcionales frecuentes para retroalimentación temprana.</div>
+      <div class="timeline-item"><strong>Diseño simple</strong>Diseño mínimo para la funcionalidad actual. No añadir hasta que sea necesario.</div>
+      <div class="timeline-item"><strong>Pruebas continuas (test-first)</strong>Se escribe la prueba unitaria <em>antes</em> de implementar la funcionalidad.</div>
+      <div class="timeline-item"><strong>Refactorización</strong>Continua y temprana. Conserva el código simple y mantenible.</div>
+      <div class="timeline-item"><strong>Pair Programming</strong>Desarrolladores en pares. Cada uno comprueba el trabajo del otro.</div>
+      <div class="timeline-item"><strong>Propiedad colectiva</strong>Todos trabajan en todas las áreas del sistema. No hay <em>islas de experiencia</em>. Todos son responsables del código.</div>
+      <div class="timeline-item"><strong>Integración continua</strong>Tan pronto se completa una tarea se integra al sistema. Pruebas unitarias automáticas.</div>
+      <div class="timeline-item"><strong>Ritmo sustentable</strong>Ritmo constante, evitar el agotamiento del equipo.</div>
+      <div class="timeline-item"><strong>Cliente en el sitio</strong>El usuario de negocio es miembro del equipo XP y lleva los requerimientos.</div>
+    </div>
+
+    <h4>Pair Programming — ventajas y desventajas</h4>
+    <div class="grid-2">
+      <div class="box pro">
+        <h5>Ventajas</h5>
+        <ul>
+          <li>Sistema es de todos; responsabilidad compartida.</li>
+          <li>Parte del sistema de revisión.</li>
+          <li>Mejora la estructura del sistema.</li>
+          <li>Debug de issues complejos.</li>
+          <li>Entrenamiento a desarrolladores menos experimentados.</li>
+        </ul>
+      </div>
+      <div class="box con">
+        <h5>Desventajas</h5>
+        <ul>
+          <li>No siempre es necesario (existen otras formas de colaboración).</li>
+          <li>Puede ser más lento.</li>
+          <li>Un desarrollador experimentado puede hacerlo solo (menos tiempo y costo).</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>SCRUM · conceptos clave</h3>
+
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Sprint</span><div class="concept-def">Iteración o ciclo. Duración <strong>2 a 4 semanas</strong> (1 para equipos expertos).</div></div>
+      <div class="concept"><span class="concept-term">Product Backlog</span><div class="concept-def">Lista de funcionalidades del producto, <strong>ordenadas por prioridad</strong>.</div></div>
+      <div class="concept"><span class="concept-term">Sprint Backlog</span><div class="concept-def">Historias que serán abordadas durante un sprint específico.</div></div>
+      <div class="concept"><span class="concept-term">Velocity</span><div class="concept-def">Estimado de cuánto puede hacer el equipo; historias entregadas del Sprint Backlog.</div></div>
+      <div class="concept"><span class="concept-term">Incremento</span><div class="concept-def">Software entregado en un Sprint.</div></div>
+      <div class="concept"><span class="concept-term">MVP</span><div class="concept-def">Producto Mínimo Viable.</div></div>
+    </div>
+
+    <h4>Roles en SCRUM</h4>
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Dev Team</span><div class="concept-def">Grupo de desarrolladores <strong>auto-organizados</strong>.</div></div>
+      <div class="concept"><span class="concept-term">Scrum Master</span><div class="concept-def">Responsable y guardián del Scrum. Coach del equipo; lo ayuda a alcanzar su máxima productividad.</div></div>
+      <div class="concept"><span class="concept-term">Product Owner</span><div class="concept-def">Responsable de maximizar el valor. <strong>Prioriza y ordena el Product Backlog</strong>; entiende las historias.</div></div>
+    </div>
+
+    <h4>Ceremonias de SCRUM</h4>
+    <div class="timeline">
+      <div class="timeline-item"><strong>Sprint Planning</strong>Se revisa el product backlog, se establece el objetivo del sprint, se analizan las historias, el equipo se compromete con un subgrupo.</div>
+      <div class="timeline-item"><strong>Daily meeting</strong>Ceremonia diaria de todo el equipo. Se revisa el progreso del sprint y se prioriza el trabajo diario. Aquí se declaran bloqueos, riesgos y apoyos.</div>
+      <div class="timeline-item"><strong>Sprint Review</strong>Al final del sprint. Se presenta el trabajo completado. Retroalimentación de stakeholders, Product Owner y asistentes.</div>
+      <div class="timeline-item"><strong>Retrospectiva</strong>Al final del sprint. El equipo reflexiona y encuentra puntos de mejora para el siguiente sprint.</div>
+    </div>
+  </section>
+
+  <!-- ========== CLASE 4 ========== -->
+  <section class="clase" id="c4">
+    <div class="clase-header">
+      <div class="clase-number">Clase IV</div>
+      <h2>SCRUM & Kanban</h2>
+    </div>
+
+    <h3>Escalamiento de métodos ágiles</h3>
+    <ul>
+      <li>Los métodos ágiles fueron desarrollados para <strong>equipos pequeños</strong>.</li>
+      <li>Se usan principalmente para sistemas pequeños y medianos.</li>
+      <li>Hay interés en escalarlos a sistemas de mayor dimensión.</li>
+      <li>Es difícil introducir lo ágil en grandes compañías.</li>
+      <li>Introducir y sostener el uso de ágil en una organización grande es un <strong>proceso de cambio cultural</strong>.</li>
+    </ul>
+
+    <h3>Kanban</h3>
+    <div class="def">
+      <div class="def-label">Definición</div>
+      Metodología de gestión de proyectos que optimiza el desarrollo mediante un <strong>flujo continuo de trabajo</strong>. A diferencia de Scrum, Kanban se enfoca en <strong>limitar el trabajo en progreso</strong>, lo que permite entregas frecuentes y ajustes continuos. El término "Kanban" significa <em>tarjeta de señal</em>: una unidad de trabajo que se mueve por el flujo solo cuando hay capacidad en el siguiente paso.
+    </div>
+
+    <ul>
+      <li>Se basa en el <strong>desarrollo incremental</strong>, dividiendo el trabajo en partes (historias, tareas).</li>
+      <li>Utiliza <strong>técnicas visuales</strong> para ver el estado de cada parte.</li>
+      <li>La tarjeta se mueve solo cuando existe capacidad para tomarla en el siguiente paso.</li>
+    </ul>
+
+    <h4>Los 5 principios de Kanban</h4>
+    <ol class="steps">
+      <li><strong>Visualizar el trabajo</strong>Todos visualizan el estado de cada tarea. Promueve transparencia, facilita comunicación sobre progreso y bloqueos.</li>
+      <li><strong>Limitar el WIP (Work In Progress)</strong>Establece un número máximo de tareas que pueden estar en una etapa. Previene sobrecarga y minimiza tiempo de ciclo.</li>
+      <li><strong>Gestionar el flujo</strong>Observa y optimiza el trabajo a través del progreso. Transparencia de inicio a fin. Identificación de bloqueos.</li>
+      <li><strong>Políticas explícitas</strong>Criterios claros que se cumplen para que una tarea pase a la siguiente etapa o columna del tablero.</li>
+      <li><strong>Colaboración, evolución y experimentación</strong>Colaboración del equipo para mejorar proceso y producto de manera incremental. Evaluación y adaptación.</li>
+    </ol>
+
+    <h4>Kanban vs Scrum · la diferencia esencial</h4>
+    <div class="grid-2">
+      <div class="box">
+        <h5>Scrum</h5>
+        <p>Trabaja con <strong>iteraciones fijas</strong> (sprints). Todo el equipo se compromete con un bloque de historias para un ciclo.</p>
+      </div>
+      <div class="box">
+        <h5>Kanban</h5>
+        <p>Trabaja con <strong>flujo continuo</strong>. Limita las tareas en progreso. Las tareas se liberan cuando hay capacidad.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CLASE 5 ========== -->
+  <section class="clase" id="c5">
+    <div class="clase-header">
+      <div class="clase-number">Clase V</div>
+      <h2>Requerimientos Funcionales y No Funcionales</h2>
+    </div>
+
+    <div class="def">
+      <div class="def-label">¿Qué son los requerimientos?</div>
+      Descripciones de los servicios del sistema en función de las necesidades del cliente, considerando también las <strong>limitaciones</strong> que se generan durante el proceso de ingeniería de requerimientos. Pueden formar parte de un <strong>contrato</strong> de desarrollo. Existen dos clases: de <strong>usuario (funcionales)</strong> y de <strong>sistema (no funcionales)</strong>.
+    </div>
+
+    <h3>Requerimientos Funcionales (FR)</h3>
+    <ul>
+      <li>Enunciados sobre <strong>servicios que el sistema debe proveer</strong>, cómo debe reaccionar a entradas particulares y cómo debe comportarse.</li>
+      <li>Lectores: gerentes de negocio, usuarios finales, ingenieros/analistas funcionales, arquitectos, contratistas.</li>
+      <li>Escritos en <strong>lenguaje natural</strong> a alto nivel (para que clientes lo entiendan).</li>
+      <li>Pueden incluir diagramas de servicio.</li>
+      <li>Apalancados por un proceso de negocio.</li>
+      <li>Al ser de alto nivel pueden ser <strong>ambiguos</strong> o de alcance no acotado.</li>
+    </ul>
+
+    <h4>Formato canónico de un FR</h4>
+    <div class="template">
+<span class="kw">El</span> [tipo de usuario, sistema o componente]
+<span class="kw">+</span> verbo en futuro
+<span class="kw">+</span> descripción
+
+<span class="str">"El Administrador podrá crear usuarios de tipo Read Only para que puedan acceder al sistema"</span>
+<span class="str">"El sistema solo permitirá crear usuarios de tipo normal especificando como identificador único su correo"</span>
+    </div>
+
+    <h3>User Stories (desarrollo ágil)</h3>
+    <p>En desarrollo ágil, los FR se denominan <span class="k">historias de usuario</span>. Forman parte del <strong>Product Roadmap</strong> y nutren el <strong>Product Backlog</strong>.</p>
+
+    <h4>INVEST · el mnemónico de buenas historias</h4>
+    <div class="mnemonic">
+      <div class="mnemonic-row"><span class="mnemonic-letter">I<span>ndependent</span></span><span class="mnemonic-text">Debe poder desarrollarse sin depender de otras.</span></div>
+      <div class="mnemonic-row"><span class="mnemonic-letter">N<span>egotiable</span></span><span class="mnemonic-text">El alcance puede discutirse con el cliente.</span></div>
+      <div class="mnemonic-row"><span class="mnemonic-letter">V<span>aluable</span></span><span class="mnemonic-text">Entrega valor al usuario final.</span></div>
+      <div class="mnemonic-row"><span class="mnemonic-letter">E<span>stimable</span></span><span class="mnemonic-text">El equipo puede estimar su esfuerzo.</span></div>
+      <div class="mnemonic-row"><span class="mnemonic-letter">S<span>mall</span></span><span class="mnemonic-text">Lo suficientemente pequeña para un sprint.</span></div>
+      <div class="mnemonic-row"><span class="mnemonic-letter">T<span>estable</span></span><span class="mnemonic-text">Se puede verificar que está completa.</span></div>
+    </div>
+
+    <h4>Formato de una User Story</h4>
+    <div class="template">
+<span class="kw">Como</span> "Rol"
+<span class="kw">Quiero (Necesito)</span> "funcionalidad"
+<span class="kw">Para</span> "beneficio"
+<span class="kw">Supuesto</span> "relación" (condiciones aceptadas como verdaderas
+           sin pruebas, ej: "el sistema tiene conexión",
+           "el usuario ya inició sesión")
+
+<span class="kw">Criterios de Aceptación:</span>
+  1. Criterio 1
+  2. Criterio 2
+  3. Criterio 3
+    </div>
+
+    <blockquote>"Como cliente, quiero buscar productos por nombre, para poder encontrar fácilmente lo que estoy buscando."</blockquote>
+
+    <h4>Criterios de Aceptación · 5 características de los buenos</h4>
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Claros y concisos</span><div class="concept-def">Lenguaje claro, sin jerga técnica ni ambigüedades. Interpretable por todos los stakeholders.</div></div>
+      <div class="concept"><span class="concept-term">Testeables</span><div class="concept-def">Verificables objetivamente. Cada uno mapea a una o más pruebas ejecutables.</div></div>
+      <div class="concept"><span class="concept-term">Resultado</span><div class="concept-def">Describe el resultado, <em>no la receta</em>. Qué debería experimentar el usuario, no los pasos técnicos.</div></div>
+      <div class="concept"><span class="concept-term">Medibles</span><div class="concept-def">Cuantificables. Reemplazar "se ve bien" por "imagen mínima de 300×300 píxeles".</div></div>
+      <div class="concept"><span class="concept-term">Independientes</span><div class="concept-def">Cada criterio autónomo. Simplifica pruebas y diagnóstico de fallos.</div></div>
+    </div>
+
+    <h3>Requerimientos No Funcionales (NFR)</h3>
+    <ul>
+      <li><strong>Limitaciones</strong> a los servicios o funciones que ofrece el sistema.</li>
+      <li>Se aplican al sistema en conjunto o a servicios individuales.</li>
+      <li>Definen propiedades: tiempo de respuesta, almacenamiento.</li>
+      <li>Por lo general son <strong>más críticos y restrictivos</strong> que los funcionales.</li>
+      <li>Pueden restringir requerimientos existentes, incluso funcionales.</li>
+      <li>Poseen métricas, son <strong>medibles y concretos</strong> (aplica / no aplica).</li>
+      <li>Ejemplos: Sistema Operativo, versión de navegador, versión de librería, lenguaje de programación.</li>
+    </ul>
+
+    <h4>Clasificación de los NFR</h4>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tipo</th><th>Subtipos / ejemplos</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Producto</strong></td><td>Velocidad de ejecución · Fiabilidad de datos · % de error aceptado</td></tr>
+          <tr><td><strong>Organizacionales</strong></td><td>Políticas y procedimientos organizacionales · Estándares · Requisitos de implementación</td></tr>
+          <tr><td><strong>Externos</strong></td><td>Proceso de desarrollo · Interoperabilidad · Legislativos</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="key">
+      <div class="key-label">Importante</div>
+      Los requerimientos (funcionales y no funcionales) <strong>forman parte de un contrato</strong> de desarrollo.
+    </div>
+
+    <h3>Documento de Requerimientos (SRS)</h3>
+    <ul>
+      <li>Comunicado <strong>oficial</strong> de lo que los desarrolladores deben implementar.</li>
+      <li>Incluye requerimientos de usuario y especificación detallada.</li>
+      <li>Esencial cuando un contratista externo diseña el sistema (independiente del modelo).</li>
+      <li>El nivel de detalle depende del tipo de sistema: a mayor complejidad, mayor detalle (incluyendo seguridad y protección de datos).</li>
+      <li>Estándar de referencia: <strong>IEEE 830</strong>.</li>
+    </ul>
+
+    <h4>Ejemplo de RF completo</h4>
+    <div class="box">
+      <strong>RF-01 — Registro de Usuario</strong>
+      <p>El sistema debe permitir la creación de un nuevo usuario mediante formulario con correo válido y contraseña. Verifica que el correo no esté registrado y envía correo de confirmación con enlace de activación.</p>
+      <p><strong>Objetivo:</strong> Garantizar cuenta única y autenticada.<br>
+      <strong>Entradas:</strong> email válido, contraseña (mín 8 caracteres, mayúscula, número, carácter especial).<br>
+      <strong>Actores:</strong> Nuevo usuario.<br>
+      <strong>Procesamiento:</strong> validación RFC 5322, verificación duplicidad, encriptación, generación de token.<br>
+      <strong>Salidas:</strong> confirmación en pantalla, registro temporal "pendiente", actualización a "verificado".<br>
+      <strong>Prioridad:</strong> Alta.<br>
+      <strong>Restricciones:</strong> mensajería corporativa; contraseña no en texto plano.<br>
+      <strong>Dependencias:</strong> RNF-01 (seguridad de datos), servicio de mensajería.</p>
+    </div>
+  </section>
+
+  <!-- ========== CLASE 6 ========== -->
+  <section class="clase" id="c6">
+    <div class="clase-header">
+      <div class="clase-number">Clase VI</div>
+      <h2>Levantamiento de Requerimientos</h2>
+    </div>
+
+    <h3>Requerimientos de Dominio</h3>
+    <ul>
+      <li>Derivan del <strong>dominio de la aplicación</strong> del sistema.</li>
+      <li>Pueden ser funcionales nuevos, restricciones funcionales, cálculos particulares.</li>
+      <li>Problema: es difícil detectar cuándo un requerimiento de dominio se pierde o entra en conflicto con otros.</li>
+      <li><strong>Si no están satisfechos, el sistema queda inutilizable</strong>.</li>
+    </ul>
+
+    <h4>Ejemplos de requerimientos de dominio</h4>
+    <ul>
+      <li>Sistema de control de trenes que considera el frenado en distintas condiciones climáticas.</li>
+      <li>Sistema de control de vuelos que considera características de pista, vientos, condiciones extremas.</li>
+    </ul>
+
+    <h3>El proceso de levantamiento</h3>
+    <ol class="steps">
+      <li><strong>Descubrimiento de los requerimientos</strong>Interacción con stakeholders para descubrir necesidades (funcionales, no funcionales y de dominio).</li>
+      <li><strong>Clasificación y organización</strong>Se agrupan y ordenan en grupos coherentes: módulos, procesos, comunicación entre sistemas.</li>
+      <li><strong>Priorización y negociación</strong>Se da prioridad y se abordan los conflictos.</li>
+      <li><strong>Especificación</strong>Se documentan y se generan versiones; muchas veces se genera una nueva iteración.</li>
+    </ol>
+
+    <h3>Técnicas de levantamiento</h3>
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Entrevistas</span><div class="concept-def">Formales o informales, con usuarios clave. Pueden ser estructuradas o semi-estructuradas. Dificultad: capturar requerimientos de dominio (jerga, puntos ciegos de stakeholders).</div></div>
+      <div class="concept"><span class="concept-term">Escenarios</span><div class="concept-def">Narrativa de una situación de uso.</div></div>
+      <div class="concept"><span class="concept-term">Casos de uso</span><div class="concept-def">Descripción formal de interacciones.</div></div>
+      <div class="concept"><span class="concept-term">Levantamiento de proceso de negocio</span><div class="concept-def">Cómo funciona hoy vs. cómo puede ser más eficiente. Alto nivel → detalle. Identificar usuarios clave por etapa.</div></div>
+      <div class="concept"><span class="concept-term">Focus groups & Workshops</span><div class="concept-def">Dinámicas grupales para recoger necesidades compartidas.</div></div>
+      <div class="concept"><span class="concept-term">Encuestas</span><div class="concept-def">Recolección masiva y cuantificable.</div></div>
+      <div class="concept"><span class="concept-term">Prototipado</span><div class="concept-def">Representaciones visuales tempranas para validar.</div></div>
+      <div class="concept"><span class="concept-term">Observación / Etnografía</span><div class="concept-def">Observar al usuario en su contexto real.</div></div>
+    </div>
+
+    <h4>Los 5 elementos de un escenario</h4>
+    <ol>
+      <li>Descripción de qué esperan el sistema y los usuarios cuando <strong>inicia</strong>.</li>
+      <li>Descripción del <strong>flujo normal</strong> de los eventos.</li>
+      <li>Qué puede <strong>salir mal</strong> y cómo se manejaría.</li>
+      <li>Información de otras <strong>actividades en paralelo</strong>.</li>
+      <li>Descripción del <strong>estado del sistema cuando termina</strong>.</li>
+    </ol>
+
+    <div class="key">
+      <div class="key-label">En agilidad</div>
+      Las historias de usuario también son requerimientos y deben ser <strong>INVEST</strong> (Independientes, Negociables, Valiosas, Estimables, Pequeñas, Testeables).
+    </div>
+  </section>
+
+  <!-- ========== CLASE 7 ========== -->
+  <section class="clase" id="c7">
+    <div class="clase-header">
+      <div class="clase-number">Clase VII</div>
+      <h2>Roadmap & User Story Mapping</h2>
+    </div>
+
+    <h3>Roadmap de Producto</h3>
+    <ul>
+      <li>Mapa de las <strong>principales funcionalidades</strong> del producto.</li>
+      <li>Es la <strong>intención</strong> de lo que se desea desarrollar.</li>
+      <li>Contiene visión y objetivos (organizacionales y de producto).</li>
+      <li>Tiene <strong>hitos visibles</strong>, etapas, y en algunos casos los quarters en que se desea entrega de valor.</li>
+      <li><strong>No es una Gantt.</strong></li>
+      <li>Se utiliza para establecer metas claras; sujeto a presupuesto.</li>
+      <li>Se presenta en una ceremonia llamada <span class="k">Agile Inception</span> (el Kick Off, donde se comparte la visión del nuevo producto).</li>
+    </ul>
+
+    <h4>Roadmap Goal Oriented · los 5 elementos</h4>
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Fecha</span><div class="concept-def">Período en que debería lograrse el objetivo.</div></div>
+      <div class="concept"><span class="concept-term">Nombre</span><div class="concept-def">Nombre de la nueva versión.</div></div>
+      <div class="concept"><span class="concept-term">Objetivo</span><div class="concept-def">Resultados o beneficios que se quieren alcanzar.</div></div>
+      <div class="concept"><span class="concept-term">Funcionalidades</span><div class="concept-def">De alto nivel, requeridas para cumplir el objetivo.</div></div>
+      <div class="concept"><span class="concept-term">Métricas</span><div class="concept-def">Mediciones que determinan si el objetivo se logró.</div></div>
+    </div>
+
+    <h4>Preguntas guía al crear/evolucionar un Roadmap</h4>
+    <ul>
+      <li>¿Cuál es la brecha entre los resultados actuales y los deseados?</li>
+      <li>¿Qué objetivos de producto pueden cerrar esas brechas?</li>
+      <li>¿Qué experimentos pueden validar nuestras suposiciones?</li>
+    </ul>
+
+    <div class="key">
+      <div class="key-label">Importante</div>
+      Actualizarlo periódicamente (en refinamiento del Product Backlog o Sprint Reviews). Mantenerlo a <strong>alto nivel</strong> y ligero. Enfocarse en <strong>objetivos, no en detalles</strong>.
+    </div>
+
+    <h3>Visión de Producto · plantilla</h3>
+    <div class="template">
+[Nombre del Producto] atiende a [Cliente/Usuario Objetivo],
+quienes buscan [Necesidades] para [Beneficio del Producto].
+
+Nuestra visión es [Cómo el producto cambiará la vida de los
+clientes en una ventana de tiempo].
+
+Lo que nos diferencia de [Competidor Principal] es que nuestro
+producto [Ventaja Competitiva Clave].
+    </div>
+
+    <h3>Mapa de Impacto</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nivel</th><th>Pregunta</th><th>Contenido</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Meta</strong></td><td>¿Para qué?</td><td>Alineada con la estrategia del negocio. Específica y medible. <strong>Objetivos SMART</strong>.</td></tr>
+          <tr><td><strong>Personas</strong></td><td>¿Quiénes?</td><td>Personas que impactan el proyecto y a las que el proyecto impacta.</td></tr>
+          <tr><td><strong>Impactos</strong></td><td>¿Cómo?</td><td>Cambios de comportamiento esperados (positivos y negativos).</td></tr>
+          <tr><td><strong>Entregables (Features)</strong></td><td>¿Qué?</td><td>Funcionalidades, tareas, componentes a implementar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4>SMART · objetivos bien formulados</h4>
+    <div class="mnemonic">
+      <div class="mnemonic-row"><span class="mnemonic-letter">S<span>pecific</span></span><span class="mnemonic-text">Específico, concreto.</span></div>
+      <div class="mnemonic-row"><span class="mnemonic-letter">M<span>easurable</span></span><span class="mnemonic-text">Medible con métricas.</span></div>
+      <div class="mnemonic-row"><span class="mnemonic-letter">A<span>chievable</span></span><span class="mnemonic-text">Alcanzable con recursos disponibles.</span></div>
+      <div class="mnemonic-row"><span class="mnemonic-letter">R<span>elevant</span></span><span class="mnemonic-text">Relevante para el negocio.</span></div>
+      <div class="mnemonic-row"><span class="mnemonic-letter">T<span>ime-bound</span></span><span class="mnemonic-text">Con plazo definido.</span></div>
+    </div>
+
+    <h3>User Story Mapping (USM)</h3>
+    <ul>
+      <li>Es la visión de historias de usuario que serán abordadas en cada etapa del roadmap.</li>
+      <li>Es <strong>flexible</strong>: puede sufrir cambios.</li>
+      <li><strong>Línea de tiempo</strong> de izquierda a derecha.</li>
+      <li><strong>Priorización vertical</strong>: las más prioritarias arriba, las menos abajo.</li>
+      <li>Agrupar historias en grupos de alto nivel que describan las funcionalidades (épicas e iniciativas).</li>
+      <li>Planificable en versiones de producto.</li>
+      <li>Permite visualización clara del <strong>MVP</strong>.</li>
+      <li>Permite visualizar la interacción de Roles.</li>
+    </ul>
+
+    <h4>Jerarquía: Iniciativa → Épica → Historia de Usuario</h4>
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Iniciativa</span><div class="concept-def">Objetivo estratégico de alto nivel que abarca múltiples épicas y puede durar varios meses o trimestres.</div></div>
+      <div class="concept"><span class="concept-term">Épica</span><div class="concept-def">Necesidad empresarial o funcional grande que <strong>no cabe en un solo sprint</strong>. Se desglosa en varias historias.</div></div>
+      <div class="concept"><span class="concept-term">Historia de Usuario</span><div class="concept-def">Descripción breve desde la perspectiva del usuario ("Como [rol], quiero [acción] para [beneficio]"). Accionable en un sprint (1–4 semanas).</div></div>
+    </div>
+
+    <blockquote>
+      <strong>Ejemplo:</strong><br>
+      Iniciativa: Mejorar el proceso de pago.<br>
+      ↓ Épica: Implementar pago con tarjeta de crédito.<br>
+      ↓ Historia: Como usuario, quiero guardar mis datos de tarjeta para no volver a escribirlos.
+    </blockquote>
+
+    <h4>Pasos para elaborar un USM</h4>
+    <ol>
+      <li>Identificación de <strong>Usuarios, Roles y Objetivos</strong> enfocado en necesidades.</li>
+      <li>Definición del <strong>Customer Journey Map</strong>.</li>
+      <li>Desglose de User Stories (funcionales y no funcionales).</li>
+      <li>Priorización vertical (arriba = más prioritario).</li>
+      <li>Añadir detalles, subtareas, dependencias, criterios de aceptación y acuerdos.</li>
+      <li>Identificar releases o versiones.</li>
+      <li>Revisar y ajustar con cada iteración.</li>
+    </ol>
+
+    <h3>Definition of Ready (DoR) & Definition of Done (DoD)</h3>
+    <div class="grid-2">
+      <div class="box pro">
+        <h5>DoR · lista para entrar al Sprint</h5>
+        <p>Criterios que la historia debe cumplir antes de ser comprometida en el Sprint: criterios de aceptación claros, estimación realizada, dependencias resueltas, etc.</p>
+      </div>
+      <div class="box con">
+        <h5>DoD · lista para considerar terminada</h5>
+        <ul>
+          <li>Código fuente en repositorio y actualizado.</li>
+          <li>Pruebas unitarias escritas, aprobadas y ejecutadas satisfactoriamente.</li>
+          <li>Sin errores de integración.</li>
+          <li>Pruebas de aceptación con cliente/usuario final.</li>
+          <li>Product Owner conforme con el incremento.</li>
+          <li>Documentación completa (usuario, desarrollo, ciberseguridad).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CLASE 8 ========== -->
+  <section class="clase" id="c8">
+    <div class="clase-header">
+      <div class="clase-number">Clase VIII</div>
+      <h2>Priorización & Estimación Ágil</h2>
+    </div>
+
+    <h3>Product Backlog y Planificación</h3>
+    <ul>
+      <li>Lista de funcionalidades a desarrollar, <strong>priorizadas descendentemente</strong> (más prioritario arriba).</li>
+      <li>En la <strong>ceremonia de planificación</strong> se revisa el product backlog.</li>
+      <li>Se establece el objetivo y entrega de valor.</li>
+      <li>Se analiza cada Historia de Usuario y su <strong>tasking</strong>.</li>
+      <li>Se revisan las reglas del equipo a nivel de HU (DoR y DoD).</li>
+      <li>El equipo se compromete con un subgrupo de historias para el Sprint.</li>
+    </ul>
+
+    <h3>Capacidad del equipo</h3>
+    <ul>
+      <li>La capacidad es el <strong>nº de historias que se pueden desarrollar</strong> durante el Sprint.</li>
+      <li>Equipo nuevo: define un <strong>baseline</strong> (ej. 8 puntos de historia por persona).</li>
+      <li>Si no se logra el objetivo, en la <strong>retrospectiva</strong> el equipo analiza mejoras y resetea la capacidad.</li>
+      <li>Los datos (métricas) son importantes.</li>
+    </ul>
+
+    <h3>Gestión del Sprint Backlog</h3>
+    <div class="key">
+      <div class="key-label">Regla clave</div>
+      <strong>Las historias no se asignan</strong>: cada miembro toma una historia de la pila. El equipo decide cómo abordar las historias comprometidas. El <strong>objetivo del sprint no se modifica</strong>; cualquier cambio debe ser acordado por el equipo junto con el Product Owner.
+    </div>
+    <p>Los bloqueos, riesgos y apoyos se declaran en la ceremonia <strong>Daily</strong>.</p>
+
+    <h3>Técnicas de estimación</h3>
+    <p>Existen distintas técnicas basadas en:</p>
+    <ul>
+      <li>Esfuerzo vs duración</li>
+      <li>Valor vs esfuerzo</li>
+    </ul>
+    <p>La estimación se realiza en el <strong>Sprint Planning</strong>. Para una buena estimación es necesario establecer una <span class="k">historia pivote</span> (referencia).</p>
+
+    <h4>1 · Estimación por Tamaño Camiseta</h4>
+    <div class="pills">
+      <span class="pill">XS</span><span class="pill">S</span><span class="pill">M</span><span class="pill">L</span><span class="pill">XL</span><span class="pill">XXL</span><span class="pill">XXXL</span>
+    </div>
+    <ul>
+      <li>Cada talla establece la complejidad de desarrollar una historia.</li>
+      <li>El pivote tiende a ser <strong>XS o S</strong>.</li>
+      <li>El equipo establece los criterios para la historia pivote; luego para las siguientes tallas.</li>
+    </ul>
+
+    <h4>2 · Estimación por Fibonacci</h4>
+    <div class="fib">
+      <div class="fib-num">1</div>
+      <div class="fib-num">2</div>
+      <div class="fib-num big">3</div>
+      <div class="fib-num">5</div>
+      <div class="fib-num">8</div>
+      <div class="fib-num">13</div>
+      <div class="fib-num">20</div>
+      <div class="fib-num">...</div>
+    </div>
+    <ul>
+      <li>Una de las estimaciones más usadas.</li>
+      <li>Pivote tiende a ser una historia con valor <strong>1 o 2</strong>.</li>
+      <li>Muy usada con <strong>Planning Poker</strong>: cartas con la secuencia Fibonacci más cartas adicionales como "?" o "Café" (break).</li>
+    </ul>
+
+    <h4>Las 3 etapas de estimación (ambas técnicas)</h4>
+    <ol class="steps">
+      <li><strong>Estimación individual</strong>Cada miembro estima por su cuenta.</li>
+      <li><strong>Estimación grupal</strong>Representa la tendencia de las estimaciones individuales.</li>
+      <li><strong>Ajuste y consenso</strong>Se discute hasta llegar al acuerdo. Resultado: la historia tiene un tamaño acordado por el equipo.</li>
+    </ol>
+  </section>
+
+  <!-- ========== CLASE 9 ========== -->
+  <section class="clase" id="c9">
+    <div class="clase-header">
+      <div class="clase-number">Clase IX</div>
+      <h2>Arquitectura de Software</h2>
+    </div>
+
+    <div class="def">
+      <div class="def-label">Definición</div>
+      La arquitectura de software se preocupa de entender <strong>cómo un sistema debería organizarse</strong> y diseñar su estructura. Es el <strong>primer paso</strong> en el proceso de diseño de un software. Se considera una relación vital entre la ingeniería de requerimientos y el diseño, ya que permite identificar los componentes principales estructurales del sistema y sus relaciones.
+    </div>
+
+    <div class="key">
+      <div class="key-label">En metodología ágil</div>
+      Se hace un <strong>diseño arquitectónico inicial</strong>. Posteriormente, en general no se modifica por completo sino que <strong>va escalando</strong>, por el alto costo que implica (independiente de la metodología).
+    </div>
+
+    <h3>Arquitectura vs Diseño</h3>
+    <p>Para definir la arquitectura se identifican los <strong>componentes arquitectónicos</strong> que reflejan las funcionalidades de alto nivel del sistema. La arquitectura puede ser parte de la ingeniería de requerimientos, asociando grupos de funcionalidades con componentes o subsistemas.</p>
+
+    <p>La arquitectura es principalmente <strong>descomponer el sistema en componentes</strong>. Cada componente debe tener un valor de negocio individual, ayuda a organizar el trabajo y recursos, permite paralelización, y permite decidir entre <span class="k">Comprar o Desarrollar</span>.</p>
+
+    <h4>Aspectos claramente arquitectónicos</h4>
+    <ul>
+      <li><strong>Forma del sistema:</strong> client-server, web-based, native mobile client, desktop app, etc.</li>
+      <li><strong>Estructura del software:</strong> componentes, capas.</li>
+      <li><strong>Tecnologías:</strong> lenguaje, plataforma de deployment.</li>
+      <li><strong>Frameworks.</strong></li>
+    </ul>
+
+    <h4>Niveles de arquitectura</h4>
+    <div class="grid-2">
+      <div class="box">
+        <h5>Pequeña Arquitectura</h5>
+        <p>Arquitectura de programas individuales y su descomposición en componentes. <strong>Foco del curso.</strong></p>
+      </div>
+      <div class="box">
+        <h5>Gran Arquitectura</h5>
+        <p>Sistemas complejos que involucran otros sistemas, programas y componentes. Sistemas de grandes empresas, distribuidos y gestionados por distintas entidades.</p>
+      </div>
+    </div>
+
+    <h3>¿Por qué importa la arquitectura?</h3>
+    <p>Afecta rendimiento, robustez, distribuibilidad y mantenibilidad. Los componentes individuales describen las <strong>características funcionales</strong>; la arquitectura describe las <strong>características no funcionales</strong>. Ventajas principales:</p>
+    <ul>
+      <li>Comunicación entre stakeholders.</li>
+      <li>Análisis del sistema.</li>
+      <li>Reutilización a gran escala.</li>
+    </ul>
+
+    <h3>Factores (NFR) que influyen en la elección del patrón</h3>
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Performance</span><div class="concept-def">Disminuir comunicaciones (tiempo de respuesta, latencia).</div></div>
+      <div class="concept"><span class="concept-term">Escalabilidad</span><div class="concept-def">Capacidad de crecimiento.</div></div>
+      <div class="concept"><span class="concept-term">Seguridad</span><div class="concept-def">Organización en capas.</div></div>
+      <div class="concept"><span class="concept-term">Disponibilidad</span><div class="concept-def">Redundancia controlada.</div></div>
+      <div class="concept"><span class="concept-term">Mantenibilidad</span><div class="concept-def">Componentes autocontenidos e intercambiables.</div></div>
+      <div class="concept"><span class="concept-term">Continuidad operacional</span><div class="concept-def">Capacidad de recuperarse frente a problemas.</div></div>
+      <div class="concept"><span class="concept-term">Restricciones</span><div class="concept-def">De requerimientos, diseño e implementación.</div></div>
+      <div class="concept"><span class="concept-term">Principios</span><div class="concept-def">Consistencia y claridad del código.</div></div>
+      <div class="concept"><span class="concept-term">Accesibilidad</span><div class="concept-def">Necesidades especiales de usuarios.</div></div>
+    </div>
+
+    <h3>Modelo C4 · descripción en 4 niveles</h3>
+    <p>Técnica de notación gráfica creada por <strong>Simon Brown</strong> para modelar arquitectura a través de cuatro niveles jerárquicos:</p>
+    <ol class="steps">
+      <li><strong>Contexto (System Context)</strong>Vista más alta: sistema y su entorno (usuarios, sistemas externos).</li>
+      <li><strong>Contenedores (Containers)</strong>Aplicaciones y datastores que componen el sistema.</li>
+      <li><strong>Componentes (Components)</strong>Cómo está estructurado cada contenedor internamente.</li>
+      <li><strong>Código (Code)</strong>Detalle a nivel de clases, interfaces, etc.</li>
+    </ol>
+
+    <h3>Patrones o Estilos Arquitectónicos</h3>
+    <div class="def">
+      <div class="def-label">¿Qué es un patrón?</div>
+      Descripción de la <strong>organización del sistema</strong> (como cliente-servidor o en capas). Capturan la esencia de una arquitectura que se ha usado en distintos sistemas.
+    </div>
+
+    <h4>1 · Arquitectura en Capas</h4>
+    <ul>
+      <li>Organiza el sistema en capas con funcionalidad relacionada.</li>
+      <li>Una capa da servicios a la capa de encima.</li>
+      <li>Las capas inferiores representan servicios núcleo reutilizables.</li>
+      <li>Permite desarrollo incremental (por capas); al cambiar, solo se modifica la capa inferior.</li>
+    </ul>
+    <div class="grid-2">
+      <div class="box pro"><h5>Ventajas</h5><p>Separación de responsabilidades, modularidad, reutilización.</p></div>
+      <div class="box con"><h5>Desventajas</h5><p>Aumento de latencia por comunicación entre capas; complejidad al crecer.</p></div>
+    </div>
+    <p><strong>Ejemplos:</strong> aplicaciones web y empresariales, sistemas operativos.</p>
+
+    <h4>2 · Modelo-Vista-Controlador (MVC)</h4>
+    <ul>
+      <li>Separa presentación e interacción con los datos.</li>
+      <li><strong>Modelo:</strong> maneja los datos y la lógica de negocio.</li>
+      <li><strong>Vista:</strong> define y maneja cómo se presentan los datos al usuario.</li>
+      <li><strong>Controlador:</strong> maneja la interacción del usuario.</li>
+    </ul>
+    <div class="grid-2">
+      <div class="box pro"><h5>Ventajas</h5><p>Los datos cambian independiente de su representación y viceversa. Soporta presentar datos de distintas formas.</p></div>
+      <div class="box con"><h5>Desventajas</h5><p>Costos adicionales y complejidad cuando el modelo e interacciones son simples.</p></div>
+    </div>
+    <p><strong>Ejemplos:</strong> aplicaciones web y móviles, interfaces de usuario.</p>
+
+    <h4>3 · Cliente-Servidor</h4>
+    <ul>
+      <li>La funcionalidad se organiza en <strong>servicios</strong>; cada servicio lo entrega un servidor independiente.</li>
+      <li>Los clientes usan los servicios ingresando a los servidores.</li>
+    </ul>
+    <div class="grid-2">
+      <div class="box pro"><h5>Ventajas</h5><p>Facilita distribución y escalabilidad; clara separación de responsabilidades.</p></div>
+      <div class="box con"><h5>Desventajas</h5><p>Posibles cuellos de botella en el servidor; problemas de seguridad y autenticación.</p></div>
+    </div>
+    <p><strong>Ejemplos:</strong> aplicaciones web y móviles, sistemas de bases de datos, correo electrónico.</p>
+
+    <h4>4 · Filtros y Tuberías (Pipe-and-Filter)</h4>
+    <ul>
+      <li>Componentes (<strong>filtros</strong>) procesan datos y los pasan a través de conectores (<strong>tuberías</strong>).</li>
+    </ul>
+    <div class="grid-2">
+      <div class="box pro"><h5>Ventajas</h5><p>Modularidad y reutilización de componentes; fácil de entender y adaptar.</p></div>
+      <div class="box con"><h5>Desventajas</h5><p>Mayor latencia por comunicación entre filtros; menos adecuado para aplicaciones interactivas.</p></div>
+    </div>
+    <p><strong>Ejemplos:</strong> compiladores, aplicaciones de procesamiento de imagen.</p>
+
+    <h4>5 · Arquitectura Basada en Eventos</h4>
+    <ul>
+      <li>Arquitectura <strong>asíncrona distribuida</strong> más común para sistemas altamente escalables.</li>
+      <li>Componentes de procesamiento de eventos de un solo propósito escuchan y procesan asincrónicamente.</li>
+      <li>Unidad central acepta los datos y los delega a módulos separados según el tipo.</li>
+    </ul>
+    <div class="grid-2">
+      <div class="box pro"><h5>Ventajas</h5><p>Adaptables a entornos complejos/caóticos. Escala fácilmente. Ampliable cuando aparecen nuevos tipos de eventos.</p></div>
+      <div class="box con"><h5>Uso típico</h5><p>Sistemas asíncronos con flujo de datos asíncrono. Interfaces de usuario.</p></div>
+    </div>
+
+    <h4>6 · Memoria Compartida (Repositorio)</h4>
+    <ul>
+      <li>Todos los datos se gestionan en un <strong>repositorio central</strong> accesible a todos los componentes.</li>
+      <li>Los componentes no interactúan directamente, sino <strong>solo a través del repositorio</strong>.</li>
+      <li>Privilegiado cuando componentes modifican información que otros usarán.</li>
+    </ul>
+    <div class="grid-2">
+      <div class="box pro"><h5>Ventajas</h5><p>Facilita gestión y control de datos; promueve reutilización e interoperabilidad.</p></div>
+      <div class="box con"><h5>Desventajas</h5><p>Cuellos de botella, problemas de escalabilidad; difícil de mantener.</p></div>
+    </div>
+    <p><strong>Ejemplos:</strong> sistemas de control de versiones, sistemas de gestión de contenido (CMS).</p>
+
+    <h4>7 · Arquitectura Orientada a Servicios (SOA)</h4>
+    <ul>
+      <li>Componentes <strong>débilmente acoplados</strong>.</li>
+      <li>Un <strong>servicio</strong> es un componente que no corre en el mismo proceso y se comunica por protocolo (como HTTP).</li>
+      <li>Servicios proveen funcionalidades según una <strong>especificación de interfaz</strong>.</li>
+      <li>Pueden ser combinados dinámicamente.</li>
+      <li>Ligado a la popularidad de los Web Services y a la formalización de procesos de negocio.</li>
+    </ul>
+    <div class="grid-2">
+      <div class="box pro"><h5>Ventajas</h5><ul><li>Flexibilidad y escalabilidad.</li><li>Reutilización e integración de componentes.</li><li>Interfaz explícita: hace más difícil violar acuerdos.</li><li>Heterogeneidad tecnológica.</li><li>"Ahorra" en código (se comparte el código común, reduce la redundancia del 20%).</li></ul></div>
+      <div class="box con"><h5>Desventajas</h5><ul><li>Mayor complejidad y sobrecarga de comunicación.</li><li>Difícil de gestionar y mantener.</li></ul></div>
+    </div>
+    <p><strong>Ejemplos:</strong> CRM (manejo de clientes), Integration Platform (Docker permite que servicios interactúen), ERP.</p>
+
+    <h4>8 · Microservicios</h4>
+    <ul>
+      <li>Aplicación construida con <strong>pequeños servicios</strong> (HTTP, REST APIs).</li>
+      <li>Altamente <strong>cohesivos y desacoplados</strong>.</li>
+      <li>Pueden escribirse en <strong>lenguajes distintos</strong> y usar distintos almacenamientos.</li>
+      <li>Rompe en pequeños servicios el componente que usualmente corresponde al server.</li>
+      <li>Desarrollo y deployment <strong>descentralizado</strong>.</li>
+      <li>Gobierno descentralizado (un servicio es totalmente independiente).</li>
+      <li>Manejo de datos descentralizado.</li>
+      <li>Surgen en 2011–2012; algunos se refieren a "SOA hecho bien" — una maduración de las ideas de SOA.</li>
+      <li><strong>No requiere capa de middleware</strong>, cada servicio expone una API (contrato).</li>
+      <li>La mayoría son servicios funcionales, con algunos de infraestructura (no expuestos al mundo externo).</li>
+    </ul>
+
+    <h4>Microservicios y contenedores</h4>
+    <ul>
+      <li>Necesidad de manejar cientos de microservicios independientes.</li>
+      <li>Un microservicio puede correr en una máquina virtual propia, pero hoy se usa la <strong>tecnología de contenedores</strong>.</li>
+      <li>Un contenedor provee todo lo necesario para el servicio, siendo mucho más liviano que una VM (no incluye un SO completo).</li>
+      <li><strong>Docker</strong> es la plataforma más popular para el manejo de contenedores; pero no es la única.</li>
+    </ul>
+
+    <h3>Resumen comparativo de patrones</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Estilo</th><th>Característica principal</th><th>Criterio de elección</th><th>Ejemplo</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cliente-Servidor</strong></td><td>Cliente y servidor interactúan a través de una red.</td><td>Separar UI y gestión de datos.</td><td>Correo electrónico.</td></tr>
+          <tr><td><strong>Filtros y Tuberías</strong></td><td>Filtros procesan datos a través de tuberías.</td><td>Procesamiento en etapas; reusabilidad.</td><td>Compiladores, procesamiento de imagen.</td></tr>
+          <tr><td><strong>MVC</strong></td><td>Modelo, Vista, Controlador.</td><td>UI y lógica de negocio evolucionan de manera independiente.</td><td>Apps web y móviles con UI.</td></tr>
+          <tr><td><strong>Repositorio</strong></td><td>Repositorio central; separa lógica y persistencia.</td><td>Datos accesibles para múltiples clientes de forma coherente.</td><td>CMS.</td></tr>
+          <tr><td><strong>Capas</strong></td><td>Capas con responsabilidades específicas y jerárquicas.</td><td>Clara separación de responsabilidades; dependencias conocidas.</td><td>Aplicaciones empresariales.</td></tr>
+          <tr><td><strong>SOA</strong></td><td>Servicios autónomos con funciones específicas.</td><td>Integrar diversas aplicaciones o módulos de negocio.</td><td>ERP.</td></tr>
+          <tr><td><strong>Microservicios</strong></td><td>Pequeños servicios autónomos e independientes.</td><td>Altamente escalables; evolución constante.</td><td>Netflix, Amazon.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========== CHEATSHEET ========== -->
+  <section class="clase" id="cheat">
+    <div class="clase-header">
+      <div class="clase-number">Cierre</div>
+      <h2>Cheatsheet final · lo imprescindible</h2>
+    </div>
+
+    <h3>Mnemónicos que no puedes olvidar</h3>
+    <div class="grid-2">
+      <div class="box">
+        <h5>INVEST — Historias de Usuario</h5>
+        <p><strong>I</strong>ndependent · <strong>N</strong>egotiable · <strong>V</strong>aluable · <strong>E</strong>stimable · <strong>S</strong>mall · <strong>T</strong>estable</p>
+      </div>
+      <div class="box">
+        <h5>SMART — Objetivos</h5>
+        <p><strong>S</strong>pecific · <strong>M</strong>easurable · <strong>A</strong>chievable · <strong>R</strong>elevant · <strong>T</strong>ime-bound</p>
+      </div>
+      <div class="box">
+        <h5>Los 4 valores del Manifiesto Ágil</h5>
+        <p>Individuos > procesos · Software funcionando > documentación · Colaboración > negociación · Respuesta al cambio > seguir un plan</p>
+      </div>
+      <div class="box">
+        <h5>Los 5 principios de XP</h5>
+        <p>Comunicación · Simplicidad · Retroalimentación · Coraje · Respeto</p>
+      </div>
+      <div class="box">
+        <h5>Los 4 estándares éticos</h5>
+        <p>Confidencialidad · Competencia · Propiedad Intelectual · Mal uso de computadoras</p>
+      </div>
+      <div class="box">
+        <h5>Las 4 fases de RUP</h5>
+        <p>Concepción · Elaboración · Construcción · Transición</p>
+      </div>
+      <div class="box">
+        <h5>Las 4 actividades del proceso</h5>
+        <p>Especificación · Diseño e implementación · Validación · Evolución</p>
+      </div>
+      <div class="box">
+        <h5>Los 5 principios de Kanban</h5>
+        <p>Visualizar · Limitar WIP · Gestionar flujo · Políticas explícitas · Colaborar/experimentar</p>
+      </div>
+      <div class="box">
+        <h5>Roles de SCRUM</h5>
+        <p>Dev Team (auto-organizados) · Scrum Master (coach) · Product Owner (prioriza backlog)</p>
+      </div>
+      <div class="box">
+        <h5>Ceremonias de SCRUM</h5>
+        <p>Sprint Planning · Daily · Sprint Review · Retrospectiva</p>
+      </div>
+      <div class="box">
+        <h5>Jerarquía USM</h5>
+        <p>Iniciativa (estratégica) → Épica (no cabe en un sprint) → Historia (1–4 semanas)</p>
+      </div>
+      <div class="box">
+        <h5>Modelo C4</h5>
+        <p>Contexto · Contenedores · Componentes · Código</p>
+      </div>
+    </div>
+
+    <h3>Diferencias críticas que suelen preguntar</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Comparación</th><th>A</th><th>B</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Scrum vs Kanban</strong></td>
+            <td><strong>Scrum:</strong> iteraciones fijas (sprints 2–4 sem), equipo se compromete con bloque de historias.</td>
+            <td><strong>Kanban:</strong> flujo continuo, limita WIP, tareas se mueven al haber capacidad.</td>
+          </tr>
+          <tr>
+            <td><strong>FR vs NFR</strong></td>
+            <td><strong>FR:</strong> servicios que el sistema provee (funcionalidades).</td>
+            <td><strong>NFR:</strong> limitaciones, propiedades, métricas del sistema (más críticos y restrictivos).</td>
+          </tr>
+          <tr>
+            <td><strong>Software genérico vs personalizado</strong></td>
+            <td><strong>Genérico:</strong> la organización desarrolladora controla la especificación.</td>
+            <td><strong>Personalizado:</strong> la organización que compra controla la especificación.</td>
+          </tr>
+          <tr>
+            <td><strong>Código vs IS</strong></td>
+            <td><strong>Código:</strong> acto individual de programar.</td>
+            <td><strong>IS:</strong> equipo, planificación, preparación, metodología, revisión, controles de calidad.</td>
+          </tr>
+          <tr>
+            <td><strong>Roadmap vs Gantt</strong></td>
+            <td><strong>Roadmap:</strong> alto nivel, orientado a objetivos, flexible.</td>
+            <td><strong>Gantt:</strong> calendario detallado de tareas con dependencias.</td>
+          </tr>
+          <tr>
+            <td><strong>SOA vs Microservicios</strong></td>
+            <td><strong>SOA:</strong> servicios más grandes, puede requerir middleware.</td>
+            <td><strong>Microservicios:</strong> servicios pequeños independientes, cada uno con su API, sin middleware. "SOA hecho bien".</td>
+          </tr>
+          <tr>
+            <td><strong>DoR vs DoD</strong></td>
+            <td><strong>DoR:</strong> lista para entrar al sprint (acuerdo de entrada).</td>
+            <td><strong>DoD:</strong> lista para considerarse terminada (acuerdo de salida).</td>
+          </tr>
+          <tr>
+            <td><strong>Output vs Outcome</strong></td>
+            <td><strong>Output:</strong> lo que se produce (features, entregables).</td>
+            <td><strong>Outcome:</strong> el impacto/resultado que genera en el usuario.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Tipos de pruebas (no confundir)</h3>
+    <div class="concept-grid">
+      <div class="concept"><span class="concept-term">Unitarias / Desarrollo</span><div class="concept-def">Prueban unidades aisladas de código.</div></div>
+      <div class="concept"><span class="concept-term">Sistema / Integración</span><div class="concept-def">Prueban que los componentes funcionen juntos.</div></div>
+      <div class="concept"><span class="concept-term">Aceptación</span><div class="concept-def">Validan que el sistema cumple con el cliente / usuario final.</div></div>
+    </div>
+
+    <h3>Conceptos que tienden a preguntarse</h3>
+    <ul>
+      <li><strong>Spike (XP):</strong> incremento sin programación (diseño arquitectónico o documentación).</li>
+      <li><strong>Test-first development (XP):</strong> se escribe la prueba ANTES de implementar la funcionalidad.</li>
+      <li><strong>HiPPO:</strong> Highest Paid Person's Opinion — problema cuando se decide por jerarquía y no por datos.</li>
+      <li><strong>Velocity:</strong> cuántas historias / puntos entrega el equipo por sprint.</li>
+      <li><strong>MVP:</strong> Producto Mínimo Viable.</li>
+      <li><strong>Historia Pivote:</strong> historia de referencia para estimar las demás.</li>
+      <li><strong>Customer Journey Map:</strong> representación del recorrido del usuario.</li>
+      <li><strong>Agile Inception:</strong> Kick Off donde se comparte la visión del nuevo producto.</li>
+      <li><strong>Requerimiento de dominio:</strong> deriva del dominio; si no se satisface, el sistema queda inutilizable.</li>
+      <li><strong>Propiedad colectiva (XP):</strong> todos son responsables de todo el código; no hay islas de experiencia.</li>
+    </ul>
+
+    <div class="key">
+      <div class="key-label">Tip para la solemne</div>
+      Las solemnes son <strong>basadas en un caso</strong> con preguntas de respuesta abierta. Lee bien el caso, identifica qué está preguntando (¿es un requerimiento funcional o no funcional?, ¿qué patrón arquitectónico recomendar?, ¿qué ceremonia de Scrum aplica?), y <strong>justifica siempre</strong> con los conceptos del curso. Mezcla definición + aplicación al caso.
+    </div>
+  </section>
+
+  <footer>
+    Apuntes compilados para estudio · Ingeniería de Software · UDP · 2026
+  </footer>
+
+</main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloque 2 — Desplazamientos de Mercado · UDP Introducción a la Economía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #2d6a6a;
+    --teal-dark: #1f5050;
+    --amber: #c88a3f;
+    --amber-dark: #a36e2a;
+    --red: #b8432e;
+    --red-dark: #8f3322;
+    --green: #4a7c59;
+    --green-dark: #375d42;
+    --bg: #fbf6ec;
+    --bg-card: #ffffff;
+    --text: #2c2922;
+    --text-muted: #6b6562;
+    --border: #e5dfd0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    padding: 48px 24px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .course-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 44px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  h1 .accent { color: var(--teal); }
+
+  .subtitle {
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+
+  .toc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+  }
+
+  .toc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+  }
+
+  .toc li {
+    counter-increment: toc;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    position: relative;
+    padding-left: 32px;
+  }
+
+  .toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--amber);
+    font-weight: 500;
+    top: 3px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.01em;
+    margin: 56px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--amber);
+  }
+
+  h2 .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--amber);
+    font-weight: 500;
+    margin-right: 12px;
+    vertical-align: 4px;
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    margin: 32px 0 14px;
+    color: var(--teal-dark);
+  }
+
+  h4 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    margin: 20px 0 10px;
+  }
+
+  p { margin-bottom: 14px; }
+  p.tight { margin-bottom: 6px; }
+
+  strong { font-weight: 700; color: var(--text); }
+
+  /* Boxes */
+  .box {
+    background: var(--bg-card);
+    padding: 22px 26px;
+    margin: 20px 0;
+    border-radius: 4px;
+    border-left: 4px solid var(--teal);
+  }
+
+  .box-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .box-def { border-left-color: var(--teal); }
+  .box-def .box-label { color: var(--teal); }
+
+  .box-example { border-left-color: var(--green); background: #f5f8f2; }
+  .box-example .box-label { color: var(--green-dark); }
+
+  .box-warning { border-left-color: var(--red); background: #fcf2ee; }
+  .box-warning .box-label { color: var(--red-dark); }
+
+  .box-control { border-left-color: var(--red); background: #fcf2ee; }
+  .box-control .box-label { color: var(--red); }
+
+  /* TRUCO */
+  .truco {
+    border: 1.5px dashed var(--amber);
+    background: transparent;
+    padding: 18px 24px;
+    margin: 20px 0;
+    border-radius: 4px;
+    position: relative;
+  }
+
+  .truco-label {
+    display: inline-block;
+    background: var(--bg);
+    padding: 0 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--amber-dark);
+    text-transform: uppercase;
+    font-weight: 600;
+    position: absolute;
+    top: -9px;
+    left: 16px;
+  }
+
+  .truco p { margin-bottom: 6px; }
+
+  /* Equations */
+  .eq {
+    background: #f7f2e5;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 14px 20px;
+    margin: 14px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--teal-dark);
+  }
+
+  .eq .comment { color: var(--text-muted); font-style: italic; }
+  .eq .answer { color: var(--red-dark); font-weight: 600; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: var(--bg-card);
+    border-radius: 4px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+
+  thead th {
+    background: var(--teal);
+    color: #fffbf2;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 12px 14px;
+    text-align: left;
+  }
+
+  tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) { background: #faf4e5; }
+
+  .arrow-up { color: var(--green-dark); font-weight: 700; }
+  .arrow-down { color: var(--red-dark); font-weight: 700; }
+  .amb { color: var(--amber-dark); font-style: italic; font-weight: 600; }
+
+  /* Key idea banner */
+  .key-idea {
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    color: #fffbf2;
+    padding: 24px 28px;
+    border-radius: 4px;
+    margin: 28px 0;
+  }
+
+  .key-idea .key-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 8px;
+  }
+
+  .key-idea p { font-size: 17px; margin-bottom: 0; }
+
+  /* Scenario card */
+  .scenario {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    position: relative;
+  }
+
+  .scenario-tag {
+    display: inline-block;
+    background: var(--amber);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 12px;
+  }
+
+  .scenario h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .scenario-analysis {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+
+  .scenario-analysis dt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--teal);
+    font-weight: 500;
+    padding-top: 2px;
+  }
+
+  .scenario-analysis dd { font-weight: 500; }
+
+  .result-pill {
+    display: inline-block;
+    background: var(--teal-dark);
+    color: #fffbf2;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    margin-right: 8px;
+    margin-top: 6px;
+  }
+
+  /* Graph grid */
+  .graph-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 24px 0;
+  }
+
+  .mini-graph {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .mini-graph-title {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--teal-dark);
+  }
+
+  .mini-graph-caption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  svg { max-width: 100%; height: auto; }
+
+  ul.clean, ol.clean { margin: 12px 0 18px 22px; }
+  ul.clean li, ol.clean li { margin-bottom: 8px; padding-left: 4px; }
+  ul.clean li::marker { color: var(--amber); }
+  ol.clean li::marker { color: var(--amber); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+  @media (max-width: 640px) {
+    body { padding: 28px 16px; font-size: 15px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 26px; }
+    h3 { font-size: 20px; }
+    .toc ol { grid-template-columns: 1fr; }
+    .graph-grid { grid-template-columns: 1fr; }
+    .scenario-analysis { grid-template-columns: 1fr; gap: 4px; }
+    .scenario-analysis dt { padding-top: 8px; }
+    .eq { font-size: 12.5px; padding: 12px 16px; }
+    table { font-size: 13px; }
+    thead th, tbody td { padding: 10px 10px; }
+    .scenario { padding: 20px 18px; }
+  }
+
+  footer {
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="course-tag">UDP · Introducción a la Economía · 2026-1</div>
+  <h1>Desplazamientos de <span class="accent">mercado</span></h1>
+  <p class="subtitle">Bloque 2 — Cómo analizar cambios de demanda y oferta, con los 5 escenarios de P3 y el comentario de P4 de la Solemne 2025 resueltos paso a paso</p>
+</header>
+
+<section class="toc">
+  <div class="toc-label">Contenidos</div>
+  <ol>
+    <li>Marco de análisis en 4 pasos</li>
+    <li>Los 4 casos básicos (matriz)</li>
+    <li>Casos ambiguos (ambas curvas)</li>
+    <li>P3 — Agua envasada (5 escenarios)</li>
+    <li>P4 — Pescados en Semana Santa</li>
+    <li>Checklist para la prueba</li>
+  </ol>
+</section>
+
+<!-- ==================== SECCIÓN 1 ==================== -->
+<h2><span class="num">01</span>Marco de análisis en 4 pasos</h2>
+
+<p>Todo ejercicio de desplazamiento se reduce a aplicar <strong>siempre</strong> el mismo procedimiento. No se trata de memorizar resultados, sino de pensar sistemáticamente.</p>
+
+<div class="box box-def">
+  <div class="box-label">Los 4 pasos</div>
+  <ol class="clean">
+    <li><strong>¿Qué variable del mundo real cambió?</strong> (clima, tecnología, ingreso, precio de un bien relacionado, etc.)</li>
+    <li><strong>¿Afecta a la demanda o a la oferta?</strong> (¿modifica el comportamiento de los consumidores o de los productores?)</li>
+    <li><strong>¿En qué dirección se desplaza la curva?</strong> (derecha = aumenta, izquierda = disminuye)</li>
+    <li><strong>¿Qué pasa con P* y Q*?</strong> (comparar el equilibrio nuevo con el viejo)</li>
+  </ol>
+</div>
+
+<div class="truco">
+  <span class="truco-label">Truco clave</span>
+  <p>Un cambio en el <strong>precio del mismo bien</strong> NUNCA desplaza la curva — solo produce un <em>movimiento a lo largo</em> de ella. La curva solo se desplaza cuando cambia algo distinto al precio.</p>
+</div>
+
+<!-- ==================== SECCIÓN 2 ==================== -->
+<h2><span class="num">02</span>Los 4 casos básicos</h2>
+
+<p>Cuando solo se mueve una curva, el resultado sobre P* y Q* es determinista. Esta tabla hay que tenerla automatizada:</p>
+
+<table>
+  <thead>
+    <tr><th>Desplazamiento</th><th>Causa típica</th><th>P*</th><th>Q*</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>D → derecha</strong> (aumenta)</td>
+      <td>Sube ingreso (bien normal), sube P de sustituto, gusto a favor, más consumidores</td>
+      <td class="arrow-up">↑ sube</td>
+      <td class="arrow-up">↑ sube</td>
+    </tr>
+    <tr>
+      <td><strong>D ← izquierda</strong> (baja)</td>
+      <td>Baja ingreso, baja P de sustituto, cambio de moda en contra</td>
+      <td class="arrow-down">↓ baja</td>
+      <td class="arrow-down">↓ baja</td>
+    </tr>
+    <tr>
+      <td><strong>S → derecha</strong> (aumenta)</td>
+      <td>Mejora tecnológica, más productores, mejor clima, bajan insumos</td>
+      <td class="arrow-down">↓ baja</td>
+      <td class="arrow-up">↑ sube</td>
+    </tr>
+    <tr>
+      <td><strong>S ← izquierda</strong> (baja)</td>
+      <td>Mal clima, suben insumos, salen productores, impuestos</td>
+      <td class="arrow-up">↑ sube</td>
+      <td class="arrow-down">↓ baja</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="graph-grid">
+  <div class="mini-graph">
+    <div class="mini-graph-title">D se desplaza a la derecha</div>
+    <svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+      <line x1="30" y1="20" x2="30" y2="150" stroke="#2c2922" stroke-width="1.3"/>
+      <line x1="30" y1="150" x2="210" y2="150" stroke="#2c2922" stroke-width="1.3"/>
+      <text x="18" y="14" font-family="Fraunces" font-size="11" font-style="italic">P</text>
+      <text x="213" y="155" font-family="Fraunces" font-size="11" font-style="italic">Q</text>
+      <!-- Oferta -->
+      <line x1="30" y1="140" x2="200" y2="35" stroke="#2d6a6a" stroke-width="1.8"/>
+      <text x="195" y="45" font-family="Fraunces" font-size="11" fill="#2d6a6a">S</text>
+      <!-- D1 -->
+      <line x1="30" y1="40" x2="160" y2="150" stroke="#b8432e" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="55" y="60" font-family="Fraunces" font-size="10" fill="#b8432e">D₁</text>
+      <!-- D2 -->
+      <line x1="70" y1="30" x2="205" y2="150" stroke="#b8432e" stroke-width="2"/>
+      <text x="120" y="55" font-family="Fraunces" font-size="11" fill="#b8432e" font-weight="600">D₂</text>
+      <!-- Arrow -->
+      <path d="M 100 95 L 140 95" stroke="#c88a3f" stroke-width="2" fill="none"/>
+      <polygon points="140,95 134,92 134,98" fill="#c88a3f"/>
+      <!-- E1 -->
+      <circle cx="90" cy="93" r="3" fill="#6b6562"/>
+      <!-- E2 -->
+      <circle cx="125" cy="78" r="3.5" fill="#c88a3f"/>
+    </svg>
+    <div class="mini-graph-caption">P* ↑ &nbsp; Q* ↑</div>
+  </div>
+
+  <div class="mini-graph">
+    <div class="mini-graph-title">S se desplaza a la derecha</div>
+    <svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+      <line x1="30" y1="20" x2="30" y2="150" stroke="#2c2922" stroke-width="1.3"/>
+      <line x1="30" y1="150" x2="210" y2="150" stroke="#2c2922" stroke-width="1.3"/>
+      <text x="18" y="14" font-family="Fraunces" font-size="11" font-style="italic">P</text>
+      <text x="213" y="155" font-family="Fraunces" font-size="11" font-style="italic">Q</text>
+      <!-- Demanda -->
+      <line x1="30" y1="40" x2="190" y2="150" stroke="#b8432e" stroke-width="1.8"/>
+      <text x="175" y="140" font-family="Fraunces" font-size="11" fill="#b8432e">D</text>
+      <!-- S1 -->
+      <line x1="30" y1="140" x2="180" y2="35" stroke="#2d6a6a" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="60" y="85" font-family="Fraunces" font-size="10" fill="#2d6a6a">S₁</text>
+      <!-- S2 -->
+      <line x1="60" y1="150" x2="205" y2="55" stroke="#2d6a6a" stroke-width="2"/>
+      <text x="155" y="80" font-family="Fraunces" font-size="11" fill="#2d6a6a" font-weight="600">S₂</text>
+      <!-- Arrow -->
+      <path d="M 80 110 L 120 110" stroke="#c88a3f" stroke-width="2" fill="none"/>
+      <polygon points="120,110 114,107 114,113" fill="#c88a3f"/>
+      <!-- E1 -->
+      <circle cx="90" cy="85" r="3" fill="#6b6562"/>
+      <!-- E2 -->
+      <circle cx="130" cy="103" r="3.5" fill="#c88a3f"/>
+    </svg>
+    <div class="mini-graph-caption">P* ↓ &nbsp; Q* ↑</div>
+  </div>
+</div>
+
+<!-- ==================== SECCIÓN 3 ==================== -->
+<h2><span class="num">03</span>Casos ambiguos (dos curvas se mueven)</h2>
+
+<p>Cuando el enunciado dispara dos efectos a la vez (por ejemplo, afecta a la demanda y a la oferta simultáneamente), <strong>uno de los dos resultados queda ambiguo</strong> — depende de qué desplazamiento sea más fuerte.</p>
+
+<table>
+  <thead>
+    <tr><th>Combinación</th><th>P*</th><th>Q*</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>D → derecha  &nbsp;&nbsp;y&nbsp;&nbsp;  S → derecha</td><td class="amb">ambiguo</td><td class="arrow-up">↑ sube (seguro)</td></tr>
+    <tr><td>D ← izquierda  &nbsp;&nbsp;y&nbsp;&nbsp;  S ← izquierda</td><td class="amb">ambiguo</td><td class="arrow-down">↓ baja (seguro)</td></tr>
+    <tr><td>D → derecha  &nbsp;&nbsp;y&nbsp;&nbsp;  S ← izquierda</td><td class="arrow-up">↑ sube (seguro)</td><td class="amb">ambiguo</td></tr>
+    <tr><td>D ← izquierda  &nbsp;&nbsp;y&nbsp;&nbsp;  S → derecha</td><td class="arrow-down">↓ baja (seguro)</td><td class="amb">ambiguo</td></tr>
+  </tbody>
+</table>
+
+<div class="truco">
+  <span class="truco-label">Regla mnemotécnica</span>
+  <p>Si las curvas se mueven <strong>en el mismo sentido</strong> (ambas a la derecha o ambas a la izquierda) → <strong>Q* es seguro, P* ambiguo</strong>.</p>
+  <p>Si se mueven <strong>en sentidos opuestos</strong> → <strong>P* es seguro, Q* ambiguo</strong>.</p>
+</div>
+
+<!-- ==================== SECCIÓN 4 ==================== -->
+<h2><span class="num">04</span>P3 — Mercado del agua envasada purificada</h2>
+
+<div class="box box-control">
+  <div class="box-label">Enunciado — Solemne 2025, Pregunta 3 (10 pts)</div>
+  <p>Analice gráficamente lo que sucedería (precio y cantidad) en el mercado del agua envasada purificada si suceden los siguientes eventos. <strong>Los eventos son independientes entre sí.</strong> Haga los supuestos más realistas posibles.</p>
+</div>
+
+<!-- Escenario 3.1 -->
+<div class="scenario">
+  <span class="scenario-tag">3.1</span>
+  <h3>Avance tecnológico en los procesos de purificación del agua para consumo doméstico</h3>
+
+  <dl class="scenario-analysis">
+    <dt>¿Qué cambió?</dt>
+    <dd>La tecnología productiva mejora — es más barato y eficiente purificar agua.</dd>
+    <dt>¿Afecta D o S?</dt>
+    <dd>Afecta la <strong>OFERTA</strong>. Los costos de producción bajan → al mismo precio, los productores quieren vender más.</dd>
+    <dt>Dirección</dt>
+    <dd>S se desplaza <strong>a la derecha</strong>.</dd>
+  </dl>
+
+  <div>
+    <span class="result-pill">P* ↓ baja</span>
+    <span class="result-pill">Q* ↑ sube</span>
+  </div>
+</div>
+
+<!-- Escenario 3.2 -->
+<div class="scenario">
+  <span class="scenario-tag">3.2</span>
+  <h3>El Ministerio de Salud advierte los peligros del consumo excesivo de bebidas azucaradas y recomienda una vida más saludable</h3>
+
+  <dl class="scenario-analysis">
+    <dt>¿Qué cambió?</dt>
+    <dd>Cambio de preferencias/gustos. Las bebidas azucaradas (jugos, gaseosas) son <strong>sustitutos</strong> del agua envasada.</dd>
+    <dt>¿Afecta D o S?</dt>
+    <dd>Afecta la <strong>DEMANDA</strong> del agua envasada. La gente migra desde las azucaradas hacia el agua.</dd>
+    <dt>Dirección</dt>
+    <dd>D se desplaza <strong>a la derecha</strong>.</dd>
+  </dl>
+
+  <div>
+    <span class="result-pill">P* ↑ sube</span>
+    <span class="result-pill">Q* ↑ sube</span>
+  </div>
+</div>
+
+<!-- Escenario 3.3 -->
+<div class="scenario">
+  <span class="scenario-tag">3.3</span>
+  <h3>Una grave sequía afecta gran parte del país</h3>
+
+  <dl class="scenario-analysis">
+    <dt>¿Qué cambió?</dt>
+    <dd>Escasez de agua como <strong>insumo productivo</strong> (menos agua disponible para envasar).</dd>
+    <dt>¿Afecta D o S?</dt>
+    <dd>Afecta principalmente la <strong>OFERTA</strong> — suben los costos de obtener el insumo agua y baja la capacidad productiva. <em>(Argumento adicional: también podría subir la demanda si baja la calidad del agua de grifo. En ese caso Q* sería ambiguo).</em></dd>
+    <dt>Dirección</dt>
+    <dd>S se desplaza <strong>a la izquierda</strong>.</dd>
+  </dl>
+
+  <div>
+    <span class="result-pill">P* ↑ sube</span>
+    <span class="result-pill">Q* ↓ baja</span>
+  </div>
+</div>
+
+<!-- Escenario 3.4 -->
+<div class="scenario">
+  <span class="scenario-tag">3.4</span>
+  <h3>Debido a la alta rentabilidad del negocio, aumenta el número de empresas que procesan agua envasada</h3>
+
+  <dl class="scenario-analysis">
+    <dt>¿Qué cambió?</dt>
+    <dd>El número de productores (N) aumenta — entran nuevas empresas al mercado.</dd>
+    <dt>¿Afecta D o S?</dt>
+    <dd>Afecta la <strong>OFERTA</strong>. Más productores → más oferta agregada al mismo precio.</dd>
+    <dt>Dirección</dt>
+    <dd>S se desplaza <strong>a la derecha</strong>.</dd>
+  </dl>
+
+  <div>
+    <span class="result-pill">P* ↓ baja</span>
+    <span class="result-pill">Q* ↑ sube</span>
+  </div>
+</div>
+
+<!-- Escenario 3.5 -->
+<div class="scenario">
+  <span class="scenario-tag">3.5</span>
+  <h3>Aumenta el precio de los jugos envasados</h3>
+
+  <dl class="scenario-analysis">
+    <dt>¿Qué cambió?</dt>
+    <dd>Sube el precio de un bien <strong>sustituto</strong> del agua envasada (los jugos).</dd>
+    <dt>¿Afecta D o S?</dt>
+    <dd>Afecta la <strong>DEMANDA</strong> del agua envasada. La gente sustituye jugos (ahora más caros) por agua.</dd>
+    <dt>Dirección</dt>
+    <dd>D se desplaza <strong>a la derecha</strong>.</dd>
+  </dl>
+
+  <div>
+    <span class="result-pill">P* ↑ sube</span>
+    <span class="result-pill">Q* ↑ sube</span>
+  </div>
+</div>
+
+<div class="key-idea">
+  <div class="key-label">Resumen P3</div>
+  <p>Tres escenarios mueven S (3.1, 3.3, 3.4) y dos mueven D (3.2, 3.5). En cuatro de cinco, Q* sube. El único donde Q* baja es la sequía (3.3). Los precios se mueven en direcciones distintas según qué curva se movió.</p>
+</div>
+
+<!-- ==================== SECCIÓN 5 ==================== -->
+<h2><span class="num">05</span>P4 — Pescados y mariscos en Semana Santa</h2>
+
+<div class="box box-control">
+  <div class="box-label">Enunciado — Solemne 2025, Pregunta 4 (10 pts)</div>
+  <p>«Es habitual observar durante los días de Semana Santa que los precios de los pescados y mariscos sufran en gran parte del país un alza importante, así como las cantidades transadas. No obstante, en alguna ocasión en que se celebró esa festividad religiosa, se pudo constatar una leve reducción de los precios de estos productos, junto con un aumento significativo de las cantidades consumidas. <em>Al parecer no estaría funcionando el mercado.</em>» Comente usando instrumental gráfico.</p>
+</div>
+
+<h3>Lo que pasa normalmente en Semana Santa</h3>
+
+<p>Por tradición religiosa (abstinencia de carnes rojas), en Semana Santa la demanda de pescados y mariscos <strong>sube fuertemente</strong>. La oferta, en el corto plazo, se mantiene aproximadamente igual (la capacidad pesquera no cambia de un día para otro).</p>
+
+<p>→ Solo se mueve D hacia la derecha → <strong>P* ↑ y Q* ↑</strong>. Esto es exactamente lo que describe el enunciado como habitual.</p>
+
+<h3>Lo que pasó en esa ocasión particular</h3>
+
+<p>Se observó que <strong>P* bajó y Q* subió</strong>. Mirando la tabla de casos básicos, este patrón corresponde a un <strong>desplazamiento de S hacia la derecha</strong> (mejor pesca, temporada excepcional, buen clima marino, importaciones, etc.).</p>
+
+<p>Pero la demanda sigue siendo alta por Semana Santa. Entonces lo que realmente ocurrió es que <strong>ambas curvas se desplazaron a la derecha</strong>: D por la tradición, S por condiciones excepcionales de oferta. Cuando ambas se mueven en el mismo sentido, Q* sube seguro, y P* queda ambiguo. En este caso particular, el desplazamiento de S fue más fuerte que el de D → <strong>P* bajó</strong>.</p>
+
+<h3>Respuesta al comentario</h3>
+
+<div class="box box-example">
+  <div class="box-label">Conclusión</div>
+  <p>La afirmación «al parecer no estaría funcionando el mercado» es <strong>INCORRECTA</strong>. El mercado funciona perfectamente. Lo que el observador no está considerando es que, además del desplazamiento habitual de la demanda por la festividad, en esa ocasión la oferta también se desplazó a la derecha (probablemente por una temporada de pesca excepcional). Como el efecto sobre la oferta fue mayor que el efecto sobre la demanda, el precio cayó levemente mientras la cantidad aumentó significativamente. Lejos de una falla de mercado, es exactamente la respuesta esperable de oferta y demanda cuando <em>ambas</em> curvas se desplazan.</p>
+</div>
+
+<div class="graph-grid">
+  <div class="mini-graph">
+    <div class="mini-graph-title">Semana Santa típica</div>
+    <svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+      <line x1="30" y1="20" x2="30" y2="150" stroke="#2c2922" stroke-width="1.3"/>
+      <line x1="30" y1="150" x2="210" y2="150" stroke="#2c2922" stroke-width="1.3"/>
+      <text x="18" y="14" font-family="Fraunces" font-size="11" font-style="italic">P</text>
+      <text x="213" y="155" font-family="Fraunces" font-size="11" font-style="italic">Q</text>
+      <!-- S fixed -->
+      <line x1="30" y1="140" x2="200" y2="35" stroke="#2d6a6a" stroke-width="1.8"/>
+      <text x="195" y="45" font-family="Fraunces" font-size="11" fill="#2d6a6a">S</text>
+      <!-- D1 -->
+      <line x1="30" y1="40" x2="160" y2="150" stroke="#b8432e" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="55" y="60" font-family="Fraunces" font-size="10" fill="#b8432e">D₁</text>
+      <!-- D2 -->
+      <line x1="70" y1="30" x2="205" y2="150" stroke="#b8432e" stroke-width="2"/>
+      <text x="125" y="55" font-family="Fraunces" font-size="11" fill="#b8432e" font-weight="600">D₂</text>
+      <circle cx="90" cy="93" r="3" fill="#6b6562"/>
+      <circle cx="125" cy="78" r="3.5" fill="#c88a3f"/>
+    </svg>
+    <div class="mini-graph-caption">Solo D se mueve → P↑ Q↑</div>
+  </div>
+
+  <div class="mini-graph">
+    <div class="mini-graph-title">La ocasión anómala</div>
+    <svg viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+      <line x1="30" y1="20" x2="30" y2="150" stroke="#2c2922" stroke-width="1.3"/>
+      <line x1="30" y1="150" x2="210" y2="150" stroke="#2c2922" stroke-width="1.3"/>
+      <text x="18" y="14" font-family="Fraunces" font-size="11" font-style="italic">P</text>
+      <text x="213" y="155" font-family="Fraunces" font-size="11" font-style="italic">Q</text>
+      <!-- D1 dashed -->
+      <line x1="30" y1="40" x2="160" y2="150" stroke="#b8432e" stroke-width="1.3" stroke-dasharray="4,3"/>
+      <text x="48" y="60" font-family="Fraunces" font-size="9.5" fill="#b8432e">D₁</text>
+      <!-- D2 solid (shift right, modest) -->
+      <line x1="60" y1="35" x2="195" y2="150" stroke="#b8432e" stroke-width="1.8"/>
+      <text x="115" y="55" font-family="Fraunces" font-size="10" fill="#b8432e" font-weight="600">D₂</text>
+      <!-- S1 dashed -->
+      <line x1="30" y1="140" x2="180" y2="40" stroke="#2d6a6a" stroke-width="1.3" stroke-dasharray="4,3"/>
+      <text x="55" y="90" font-family="Fraunces" font-size="9.5" fill="#2d6a6a">S₁</text>
+      <!-- S2 solid (shift right, bigger) -->
+      <line x1="55" y1="150" x2="205" y2="50" stroke="#2d6a6a" stroke-width="1.8"/>
+      <text x="170" y="85" font-family="Fraunces" font-size="10" fill="#2d6a6a" font-weight="600">S₂</text>
+      <!-- Equilibria -->
+      <circle cx="88" cy="90" r="3" fill="#6b6562"/>
+      <circle cx="135" cy="98" r="3.5" fill="#c88a3f"/>
+    </svg>
+    <div class="mini-graph-caption">S↑ &gt; D↑ → P↓ Q↑↑</div>
+  </div>
+</div>
+
+<!-- ==================== SECCIÓN 6 ==================== -->
+<h2><span class="num">06</span>Checklist para la prueba</h2>
+
+<div class="box box-control">
+  <div class="box-label">Antes de responder cualquier ejercicio de desplazamientos</div>
+  <ul class="clean">
+    <li>Identificá primero <strong>qué variable cambió</strong> en el enunciado (tecnología, precio de un relacionado, clima, etc.).</li>
+    <li>Preguntate: ¿afecta al <strong>comportamiento de los consumidores</strong> (demanda) o al de los <strong>productores</strong> (oferta)?</li>
+    <li>Recordá que un cambio en el <strong>precio del mismo bien</strong> NO desplaza la curva.</li>
+    <li>Identificá la dirección: ¿sube (derecha) o baja (izquierda) la curva?</li>
+    <li>Deducí P* y Q* usando la matriz de 4 casos básicos.</li>
+    <li>Si afecta a ambas curvas, usá la regla mnemotécnica: mismo sentido → Q seguro, P ambiguo. Sentido opuesto → P seguro, Q ambiguo.</li>
+    <li>En el gráfico: etiquetá D₁, D₂, S₁, S₂, E₁, E₂ y las direcciones de P y Q con flechas claras.</li>
+    <li>Sustitutos: sube precio del otro → sube mi demanda. Complementos: sube precio del otro → baja mi demanda.</li>
+  </ul>
+</div>
+
+<footer>
+  UDP · Introducción a la Economía · 2026-1 — Guía Bloque 2
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SyS - Modo Emergencia</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "$$", right: "$$", display: true},
+      {left: "$", right: "$", display: false}
+    ],
+    throwOnError: false
+  });
+});
+</script>
+<style>
+:root{
+  --bg:#0e0f14;
+  --panel:#171923;
+  --panel2:#1e2030;
+  --fg:#e6e8ef;
+  --muted:#9aa0b4;
+  --accent:#ffcc3d;
+  --accent2:#5cffb1;
+  --danger:#ff6b6b;
+  --blue:#60a5fa;
+  --border:#2a2d3e;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);
+  color:var(--fg);
+  line-height:1.55;
+  font-size:16px;
+}
+header{
+  padding:16px;
+  background:linear-gradient(135deg,#1a1c2a,#2a1a3a);
+  border-bottom:2px solid var(--accent);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+header h1{
+  margin:0 0 4px 0;
+  font-size:18px;
+  color:var(--accent);
+  letter-spacing:0.5px;
+}
+header p{
+  margin:0;
+  font-size:13px;
+  color:var(--muted);
+}
+nav{
+  padding:12px 16px;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto;
+  white-space:nowrap;
+  position:sticky;
+  top:64px;
+  z-index:99;
+}
+nav a{
+  color:var(--fg);
+  background:var(--panel2);
+  padding:6px 12px;
+  margin-right:6px;
+  border-radius:6px;
+  font-size:12px;
+  text-decoration:none;
+  border:1px solid var(--border);
+  display:inline-block;
+}
+nav a:hover{background:var(--accent);color:#000}
+main{padding:16px;max-width:900px;margin:0 auto}
+section{
+  background:var(--panel);
+  border-radius:10px;
+  padding:18px;
+  margin-bottom:16px;
+  border:1px solid var(--border);
+}
+h2{
+  color:var(--accent);
+  margin-top:0;
+  font-size:20px;
+  border-bottom:1px solid var(--border);
+  padding-bottom:8px;
+}
+h3{
+  color:var(--accent2);
+  font-size:16px;
+  margin-top:18px;
+  margin-bottom:8px;
+}
+h4{
+  color:var(--blue);
+  font-size:14px;
+  margin-top:14px;
+  margin-bottom:6px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+p{margin:8px 0}
+ul,ol{padding-left:22px;margin:8px 0}
+li{margin-bottom:4px}
+code{
+  background:#0a0b10;
+  color:var(--accent);
+  padding:2px 6px;
+  border-radius:4px;
+  font-size:13px;
+  font-family:"Fira Code",Consolas,monospace;
+}
+.box{
+  background:var(--panel2);
+  padding:12px;
+  border-radius:8px;
+  border-left:3px solid var(--accent);
+  margin:12px 0;
+}
+.warn{border-left-color:var(--danger);background:#2a1515}
+.tip{border-left-color:var(--accent2);background:#0f2a20}
+.tip::before{content:"⚡ TRUCO: ";color:var(--accent2);font-weight:bold}
+.warn::before{content:"⚠ OJO: ";color:var(--danger);font-weight:bold}
+.def{border-left-color:var(--blue);background:#0f1a2a}
+.def::before{content:"📌 DEF: ";color:var(--blue);font-weight:bold}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin:10px 0;
+  font-size:14px;
+}
+th,td{
+  border:1px solid var(--border);
+  padding:8px;
+  text-align:left;
+}
+th{background:var(--panel2);color:var(--accent)}
+.formula{
+  background:#0a0b10;
+  padding:10px;
+  border-radius:6px;
+  margin:8px 0;
+  text-align:center;
+  overflow-x:auto;
+  border:1px solid var(--border);
+}
+.step{
+  margin:10px 0;
+  padding-left:14px;
+  border-left:2px solid var(--accent2);
+}
+.step-num{
+  display:inline-block;
+  background:var(--accent2);
+  color:#000;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  text-align:center;
+  line-height:22px;
+  font-weight:bold;
+  margin-right:8px;
+  font-size:12px;
+}
+details{
+  background:var(--panel2);
+  border-radius:6px;
+  padding:8px 12px;
+  margin:8px 0;
+  border:1px solid var(--border);
+}
+details summary{
+  cursor:pointer;
+  color:var(--accent);
+  font-weight:600;
+  outline:none;
+}
+details[open] summary{margin-bottom:10px}
+.ans{
+  background:#0f2a20;
+  padding:8px;
+  border-radius:6px;
+  margin-top:6px;
+  border-left:3px solid var(--accent2);
+  font-size:14px;
+}
+.ans strong{color:var(--accent2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.checklist{list-style:none;padding-left:0}
+.checklist li{padding:6px 0;border-bottom:1px solid var(--border)}
+.checklist li::before{content:"☐ ";color:var(--accent);font-weight:bold}
+.kbd{
+  background:#0a0b10;
+  border:1px solid var(--border);
+  padding:1px 6px;
+  border-radius:3px;
+  font-family:monospace;
+  font-size:12px;
+  color:var(--accent);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚨 SEÑALES Y SISTEMAS — MODO EMERGENCIA</h1>
+  <p>Solemne 1 · Contenido hasta Convolución · Lo que necesitas para aprobar</p>
+</header>
+
+<nav>
+  <a href="#plan">📋 Plan</a>
+  <a href="#formulario">📐 Fórmulas</a>
+  <a href="#clas">1. Clasificación</a>
+  <a href="#trans">2. Transformaciones</a>
+  <a href="#elem">3. Señales</a>
+  <a href="#prop">4. Propiedades</a>
+  <a href="#lti">5. LTI</a>
+  <a href="#conv">6. Convolución</a>
+  <a href="#inter">7. Interconexión</a>
+  <a href="#sol1">📝 Solemne 2025-1</a>
+  <a href="#sol2">📝 Solemne 2025-2</a>
+  <a href="#trucos">⚡ Trucos</a>
+</nav>
+
+<main>
+
+<section id="plan">
+<h2>Plan de batalla</h2>
+<p>Si tienes <strong>4 horas o menos</strong>, estudia en este orden. No te desvíes:</p>
+<ol>
+  <li><strong>Formulario y definiciones básicas</strong> (20 min) — secciones 1-3</li>
+  <li><strong>Propiedades de sistemas</strong> (30 min) — la MC pregunta esto SIEMPRE</li>
+  <li><strong>LTI y convolución básica</strong> (40 min) — sección 5-6</li>
+  <li><strong>Interconexión serie/paralelo</strong> (15 min) — cae en desarrollo</li>
+  <li><strong>Solemnes pasadas RESUELTAS paso a paso</strong> (90 min) — este es el oro</li>
+  <li><strong>Repaso formulario</strong> (10 min antes del examen)</li>
+</ol>
+<div class="warn">El patrón de las pruebas: ~15-20 preguntas MC sobre definiciones + 1 problema de h(t)/h[n] (energía, simetría, causalidad, respuesta) + 1 problema de interconexión con BIBO. <strong>Conoce ese patrón de memoria.</strong></div>
+</section>
+
+<section id="formulario">
+<h2>📐 Formulario Relámpago</h2>
+
+<h4>Energía y Potencia</h4>
+<div class="formula">
+$E_\infty = \int_{-\infty}^{\infty}|x(t)|^2\,dt \qquad P_\infty = \lim_{T\to\infty}\frac{1}{2T}\int_{-T}^{T}|x(t)|^2\,dt$
+</div>
+<div class="formula">
+$E_\infty = \sum_{n=-\infty}^{\infty}|x[n]|^2 \qquad P_\infty = \lim_{N\to\infty}\frac{1}{2N+1}\sum_{n=-N}^{N}|x[n]|^2$
+</div>
+
+<h4>Par / Impar</h4>
+<div class="formula">
+$x_p(t)=\tfrac{1}{2}[x(t)+x(-t)] \qquad x_i(t)=\tfrac{1}{2}[x(t)-x(-t)]$
+</div>
+
+<h4>Señales elementales y sus relaciones</h4>
+<div class="formula">
+$\delta(t)=\dfrac{du(t)}{dt}, \quad u(t)=\int_{-\infty}^{t}\delta(\tau)d\tau, \quad r(t)=t\,u(t)=\int_{-\infty}^{t}u(\tau)d\tau$
+</div>
+<div class="formula">
+$\delta[n]=u[n]-u[n-1], \quad u[n]=\sum_{k=0}^{\infty}\delta[n-k]$
+</div>
+
+<h4>Propiedades del impulso</h4>
+<div class="formula">
+$\int_{-\infty}^{\infty}x(t)\delta(t-t_0)dt = x(t_0) \qquad x(t)\delta(t-t_0)=x(t_0)\delta(t-t_0)$
+</div>
+<div class="formula">
+$\delta(at)=\dfrac{1}{|a|}\delta(t) \qquad \delta(a(t-t_0))=\dfrac{1}{|a|}\delta(t-t_0)$
+</div>
+
+<h4>Exponencial compleja</h4>
+<div class="formula">
+$e^{j\theta}=\cos\theta+j\sin\theta \qquad A\cos(\omega_0 t+\phi)=\tfrac{A}{2}e^{j\phi}e^{j\omega_0 t}+\tfrac{A}{2}e^{-j\phi}e^{-j\omega_0 t}$
+</div>
+
+<h4>Periodicidad</h4>
+<ul>
+  <li><strong>Continua:</strong> $e^{j\omega_0 t}$ es <em>siempre</em> periódica con $T_0 = 2\pi/|\omega_0|$</li>
+  <li><strong>Discreta:</strong> $e^{j\Omega_0 n}$ es periódica SOLO si $\Omega_0/2\pi = m/N$ (racional)</li>
+  <li>Período de suma de señales = <strong>mínimo común múltiplo</strong> de los períodos individuales</li>
+</ul>
+
+<h4>Convolución</h4>
+<div class="formula">
+$y(t)=x(t)*h(t)=\int_{-\infty}^{\infty}x(\tau)h(t-\tau)d\tau$
+</div>
+<div class="formula">
+$y[n]=x[n]*h[n]=\sum_{k=-\infty}^{\infty}x[k]h[n-k]$
+</div>
+
+<h4>Interconexión LTI</h4>
+<ul>
+  <li><strong>Serie (cascada):</strong> $h_{eq} = h_1 * h_2$</li>
+  <li><strong>Paralelo:</strong> $h_{eq} = h_1 + h_2$</li>
+</ul>
+
+<h4>Estabilidad BIBO</h4>
+<p>Sistema LTI es BIBO estable $\iff$ $\int_{-\infty}^{\infty}|h(t)|dt < \infty$ (continuo) o $\sum |h[n]| < \infty$ (discreto).</p>
+
+<h4>Causalidad LTI</h4>
+<p>Sistema LTI es causal $\iff$ $h(t)=0$ para $t<0$ (o $h[n]=0$ para $n<0$).</p>
+</section>
+
+<section id="clas">
+<h2>1. Clasificación de Señales</h2>
+
+<h3>Continua vs Discreta</h3>
+<ul>
+  <li><strong>Continua $x(t)$:</strong> definida para todo $t\in\mathbb{R}$</li>
+  <li><strong>Discreta $x[n]$:</strong> definida solo para $n\in\mathbb{Z}$</li>
+</ul>
+
+<h3>Par / Impar</h3>
+<table>
+<tr><th>Par</th><th>Impar</th></tr>
+<tr><td>$x(-t)=x(t)$</td><td>$x(-t)=-x(t)$</td></tr>
+<tr><td>Simétrica respecto al eje Y</td><td>Antisimétrica (gira 180°)</td></tr>
+<tr><td>$\cos$, $|t|$, $t^2$, $e^{-|t|}$</td><td>$\sin$, $t$, $t^3$</td></tr>
+</table>
+<div class="tip">Si $x(t)$ es impar: $\int_{-A}^{A}x(t)dt = 0$. Si es par: $\int_{-A}^{A}x(t)dt = 2\int_0^A x(t)dt$.</div>
+
+<h3>Periódica / Aperiódica</h3>
+<p>$x(t)$ periódica si existe $T_0 > 0$ tal que $x(t+T_0)=x(t)$ para todo $t$. El <strong>período fundamental</strong> es el menor $T_0$ que cumple esto.</p>
+
+<div class="warn">En discreto, $x[n]=\cos(\Omega_0 n)$ es periódica SOLO si $\Omega_0/(2\pi)$ es racional. Ej: $\cos(3n/8)$ NO es periódica porque $3/(16\pi)$ es irracional.</div>
+
+<h3>Energía vs Potencia</h3>
+<ul>
+  <li><strong>Señal de energía:</strong> $0 < E_\infty < \infty$ y $P_\infty = 0$ (es transitoria, se apaga)</li>
+  <li><strong>Señal de potencia:</strong> $E_\infty = \infty$ y $0 < P_\infty < \infty$ (persiste en el tiempo)</li>
+  <li>Algunas señales no son ni de energía ni de potencia</li>
+</ul>
+<div class="tip">Regla rápida: si decae exponencialmente → energía. Si es una sinusoidal/constante no nula → potencia.</div>
+
+<h3>Descomposición par + impar</h3>
+<p>Toda señal $x(t) = x_p(t) + x_i(t)$ donde:</p>
+<div class="formula">
+$x_p(t)=\frac{x(t)+x(-t)}{2}, \quad x_i(t)=\frac{x(t)-x(-t)}{2}$
+</div>
+</section>
+
+<section id="trans">
+<h2>2. Transformaciones Temporales</h2>
+
+<table>
+<tr><th>Operación</th><th>Efecto</th></tr>
+<tr><td>$x(t-t_0)$, $t_0>0$</td><td>Desplaza a la DERECHA $t_0$ unidades</td></tr>
+<tr><td>$x(t+t_0)$, $t_0>0$</td><td>Desplaza a la IZQUIERDA $t_0$ unidades</td></tr>
+<tr><td>$x(-t)$</td><td>Reflexión sobre eje Y</td></tr>
+<tr><td>$x(at)$, $|a|>1$</td><td>COMPRIME por factor $|a|$</td></tr>
+<tr><td>$x(at)$, $|a|<1$</td><td>EXPANDE por factor $1/|a|$</td></tr>
+</table>
+
+<h3>🔑 Cómo graficar $x(at+b)$</h3>
+<div class="box">
+<strong>Regla maestra:</strong> factoriza primero $\to$ $x(a(t+b/a))$
+<div class="formula">$x(at+b) = x\!\left(a\left(t+\tfrac{b}{a}\right)\right)$</div>
+<strong>Orden de operaciones:</strong>
+<ol>
+<li>Primero <strong>escalar/reflejar</strong> (factor $a$)</li>
+<li>Después <strong>desplazar</strong> $b/a$ unidades</li>
+</ol>
+</div>
+
+<div class="tip">Ejemplo: $x(-2t+4) = x(-2(t-2))$. Orden: reflejar, comprimir por 2, desplazar 2 a la DERECHA.</div>
+
+<h3>Escalado de energía</h3>
+<p>Si $x(t)$ tiene energía $E$, entonces $x(at)$ tiene energía $E/|a|$.</p>
+</section>
+
+<section id="elem">
+<h2>3. Señales Elementales</h2>
+
+<h3>Delta de Dirac $\delta(t)$</h3>
+<div class="def">$\delta(t)=0$ para $t\neq 0$, y $\int_{-\infty}^{\infty}\delta(t)dt = 1$.</div>
+
+<h4>Propiedades clave</h4>
+<ul>
+  <li><strong>Selección/muestreo:</strong> $\int x(t)\delta(t-t_0)dt = x(t_0)$</li>
+  <li><strong>Producto:</strong> $x(t)\delta(t-t_0) = x(t_0)\delta(t-t_0)$</li>
+  <li><strong>Escalado:</strong> $\delta(at) = \dfrac{1}{|a|}\delta(t)$</li>
+  <li><strong>Derivada:</strong> $\int x(t)\delta'(t)dt = -x'(0)$</li>
+</ul>
+
+<h3>Escalón $u(t)$</h3>
+<p>$u(t)=1$ si $t\geq 0$, $u(t)=0$ si $t<0$.</p>
+<p><strong>Relación clave:</strong> $\delta(t) = \dfrac{du(t)}{dt}$, $u(t) = \int_{-\infty}^t \delta(\tau)d\tau$</p>
+
+<h3>Rampa $r(t)$</h3>
+<p>$r(t) = t\cdot u(t)$. Derivada: $r'(t) = u(t)$.</p>
+
+<h3>Pulso rectangular</h3>
+<p>Un pulso de altura $A$ y ancho $T$ centrado en $t_0$ se escribe:</p>
+<div class="formula">
+$A\left[u(t-(t_0-T/2)) - u(t-(t_0+T/2))\right]$
+</div>
+
+<h3>Delta discreto $\delta[n]$ y escalón $u[n]$</h3>
+<ul>
+<li>$\delta[n] = 1$ si $n=0$, $0$ en otro caso</li>
+<li>$u[n] = 1$ si $n\geq 0$, $0$ si $n<0$</li>
+<li>$\delta[n] = u[n] - u[n-1]$</li>
+<li>$u[n] = \sum_{k=0}^{\infty}\delta[n-k]$</li>
+</ul>
+
+<h3>Exponencial compleja</h3>
+<p><strong>Continuo:</strong> $x(t)=Ce^{(\sigma+j\omega_0)t}$</p>
+<ul>
+<li>Magnitud: $|x(t)|=|C|e^{\sigma t}$</li>
+<li>Fase: $\arg x(t) = \arg C + \omega_0 t$</li>
+<li>Periódica solo si $\sigma=0$, con $T_0 = 2\pi/|\omega_0|$</li>
+</ul>
+
+<p><strong>Discreto:</strong> $x[n]=Cr^n e^{j\Omega_0 n}$</p>
+<ul>
+<li>Periódica solo si $r=1$ y $\Omega_0/(2\pi)=m/N$ racional</li>
+<li>Frecuencias $\Omega_0$ y $\Omega_0+2\pi k$ son indistinguibles (ambigüedad discreta)</li>
+</ul>
+</section>
+
+<section id="prop">
+<h2>4. Propiedades de Sistemas</h2>
+
+<h3>Memoria</h3>
+<ul>
+<li><strong>Sin memoria:</strong> $y(t_0)$ depende SOLO de $x(t_0)$. Ej: $y(t)=3x(t)$, $y(t)=x^2(t)$.</li>
+<li><strong>Con memoria:</strong> usa valores pasados o futuros. Ej: $y(t)=x(t-1)$, $y[n]=x[n]+x[n-1]$.</li>
+</ul>
+
+<h3>Causalidad</h3>
+<ul>
+<li><strong>Causal:</strong> $y(t_0)$ depende solo de $x(t)$ para $t\leq t_0$ (presente y pasado)</li>
+<li><strong>No causal:</strong> requiere valores futuros. Ej: $y(t)=x(t+1)$, $y(t)=x(-t)$ (evaluada en $t<0$ requiere futuro)</li>
+</ul>
+<div class="tip">En LTI: causal ⟺ $h(t)=0$ para $t<0$.</div>
+
+<h3>Linealidad</h3>
+<p>Se cumple HOMOGENEIDAD + SUPERPOSICIÓN:</p>
+<div class="formula">
+$T\{\alpha x_1(t)+\beta x_2(t)\} = \alpha T\{x_1(t)\}+\beta T\{x_2(t)\}$
+</div>
+<div class="tip">Para probar NO lineal: basta un contraejemplo. Para probar lineal: aplica la definición con señales genéricas.</div>
+
+<h3>Invarianza Temporal (IT)</h3>
+<p>Si $x(t)\to y(t)$, entonces $x(t-t_0)\to y(t-t_0)$. La forma de la salida no cambia si desplazas la entrada.</p>
+
+<h4>Método para probar IT:</h4>
+<div class="step"><span class="step-num">1</span>Calcula $y_1(t)=T\{x(t-t_0)\}$ (sistema aplicado a la entrada desplazada)</div>
+<div class="step"><span class="step-num">2</span>Calcula $y_2(t)=y(t-t_0)$ (la salida original desplazada)</div>
+<div class="step"><span class="step-num">3</span>Si $y_1(t)=y_2(t)$ → IT. Si no → variante.</div>
+
+<div class="warn">Sistemas como $y(t)=tx(t)$ o $y[n]=nx[n]$ son LINEALES pero VARIANTES (el coeficiente depende de $t$ o $n$). Muy frecuente en MC.</div>
+
+<h3>Estabilidad BIBO</h3>
+<p>Entrada acotada ($|x(t)|\leq M$) produce salida acotada ($|y(t)|\leq K$).</p>
+<div class="box">Para LTI: estable $\iff \int |h(t)|dt < \infty$ o $\sum |h[n]| < \infty$</div>
+
+<h3>Invertibilidad</h3>
+<p>Existe sistema inverso que recupera $x$ desde $y$. Ej: $y(t)=2x(t)$ es invertible con $x(t)=y(t)/2$. Pero $y(t)=x^2(t)$ NO (pierdes el signo).</p>
+</section>
+
+<section id="lti">
+<h2>5. Sistemas LTI</h2>
+
+<div class="def">Un sistema es LTI si es Lineal + Invariante en el Tiempo.</div>
+
+<h3>Respuesta al impulso $h(t)$</h3>
+<p>$h(t) = T\{\delta(t)\}$ — la salida del sistema cuando la entrada es un impulso. Caracteriza completamente al sistema LTI.</p>
+
+<h3>Idea central</h3>
+<p>Toda señal se puede escribir como suma de impulsos desplazados:</p>
+<div class="formula">
+$x(t) = \int x(\tau)\delta(t-\tau)d\tau \quad\Rightarrow\quad y(t) = \int x(\tau)h(t-\tau)d\tau$
+</div>
+<p>Por linealidad e invariancia temporal, la salida es la <strong>convolución</strong> $y(t) = x(t) * h(t)$.</p>
+
+<h3>Respuesta al escalón</h3>
+<div class="formula">
+$s(t) = h(t)*u(t) = \int_{-\infty}^{t} h(\tau)d\tau$
+</div>
+<p>Equivalentemente: $h(t) = \dfrac{ds(t)}{dt}$.</p>
+</section>
+
+<section id="conv">
+<h2>6. Convolución — EL cálculo clave</h2>
+
+<div class="formula">
+$y(t) = \int_{-\infty}^{\infty} x(\tau)\,h(t-\tau)\,d\tau$
+</div>
+
+<h3>Receta de 4 pasos (INVERTIR-DESPLAZAR-MULTIPLICAR-ACUMULAR)</h3>
+<div class="step"><span class="step-num">1</span><strong>Invertir</strong> $h(\tau) \to h(-\tau)$</div>
+<div class="step"><span class="step-num">2</span><strong>Desplazar</strong> $h(-\tau)\to h(t-\tau)$ (deslizar por $t$)</div>
+<div class="step"><span class="step-num">3</span><strong>Multiplicar</strong> $x(\tau)h(t-\tau)$</div>
+<div class="step"><span class="step-num">4</span><strong>Integrar</strong> sobre $\tau$ donde hay traslape</div>
+
+<h3>Propiedades (útiles para simplificar)</h3>
+<ul>
+<li><strong>Conmutativa:</strong> $x*h = h*x$</li>
+<li><strong>Asociativa:</strong> $x*(h_1*h_2) = (x*h_1)*h_2$</li>
+<li><strong>Distributiva:</strong> $x*(h_1+h_2) = x*h_1 + x*h_2$</li>
+<li><strong>Identidad:</strong> $x(t)*\delta(t) = x(t)$</li>
+<li><strong>Desplazamiento:</strong> $x(t)*\delta(t-t_0) = x(t-t_0)$</li>
+</ul>
+
+<h3>Ejemplo clásico: convolución de dos exponenciales causales</h3>
+<p>Si $x(t) = e^{-at}u(t)$ y $h(t) = e^{-bt}u(t)$ con $a\neq b$:</p>
+<div class="formula">
+$y(t) = \dfrac{e^{-at} - e^{-bt}}{b-a}u(t)$
+</div>
+
+<p>Si $a = b$:</p>
+<div class="formula">
+$y(t) = t\,e^{-at}u(t)$
+</div>
+
+<div class="tip">Memoriza estos dos resultados. Aparecen SIEMPRE en pruebas con $h(t)=e^{-at}u(t)$.</div>
+
+<h3>Convolución con pulsos rectangulares</h3>
+<p>Convolución de dos rectángulos del mismo ancho $T$ da un <strong>triángulo</strong> de ancho $2T$ y altura proporcional.</p>
+
+<h3>Suma de convolución discreta</h3>
+<div class="formula">
+$y[n] = \sum_{k=-\infty}^{\infty} x[k]\,h[n-k]$
+</div>
+<p>Para secuencias finitas: extiende, suma término a término. Si $x$ empieza en $n_1$ con largo $L_1$ y $h$ empieza en $n_2$ con largo $L_2$, entonces $y$ empieza en $n_1+n_2$ con largo $L_1+L_2-1$.</p>
+</section>
+
+<section id="inter">
+<h2>7. Interconexión de Sistemas</h2>
+
+<h3>Serie (cascada)</h3>
+<div class="formula">
+$x \to h_1 \to h_2 \to y \quad\Rightarrow\quad h_{eq} = h_1 * h_2$
+</div>
+
+<h3>Paralelo</h3>
+<div class="formula">
+$h_{eq} = h_1 + h_2$
+</div>
+
+<h3>Estrategia para problemas con diagramas de bloques</h3>
+<ol>
+<li>Identifica qué está en serie (cascada directa)</li>
+<li>Identifica qué está en paralelo (ramas que se suman)</li>
+<li>Aplica las fórmulas paso a paso de adentro hacia afuera</li>
+<li>Usa propiedad distributiva para simplificar</li>
+</ol>
+</section>
+
+<section id="sol1">
+<h2>📝 Solemne 2025-1 Resuelta</h2>
+<p>Este fue el examen de abril 2025. <strong>Estudia estas respuestas hasta sabértelas de memoria.</strong></p>
+
+<h3>Selección Múltiple</h3>
+<details>
+<summary>1. Señal de tiempo continuo</summary>
+<div class="ans"><strong>C)</strong> Está definida para cualquier valor real del tiempo.</div>
+</details>
+<details>
+<summary>2. Una señal $x[n]$ es</summary>
+<div class="ans"><strong>C)</strong> Secuencia definida solo para valores enteros de $n$.</div>
+</details>
+<details>
+<summary>3. Condición para señal de energía</summary>
+<div class="ans"><strong>C)</strong> Energía finita y potencia cero. (Si la potencia fuera distinta de cero, la energía sería infinita.)</div>
+</details>
+<details>
+<summary>4. Fórmula de energía discreta</summary>
+<div class="ans"><strong>B)</strong> $\sum_{n=-\infty}^{\infty} |x[n]|^2$</div>
+</details>
+<details>
+<summary>5. Operación que desplaza a la derecha</summary>
+<div class="ans"><strong>C)</strong> $x(t-t_0)$ con $t_0>0$</div>
+</details>
+<details>
+<summary>6. Señal par</summary>
+<div class="ans"><strong>C)</strong> $x(-t)=x(t)$</div>
+</details>
+<details>
+<summary>7. Tipo de señal $\cos(\omega_0 t)$</summary>
+<div class="ans"><strong>B)</strong> Continua y periódica</div>
+</details>
+<details>
+<summary>8. Período fundamental de $e^{j\omega_0 t}$</summary>
+<div class="ans"><strong>C)</strong> $\dfrac{2\pi}{\omega_0}$</div>
+</details>
+<details>
+<summary>9. Periodicidad de $e^{j\omega_0 n}$ discreta</summary>
+<div class="ans"><strong>B)</strong> $\omega_0 N = 2\pi m$ con $m\in\mathbb{Z}$</div>
+</details>
+<details>
+<summary>10. Propiedad de $\delta[n]$</summary>
+<div class="ans"><strong>B)</strong> Ser 1 solo en $n=0$</div>
+</details>
+<details>
+<summary>11. Propiedad de $x[n]\cdot\delta[n-n_0]$</summary>
+<div class="ans"><strong>C)</strong> Selecciona el valor $x[n_0]$</div>
+</details>
+<details>
+<summary>12. Sistema con memoria</summary>
+<div class="ans"><strong>B)</strong> Con memoria. (Un sistema con memoria depende de valores pasados/presentes distintos al instante actual.)</div>
+</details>
+<details>
+<summary>13. Propiedad de desplazamiento conservado</summary>
+<div class="ans"><strong>C)</strong> Invarianza en el tiempo</div>
+</details>
+<details>
+<summary>14. Sistema con homogeneidad + superposición</summary>
+<div class="ans"><strong>D)</strong> Lineal</div>
+</details>
+<details>
+<summary>15. Convolución discreta notación</summary>
+<div class="ans"><strong>C)</strong> $x[n]*h[n]$</div>
+</details>
+<details>
+<summary>16. Orden de aplicación no importa en LTI</summary>
+<div class="ans"><strong>A)</strong> Conmutatividad</div>
+</details>
+<details>
+<summary>17. Sistema FIR tiene $h[n]$ de duración</summary>
+<div class="ans"><strong>C)</strong> Finita (Finite Impulse Response)</div>
+</details>
+<details>
+<summary>18. Distributividad LTI</summary>
+<div class="ans"><strong>A)</strong> $x[n]*(h_1[n]+h_2[n]) = x[n]*h_1[n] + x[n]*h_2[n]$</div>
+</details>
+<details>
+<summary>19. BIBO estable</summary>
+<div class="ans"><strong>C)</strong> Entrada acotada produce salida acotada</div>
+</details>
+<details>
+<summary>20. Operación para salida de LTI continuo</summary>
+<div class="ans"><strong>D)</strong> Convolución</div>
+</details>
+
+<h3>Problema 1 (Interconexión con exponenciales)</h3>
+<div class="box">
+<strong>Dato:</strong> $x(t)=e^{-t}u(t)$; $h_1(t)=e^{-2t}u(t)$; $h_2(t)=e^{-3t}u(t)$; $h_3(t)=e^{-t}u(t)$.<br>
+$h_1$ y $h_2$ en serie (rama superior), en paralelo con $h_3$.
+</div>
+
+<h4>Paso 1: $h_{12} = h_1 * h_2$ (serie)</h4>
+<p>Usando la fórmula de dos exponenciales causales con $a=2, b=3$:</p>
+<div class="formula">
+$h_{12}(t) = \dfrac{e^{-2t}-e^{-3t}}{3-2}u(t) = (e^{-2t}-e^{-3t})u(t)$
+</div>
+
+<h4>Paso 2: $h_{eq} = h_{12} + h_3$ (paralelo)</h4>
+<div class="formula">
+$h_{eq}(t) = (e^{-2t} - e^{-3t} + e^{-t})u(t)$
+</div>
+
+<h4>Paso 3: $y(t) = x(t) * h_{eq}(t)$</h4>
+<p>Por distributividad:</p>
+<div class="formula">
+$y(t) = \underbrace{x*e^{-2t}u(t)}_{A} - \underbrace{x*e^{-3t}u(t)}_{B} + \underbrace{x*e^{-t}u(t)}_{C}$
+</div>
+<p>Calculando cada una (siempre $u(t)$ para $t\geq 0$):</p>
+<ul>
+<li>$A = \dfrac{e^{-t}-e^{-2t}}{2-1} = e^{-t} - e^{-2t}$</li>
+<li>$B = \dfrac{e^{-t}-e^{-3t}}{3-1} = \dfrac{e^{-t}-e^{-3t}}{2}$</li>
+<li>$C = t\,e^{-t}$ (caso $a=b$)</li>
+</ul>
+
+<div class="formula">
+$\boxed{y(t) = \left[\tfrac{1}{2}e^{-t} - e^{-2t} + \tfrac{1}{2}e^{-3t} + t\,e^{-t}\right]u(t)}$
+</div>
+
+<h3>Problema 2 (h[n] discreto)</h3>
+<div class="box">
+De la figura: $h[n]$ toma valores $-1$ en $n=-5,-4,-3$; valor $2$ en $n=0$; y $1$ en $n=-2,-1,1,2,3,4,5$.
+</div>
+
+<h4>a) Expresión analítica</h4>
+<div class="formula">
+$h[n] = -\sum_{k=3}^{5}\delta[n+k] + \sum_{k=-2,k\neq 0}^{5}\delta[n-k] + 2\delta[n]$
+</div>
+<p>O más simple:</p>
+<div class="formula">
+$h[n] = -\delta[n+5]-\delta[n+4]-\delta[n+3] + \delta[n+2] + \delta[n+1] + 2\delta[n] + \delta[n-1] + \delta[n-2] + \delta[n-3] + \delta[n-4] + \delta[n-5]$
+</div>
+
+<h4>b) Simetría</h4>
+<p>Comprobemos: $h[-n]$ vs $h[n]$. Ejemplo: $h[1]=1$ pero $h[-1]=1$... y $h[3]=1$ pero $h[-3]=-1$. <strong>No es par ni impar.</strong></p>
+
+<h4>c) Causalidad</h4>
+<p><strong>No es causal</strong>, porque $h[n]\neq 0$ para $n<0$ (específicamente en $n=-5,-4,-3,-2,-1$).</p>
+</section>
+
+<section id="sol2">
+<h2>📝 Solemne 2025-2 Resuelta</h2>
+
+<h3>Selección Múltiple</h3>
+<details>
+<summary>1. Péndulo (figura)</summary>
+<div class="ans"><strong>A)</strong> Estable. (Un péndulo con fricción converge a reposo ante entrada acotada.)</div>
+</details>
+<details>
+<summary>2. Sistema invariante en el tiempo</summary>
+<div class="ans"><strong>B)</strong> Responde siempre de la misma manera a la misma entrada, independiente de cuándo se le estimule.</div>
+</details>
+<details>
+<summary>3. Sistema con salida dependiente de pasado/presente</summary>
+<div class="ans"><strong>B)</strong> Causal</div>
+</details>
+<details>
+<summary>4. Afirmación FALSA sobre sistemas lineales</summary>
+<div class="ans"><strong>B)</strong> "La suma de dos entradas NO es igual a la suma de las respuestas" es FALSA. (En lineales SÍ se cumple superposición.)</div>
+</details>
+<details>
+<summary>5. Señal par</summary>
+<div class="ans"><strong>C)</strong> $x(-t)=x(t)$</div>
+</details>
+<details>
+<summary>6. Propiedad que NO corresponde a $\delta(t)$</summary>
+<div class="ans"><strong>D)</strong> Todas las propiedades corresponden. (A, B, C son todas correctas.)</div>
+</details>
+<details>
+<summary>7. Señal de tiempo continuo</summary>
+<div class="ans"><strong>C)</strong> Definida para cualquier valor real del tiempo.</div>
+</details>
+<details>
+<summary>8. Sistema estable verdadera</summary>
+<div class="ans"><strong>C)</strong> Posee salida acotada ante entrada acotada.</div>
+</details>
+<details>
+<summary>9. $x(2t)$ representa</summary>
+<div class="ans"><strong>A)</strong> Compresión.</div>
+</details>
+<details>
+<summary>10. Reproducir propiedad de selección</summary>
+<div class="ans"><strong>A)</strong> Usando pulsos rectangulares con ancho → 0.</div>
+</details>
+<details>
+<summary>11. Sistema LTI se representa como</summary>
+<div class="ans"><strong>D)</strong> La respuesta a impulso.</div>
+</details>
+<details>
+<summary>12. $h[n]=\delta[n]$ representa</summary>
+<div class="ans"><strong>A)</strong> Sistema identidad. ($y[n]=x[n]*\delta[n]=x[n]$)</div>
+</details>
+<details>
+<summary>13. $\int x(\tau)h(t-\tau)d\tau$ representa</summary>
+<div class="ans"><strong>C)</strong> Integral de convolución.</div>
+</details>
+<details>
+<summary>14. Representación correcta de $u[n]$</summary>
+<div class="ans"><strong>B)</strong> $u[n]=\sum_{k=0}^{\infty}\delta[n-k]$</div>
+</details>
+<details>
+<summary>15. Figura de sinusoidal (período 2)</summary>
+<div class="ans"><strong>C)</strong> $x[n]=\cos(n\pi)$ (alterna $+1,-1$, período 2). <em>Según la pauta oficial.</em></div>
+</details>
+
+<h3>Problema 1 (h(t) gráfico: energía, respuesta al escalón, simetría, causalidad)</h3>
+<div class="box">
+De la figura: $h(t) = \begin{cases} -1, & -2\leq t\leq -1 \\ t+2, & -1\leq t\leq 0 \\ 1-t, & 0\leq t\leq 1 \\ 0, & \text{en otro caso} \end{cases}$
+</div>
+
+<h4>1. Energía total</h4>
+<div class="formula">
+$E_h = \int_{-2}^{-1}(-1)^2 dt + \int_{-1}^{0}(t+2)^2 dt + \int_{0}^{1}(1-t)^2 dt$
+</div>
+<p>Calculando cada integral:</p>
+<ul>
+<li>$\int_{-2}^{-1}1\,dt = 1$</li>
+<li>$\int_{-1}^{0}(t+2)^2 dt = \left[\dfrac{(t+2)^3}{3}\right]_{-1}^{0} = \dfrac{8}{3}-\dfrac{1}{3} = \dfrac{7}{3}$</li>
+<li>$\int_{0}^{1}(1-t)^2 dt = \left[-\dfrac{(1-t)^3}{3}\right]_0^1 = 0-\left(-\dfrac{1}{3}\right) = \dfrac{1}{3}$</li>
+</ul>
+<div class="formula">
+$\boxed{E_h = 1 + \dfrac{7}{3} + \dfrac{1}{3} = \dfrac{11}{3}}$
+</div>
+
+<h4>2. Respuesta a $x(t)=u(t)-u(t-1)$</h4>
+<p>Como $x(t)$ es un pulso rectangular de ancho 1:</p>
+<div class="formula">
+$y(t) = (h*x)(t) = \int_{t-1}^{t} h(\tau)d\tau = s(t)-s(t-1)$
+</div>
+<p>donde $s(t)$ es la respuesta al escalón.</p>
+
+<p><strong>Respuesta al escalón por tramos:</strong></p>
+<div class="formula">
+$s(t) = \begin{cases} 0, & t\leq -2 \\ -(t+2), & -2\leq t\leq -1 \\ \dfrac{t^2}{2}+2t+\dfrac{1}{2}, & -1\leq t\leq 0 \\ \dfrac{1}{2}+t-\dfrac{t^2}{2}, & 0\leq t\leq 1 \\ 1, & t\geq 1 \end{cases}$
+</div>
+
+<p><strong>Respuesta total $y(t)=s(t)-s(t-1)$ no nula en $-2\leq t\leq 2$:</strong></p>
+<div class="formula">
+$y(t) = \begin{cases} -t-2, & -2\leq t\leq -1 \\ \dfrac{t^2}{2}+3t+\dfrac{3}{2}, & -1\leq t\leq 0 \\ \dfrac{3}{2}-t^2, & 0\leq t\leq 1 \\ \dfrac{t^2}{2}-2t+2, & 1\leq t\leq 2 \end{cases}$
+</div>
+
+<h4>3. Simetría</h4>
+<p>$h(t)$ NO es par ni impar. Ejemplo: $h(0.5)=0.5$ pero $h(-0.5)=1.5$. No se cumple ni $h(t)=h(-t)$ ni $h(t)=-h(-t)$.</p>
+
+<h4>4. Causalidad</h4>
+<p><strong>NO es causal.</strong> Para LTI causal se requiere $h(t)=0$ para $t<0$, pero aquí $h(t)\neq 0$ en $[-2,0)$.</p>
+
+<h3>Problema 2 (Interconexión BIBO)</h3>
+<div class="box">
+$h_1[n]=n$, $h_2[n]=e^{n-1}$, $h_3[n]=u[n]$. $h_1$ y $h_2$ en paralelo, el resultado en serie con $h_3$. En paralelo global con $h_4[n]$.<br>
+Hint: $\sum_{k=0}^{\infty}e^{-k}=\dfrac{e}{e-1}$
+</div>
+
+<h4>1. Respuesta al impulso $H[n]$</h4>
+<p>Paralelo interno: $h_{12}[n]=h_1[n]+h_2[n] = n + e^{n-1}$.</p>
+<p>Serie con $h_3$: $H[n]=(h_1+h_2)*h_3 = h_1*u[n] + h_2*u[n]$.</p>
+
+<p><strong>$C_1 = h_1*u[n]$:</strong></p>
+<div class="formula">
+$C_1[n] = \sum_{k=0}^{\infty}(n-k) = n\cdot\infty - \sum_{k=0}^{\infty}k \to \text{DIVERGE}$
+</div>
+
+<p><strong>$C_2 = h_2*u[n]$:</strong></p>
+<div class="formula">
+$C_2[n] = \sum_{k=0}^{\infty}e^{n-k-1} = e^{n-1}\sum_{k=0}^{\infty}e^{-k} = \dfrac{e^{n-1}\cdot e}{e-1} = \dfrac{e^n}{e-1}$
+</div>
+<p>(Nota: la pauta oficial escribe $\dfrac{e^{n+2}}{e-1}$ partiendo de $e^{n-k+1}$, pero la idea es la misma — una parte converge, la otra diverge.)</p>
+
+<h4>2. Determinar $h_4[n]$ para hacer BIBO estable</h4>
+<p>La salida total con $h_4$ en paralelo:</p>
+<div class="formula">
+$y[n] = H[n] + h_4[n] \cdot x[n]$
+</div>
+<p>Como $H[n]$ contiene $C_1$ que diverge, $h_4[n]$ debe cancelar esa divergencia:</p>
+<div class="formula">
+$h_4[n] = \sum_{k=0}^{\infty}k \qquad \text{(para cancelar } C_1\text{)}$
+</div>
+<p>Entonces $y[n] = n + \dfrac{e^{n+2}}{e-1}$ queda BIBO estable (según la pauta oficial).</p>
+</section>
+
+<section id="trucos">
+<h2>⚡ Trucos, atajos y errores típicos</h2>
+
+<h3>Trucos de MC</h3>
+<ul>
+<li><strong>"Todas las anteriores son correctas":</strong> en el Solemne 2025-2 la pregunta del delta Dirac tiene esa trampa. Léelas todas antes de decidir.</li>
+<li><strong>Sistema LTI:</strong> se caracteriza por $h(t)$ o $h[n]$. Si la pregunta menciona algo que caracteriza un sistema lineal invariante, piensa inmediatamente en "respuesta al impulso".</li>
+<li><strong>FIR vs IIR:</strong> Finite = $h[n]$ tiene duración finita. $h[n]=(1/2)^n u[n]$ es IIR.</li>
+<li><strong>Periodicidad discreta:</strong> siempre verifica $\Omega_0/(2\pi)$ racional. Si hay $\pi$ en el argumento, casi siempre es periódica. Si no hay $\pi$, casi siempre NO.</li>
+</ul>
+
+<h3>Trucos de desarrollo</h3>
+<ul>
+<li><strong>Energía con tramos:</strong> divide la integral en los tramos no nulos de $h$, integra cada uno, suma.</li>
+<li><strong>Simetría:</strong> evalúa $h(t)$ en algún $t$ positivo y en su negativo. Si no son iguales ni opuestos, ya mostraste que no es par ni impar. No necesitas probar todo.</li>
+<li><strong>Causalidad LTI:</strong> mira SOLO si $h(t)=0$ para $t<0$. Ni lo pienses más.</li>
+<li><strong>Interconexión:</strong> dibuja $h_{eq}$ primero antes de calcular la salida. Usa distributividad para separar convoluciones complejas en sumas de simples.</li>
+<li><strong>BIBO:</strong> revisa que $\int |h(t)|dt < \infty$. Si $h(t)$ contiene $u(t)$ o $n\cdot u[n]$ sin decaer, diverge → inestable.</li>
+</ul>
+
+<h3>Errores clásicos (NO los cometas)</h3>
+<div class="warn">Confundir $x(2t)$ (compresión) con $x(t/2)$ (expansión). Recuerda: factor GRANDE dentro del argumento → COMPRIME en el tiempo.</div>
+<div class="warn">Olvidar el factor $1/|a|$ en $\delta(at) = \delta(t)/|a|$. Esto aparece en integrales tipo $\int f(t)\delta(2t-1)dt = f(1/2)/2$.</div>
+<div class="warn">Pensar que $y(t)=tx(t)$ es invariante. NO: es lineal pero variante.</div>
+<div class="warn">Pensar que $y(t)=x^2(t)$ es lineal. NO: $(ax)^2 = a^2 x^2 \neq a\,x^2$.</div>
+<div class="warn">En convolución discreta, el rango de $n$ de la salida es la SUMA de los rangos, no la intersección.</div>
+
+<h3>Fórmulas que se te van a olvidar (escríbelas al recibir la prueba)</h3>
+<ol>
+<li>$E=\int|x(t)|^2 dt$ y $P=\lim\frac{1}{2T}\int |x|^2 dt$</li>
+<li>$\delta(at)=\dfrac{1}{|a|}\delta(t)$</li>
+<li>$e^{-at}u(t)*e^{-bt}u(t) = \dfrac{e^{-at}-e^{-bt}}{b-a}u(t)$ (y $te^{-at}u(t)$ si $a=b$)</li>
+<li>Serie: $h_1*h_2$ / Paralelo: $h_1+h_2$</li>
+<li>$x(t)*\delta(t-t_0) = x(t-t_0)$</li>
+</ol>
+
+<h3>Checklist pre-examen</h3>
+<ul class="checklist">
+<li>Sé decir si una señal es par/impar/ninguna</li>
+<li>Sé calcular energía de una señal con tramos</li>
+<li>Sé determinar periodicidad (continua y discreta)</li>
+<li>Sé graficar $x(at+b)$ paso a paso</li>
+<li>Sé las 6 propiedades de sistemas (memoria, causalidad, linealidad, IT, BIBO, invertibilidad)</li>
+<li>Sé qué es LTI y qué es $h(t)$</li>
+<li>Sé hacer convolución de 2 exponenciales causales</li>
+<li>Sé la interconexión serie (convolución) y paralelo (suma)</li>
+<li>Sé probar BIBO con la integral/suma de $|h|$</li>
+<li>Sé la respuesta al escalón como integral de $h$</li>
+</ul>
+
+<div class="tip"><strong>En los últimos 5 min antes del examen:</strong> cierra todo, respira, repasa mentalmente las 5 fórmulas de arriba. Cuando te entreguen la prueba, anótalas en el margen ANTES de leer nada. Eso te ahorra pánico.</div>
+
+<div class="box" style="border-left-color:var(--danger);background:#2a1a1a;text-align:center;font-size:15px">
+<strong>Lee toda la prueba primero. Responde primero lo que sabes. Los puntos de MC son más "baratos" por tiempo que los de desarrollo — empieza por ahí.</strong>
+</div>
+
+</section>
+
+<section style="text-align:center;padding:24px">
+<h2 style="border:none">Tú puedes, Gabriel. 💪</h2>
+<p style="color:var(--muted);font-size:13px">Si te queda tiempo, vuelve al formulario y a las solemnes resueltas. Son el 80% del valor.</p>
+</section>
+
+</main>
+
+</body>
+</html>

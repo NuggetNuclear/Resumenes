@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloque 1 — Oferta, Demanda y Equilibrio · UDP Introducción a la Economía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #2d6a6a;
+    --teal-dark: #1f5050;
+    --amber: #c88a3f;
+    --amber-dark: #a36e2a;
+    --red: #b8432e;
+    --red-dark: #8f3322;
+    --green: #4a7c59;
+    --green-dark: #375d42;
+    --bg: #fbf6ec;
+    --bg-card: #ffffff;
+    --text: #2c2922;
+    --text-muted: #6b6562;
+    --border: #e5dfd0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    padding: 48px 24px;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .course-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 44px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  h1 .accent { color: var(--teal); }
+
+  .subtitle {
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+
+  .toc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+  }
+
+  .toc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+  }
+
+  .toc li {
+    counter-increment: toc;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    position: relative;
+    padding-left: 32px;
+  }
+
+  .toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--amber);
+    font-weight: 500;
+    top: 3px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.01em;
+    margin: 56px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--amber);
+    position: relative;
+  }
+
+  h2 .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--amber);
+    font-weight: 500;
+    margin-right: 12px;
+    vertical-align: 4px;
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 22px;
+    margin: 32px 0 14px;
+    color: var(--teal-dark);
+  }
+
+  p { margin-bottom: 14px; }
+  p.tight { margin-bottom: 6px; }
+
+  strong { font-weight: 700; color: var(--text); }
+
+  .highlight-teal { color: var(--teal-dark); font-weight: 600; }
+  .highlight-amber { color: var(--amber-dark); font-weight: 600; }
+  .highlight-red { color: var(--red-dark); font-weight: 600; }
+
+  /* Boxes */
+  .box {
+    background: var(--bg-card);
+    padding: 22px 26px;
+    margin: 20px 0;
+    border-radius: 4px;
+    border-left: 4px solid var(--teal);
+  }
+
+  .box-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .box-def { border-left-color: var(--teal); }
+  .box-def .box-label { color: var(--teal); }
+  .box-def h4 { color: var(--teal-dark); }
+
+  .box-example { border-left-color: var(--green); background: #f5f8f2; }
+  .box-example .box-label { color: var(--green-dark); }
+
+  .box-warning { border-left-color: var(--red); background: #fcf2ee; }
+  .box-warning .box-label { color: var(--red-dark); }
+  .box-warning h4 { color: var(--red-dark); }
+
+  .box-control { border-left-color: var(--red); border-width: 4px; background: #fcf2ee; }
+  .box-control .box-label { color: var(--red); }
+
+  .box h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  /* TRUCO dashed box */
+  .truco {
+    border: 1.5px dashed var(--amber);
+    background: transparent;
+    padding: 18px 24px;
+    margin: 20px 0;
+    border-radius: 4px;
+    position: relative;
+  }
+
+  .truco-label {
+    display: inline-block;
+    background: var(--bg);
+    padding: 0 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--amber-dark);
+    text-transform: uppercase;
+    font-weight: 600;
+    position: absolute;
+    top: -9px;
+    left: 16px;
+  }
+
+  .truco p { margin-bottom: 6px; }
+
+  /* Code blocks - for equations */
+  .eq {
+    background: #f7f2e5;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--teal-dark);
+    overflow-x: auto;
+  }
+
+  .eq .comment { color: var(--text-muted); font-style: italic; }
+  .eq .answer { color: var(--red-dark); font-weight: 600; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: var(--bg-card);
+    border-radius: 4px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+
+  thead th {
+    background: var(--teal);
+    color: #fffbf2;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 12px 14px;
+    text-align: left;
+  }
+
+  tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) { background: #faf4e5; }
+
+  /* Lists */
+  ul.clean, ol.clean {
+    margin: 12px 0 18px 22px;
+  }
+
+  ul.clean li, ol.clean li {
+    margin-bottom: 8px;
+    padding-left: 4px;
+  }
+
+  ul.clean li::marker { color: var(--amber); }
+  ol.clean li::marker { color: var(--amber); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+  /* Step callouts */
+  .step {
+    display: flex;
+    gap: 16px;
+    margin: 14px 0;
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--amber);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .step-body { flex: 1; line-height: 1.6; padding-top: 2px; }
+
+  /* Graph container */
+  .graph-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin: 24px 0;
+    text-align: center;
+  }
+
+  .graph-caption {
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 12px;
+  }
+
+  svg { max-width: 100%; height: auto; }
+
+  /* Key idea banner */
+  .key-idea {
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    color: #fffbf2;
+    padding: 24px 28px;
+    border-radius: 4px;
+    margin: 28px 0;
+  }
+
+  .key-idea .key-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 8px;
+  }
+
+  .key-idea p { font-size: 17px; margin-bottom: 0; }
+
+  /* Two column */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 20px 0;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 28px 16px; font-size: 15px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 26px; }
+    h3 { font-size: 20px; }
+    .toc ol { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .eq { font-size: 12.5px; padding: 14px 16px; }
+    table { font-size: 13px; }
+    thead th, tbody td { padding: 10px 10px; }
+  }
+
+  footer {
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="course-tag">UDP · Introducción a la Economía · 2026-1</div>
+  <h1>Oferta, Demanda y <span class="accent">Equilibrio</span></h1>
+  <p class="subtitle">Bloque 1 — Guía completa para la Solemne N°1: conceptos, fórmulas, método analítico y ejercicio resuelto de helados</p>
+</header>
+
+<section class="toc">
+  <div class="toc-label">Contenidos</div>
+  <ol>
+    <li>Demanda y ley de la demanda</li>
+    <li>Oferta y ley de la oferta</li>
+    <li>Determinantes (qué mueve las curvas)</li>
+    <li>Equilibrio de mercado — método</li>
+    <li>Excedente del consumidor</li>
+    <li>Excedente del productor y bienestar total</li>
+    <li>Ejercicio resuelto — Helados (Solemne 2025)</li>
+  </ol>
+</section>
+
+<!-- ==================== SECCIÓN 1 ==================== -->
+<h2><span class="num">01</span>Demanda y ley de la demanda</h2>
+
+<div class="box box-def">
+  <div class="box-label">Demanda</div>
+  <p>Cantidad de un bien que los consumidores están <strong>dispuestos y en capacidad</strong> de comprar a distintos precios, manteniendo todo lo demás constante (<em>ceteris paribus</em>).</p>
+</div>
+
+<div class="box box-def">
+  <div class="box-label">Curva de demanda</div>
+  <p>Representación gráfica de la relación entre precio y cantidad demandada. Tiene <strong>pendiente negativa</strong>: a mayor precio, menor cantidad demandada.</p>
+</div>
+
+<div class="box box-def">
+  <div class="box-label">Función de demanda</div>
+  <p>Expresión matemática de la curva. Forma típica:</p>
+  <div class="eq">Q<sup>d</sup> = a − bP + (efecto de otras variables)</div>
+  <p>Donde <strong>a</strong> es el intercepto horizontal cuando las otras variables están fijas, y <strong>b</strong> es la sensibilidad al precio.</p>
+</div>
+
+<div class="box box-def">
+  <div class="box-label">Ley de la demanda</div>
+  <p>Si <strong>sube el precio</strong>, cae la cantidad demandada. Si <strong>baja el precio</strong>, sube la cantidad demandada. Siempre <em>ceteris paribus</em>.</p>
+</div>
+
+<div class="box box-def">
+  <div class="box-label">Demanda de mercado</div>
+  <p>Suma horizontal de las demandas individuales. Si hay <strong>n</strong> consumidores idénticos con demanda individual Q<sub>i</sub> = f(P), la demanda de mercado es Q<sub>mercado</sub> = n · f(P).</p>
+</div>
+
+<div class="truco">
+  <span class="truco-label">Truco</span>
+  <p><strong>Movimiento vs desplazamiento:</strong></p>
+  <p>— Si cambia el <strong>precio</strong> del bien → <em>movimiento a lo largo</em> de la curva (mismo Qd cambiando de P).</p>
+  <p>— Si cambia una variable distinta al precio (ingreso, clima, gustos) → <em>desplazamiento</em> de toda la curva a derecha o izquierda.</p>
+</div>
+
+<!-- ==================== SECCIÓN 2 ==================== -->
+<h2><span class="num">02</span>Oferta y ley de la oferta</h2>
+
+<div class="box box-def">
+  <div class="box-label">Oferta</div>
+  <p>Cantidad de un bien que los productores están <strong>dispuestos y en capacidad</strong> de producir y vender a distintos precios, <em>ceteris paribus</em>.</p>
+</div>
+
+<div class="box box-def">
+  <div class="box-label">Curva de oferta</div>
+  <p>Representación gráfica de la relación precio–cantidad ofrecida. Tiene <strong>pendiente positiva</strong>: a mayor precio, mayor cantidad ofrecida.</p>
+</div>
+
+<div class="box box-def">
+  <div class="box-label">Función de oferta</div>
+  <p>Forma típica:</p>
+  <div class="eq">Q<sup>s</sup> = −c + dP + (efecto de otras variables)</div>
+  <p>El signo negativo del intercepto es común: los productores solo entran al mercado si el precio supera un mínimo.</p>
+</div>
+
+<div class="box box-def">
+  <div class="box-label">Ley de la oferta</div>
+  <p>Si <strong>sube el precio</strong>, sube la cantidad ofrecida. Los productores quieren vender más cuando el precio es mayor.</p>
+</div>
+
+<div class="box box-def">
+  <div class="box-label">Oferta de mercado</div>
+  <p>Suma horizontal de las ofertas individuales. Si 20 productores tienen Q<sub>i</sub> = 5P cada uno, la oferta de mercado es Q<sub>s</sub> = 20 · 5P = 100P.</p>
+</div>
+
+<!-- ==================== SECCIÓN 3 ==================== -->
+<h2><span class="num">03</span>Determinantes — qué mueve cada curva</h2>
+
+<h3>Determinantes de la demanda (desplazan Qd)</h3>
+
+<table>
+  <thead>
+    <tr><th>Variable</th><th>Si sube…</th><th>Qd se desplaza</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Ingreso / renta (M) — bien normal</td><td>demanda sube</td><td>→ derecha</td></tr>
+    <tr><td>Ingreso / renta (M) — bien inferior</td><td>demanda baja</td><td>← izquierda</td></tr>
+    <tr><td>Precio de un bien sustituto</td><td>demanda sube</td><td>→ derecha</td></tr>
+    <tr><td>Precio de un bien complemento</td><td>demanda baja</td><td>← izquierda</td></tr>
+    <tr><td>Gustos / preferencias a favor</td><td>demanda sube</td><td>→ derecha</td></tr>
+    <tr><td>Expectativas de subida futura de P</td><td>demanda sube hoy</td><td>→ derecha</td></tr>
+    <tr><td>Número de consumidores</td><td>demanda sube</td><td>→ derecha</td></tr>
+  </tbody>
+</table>
+
+<h3>Determinantes de la oferta (desplazan Qs)</h3>
+
+<table>
+  <thead>
+    <tr><th>Variable</th><th>Si sube…</th><th>Qs se desplaza</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Precio de insumos</td><td>oferta baja</td><td>← izquierda</td></tr>
+    <tr><td>Tecnología / productividad</td><td>oferta sube</td><td>→ derecha</td></tr>
+    <tr><td>Número de productores (N)</td><td>oferta sube</td><td>→ derecha</td></tr>
+    <tr><td>Expectativas de P futuro más alto</td><td>oferta actual baja</td><td>← izquierda</td></tr>
+    <tr><td>Condiciones climáticas favorables</td><td>oferta sube</td><td>→ derecha</td></tr>
+    <tr><td>Impuestos a la producción</td><td>oferta baja</td><td>← izquierda</td></tr>
+  </tbody>
+</table>
+
+<div class="truco">
+  <span class="truco-label">Truco</span>
+  <p><strong>Bienes sustitutos:</strong> reemplazan el consumo (Coca-Cola y Pepsi). Si sube P de Pepsi → más gente toma Coca-Cola.</p>
+  <p><strong>Bienes complementos:</strong> se consumen juntos (café y azúcar). Si sube P del café → baja consumo de azúcar.</p>
+</div>
+
+<!-- ==================== SECCIÓN 4 ==================== -->
+<h2><span class="num">04</span>Equilibrio de mercado</h2>
+
+<div class="box box-def">
+  <div class="box-label">Equilibrio</div>
+  <p>Punto donde <strong>Q<sup>d</sup> = Q<sup>s</sup></strong>. En ese precio P* no hay ni escasez ni excedente — el mercado se "vacía". Gráficamente: intersección de las dos curvas.</p>
+</div>
+
+<div class="key-idea">
+  <div class="key-label">Idea clave</div>
+  <p>Si P &gt; P* → exceso de oferta (los productores bajan precios hasta volver a P*).<br>Si P &lt; P* → exceso de demanda (los consumidores empujan el precio hasta P*).</p>
+</div>
+
+<h3>Método analítico (paso a paso)</h3>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-body">Si hay variables adicionales (M, R, N), <strong>sustituirlas por sus valores</strong> numéricos para dejar Q<sup>d</sup> y Q<sup>s</sup> en función solo del precio P.</div>
+</div>
+
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-body"><strong>Igualar</strong> Q<sup>d</sup> = Q<sup>s</sup>.</div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body"><strong>Despejar P*</strong> (precio de equilibrio).</div>
+</div>
+
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-body"><strong>Sustituir P*</strong> en cualquiera de las dos funciones para obtener Q* (cantidad de equilibrio).</div>
+</div>
+
+<div class="step">
+  <div class="step-num">5</div>
+  <div class="step-body"><strong>Verificar</strong> con la otra función. Deben coincidir.</div>
+</div>
+
+<h3>Cómo graficar</h3>
+
+<div class="box box-warning">
+  <div class="box-label">Ojo con los ejes</div>
+  <p>En economía el <strong>eje Y es el PRECIO</strong> y el <strong>eje X es la CANTIDAD</strong>. Está al revés del hábito matemático. Para graficar, siempre hay que <em>despejar P en función de Q</em> (inversa de la función).</p>
+</div>
+
+<p><strong>Inversa de la demanda:</strong> desde Q<sup>d</sup> = a − bP se despeja:</p>
+<div class="eq">P = (a − Q) / b</div>
+
+<p><strong>Inversa de la oferta:</strong> desde Q<sup>s</sup> = −c + dP se despeja:</p>
+<div class="eq">P = (Q + c) / d</div>
+
+<p>Con eso, para cada curva se calculan dos puntos (intercepto vertical haciendo Q=0, intercepto horizontal haciendo P=0) y se traza una recta. El cruce es el equilibrio.</p>
+
+<!-- ==================== SECCIÓN 5 ==================== -->
+<h2><span class="num">05</span>Excedente del consumidor</h2>
+
+<div class="box box-def">
+  <div class="box-label">Excedente del consumidor (EC)</div>
+  <p>Diferencia entre el precio máximo que el consumidor <strong>estaría dispuesto a pagar</strong> y el precio que <strong>efectivamente paga</strong>. Es el "ahorro" total de los consumidores.</p>
+</div>
+
+<p>Gráficamente: <strong>área del triángulo que queda entre la curva de demanda y el precio de equilibrio</strong>, hasta la cantidad de equilibrio.</p>
+
+<div class="eq">EC = (1/2) × base × altura<br>
+<span class="comment">// base  = Q*  (cantidad de equilibrio)</span><br>
+<span class="comment">// altura = P<sub>máx</sub> − P*  (precio máximo de la demanda menos P*)</span></div>
+
+<p>Donde <strong>P<sub>máx</sub></strong> es el precio al cual la cantidad demandada es cero — el intercepto vertical de la demanda.</p>
+
+<!-- ==================== SECCIÓN 6 ==================== -->
+<h2><span class="num">06</span>Excedente del productor y bienestar total</h2>
+
+<div class="box box-def">
+  <div class="box-label">Excedente del productor (EP)</div>
+  <p>Diferencia entre el precio al que efectivamente venden y el precio mínimo al cual estarían dispuestos a vender. Es la "ganancia extra" de los productores.</p>
+</div>
+
+<p>Gráficamente: <strong>área del triángulo entre el precio de equilibrio y la curva de oferta</strong>, hasta la cantidad de equilibrio.</p>
+
+<div class="eq">EP = (1/2) × base × altura<br>
+<span class="comment">// base  = Q*</span><br>
+<span class="comment">// altura = P* − P<sub>mín</sub>  (precio mínimo al que alguien ofrece, intercepto vertical de la oferta)</span></div>
+
+<div class="box box-def">
+  <div class="box-label">Bienestar total (ET)</div>
+  <p>Suma de los dos excedentes: <strong>ET = EC + EP</strong>. Mide la ganancia social total del mercado en equilibrio.</p>
+</div>
+
+<div class="truco">
+  <span class="truco-label">Truco visual</span>
+  <p>Piensa en los dos triángulos pegados entre las dos curvas. El <strong>de arriba</strong> (entre la demanda y P*) es del <em>consumidor</em>. El <strong>de abajo</strong> (entre P* y la oferta) es del <em>productor</em>. La base de ambos triángulos es Q*.</p>
+</div>
+
+<!-- ==================== SECCIÓN 7 ==================== -->
+<h2><span class="num">07</span>Ejercicio resuelto — Helados (Solemne 2025)</h2>
+
+<div class="box box-control">
+  <div class="box-label">Enunciado — Solemne 2025, Pregunta 2 (24 pts)</div>
+  <div class="eq">Q<sup>d</sup> = 30 000 − 5P + 0,01 M − 1000 R<br>
+Q<sup>s</sup> = −20 000 + 10P + 1000 N</div>
+  <p class="tight"><strong>Q</strong>: miles de litros. <strong>P</strong>: precio del litro.</p>
+  <p class="tight"><strong>M</strong>: renta promedio de los consumidores = $2 000 000</p>
+  <p class="tight"><strong>R</strong>: número de días de lluvia durante el verano = 10</p>
+  <p class="tight"><strong>N</strong>: número de productores de helados = 12</p>
+  <p style="margin-top:8px;"><strong>2.1</strong> Calcule el punto de equilibrio. Grafique.<br><strong>2.2</strong> Señale y calcule los excedentes de consumidores y productores.</p>
+</div>
+
+<h3>Paso 1 — Sustituir M, R, N</h3>
+
+<p>Metemos los valores dados en cada función:</p>
+
+<div class="eq">Q<sup>d</sup> = 30 000 − 5P + 0,01 (2 000 000) − 1000 (10)<br>
+Q<sup>d</sup> = 30 000 − 5P + 20 000 − 10 000<br>
+<span class="answer">Q<sup>d</sup> = 40 000 − 5P</span></div>
+
+<div class="eq">Q<sup>s</sup> = −20 000 + 10P + 1000 (12)<br>
+Q<sup>s</sup> = −20 000 + 10P + 12 000<br>
+<span class="answer">Q<sup>s</sup> = −8 000 + 10P</span></div>
+
+<h3>Paso 2 — Igualar y despejar P*</h3>
+
+<div class="eq">40 000 − 5P = −8 000 + 10P<br>
+40 000 + 8 000 = 10P + 5P<br>
+48 000 = 15P<br>
+<span class="answer">P* = 3 200</span></div>
+
+<h3>Paso 3 — Calcular Q* y verificar</h3>
+
+<div class="eq">Q* = 40 000 − 5 (3 200) = 40 000 − 16 000 = <span class="answer">24 000</span><br>
+<span class="comment">// Verificación con la oferta:</span><br>
+Q* = −8 000 + 10 (3 200) = −8 000 + 32 000 = 24 000 ✓</div>
+
+<div class="key-idea">
+  <div class="key-label">Resultado P2.1</div>
+  <p>Equilibrio: <strong>P* = 3 200</strong> por litro · <strong>Q* = 24 000</strong> miles de litros.</p>
+</div>
+
+<h3>Paso 4 — Armar el gráfico</h3>
+
+<p>Despejamos P en cada función para graficar con P en eje Y:</p>
+
+<div class="two-col">
+  <div class="eq">Demanda:<br>P = (40 000 − Q) / 5<br>P = 8 000 − Q/5<br><br>
+<span class="comment">// Q=0 → P = 8 000</span><br>
+<span class="comment">// P=0 → Q = 40 000</span></div>
+
+  <div class="eq">Oferta:<br>P = (Q + 8 000) / 10<br>P = 800 + Q/10<br><br>
+<span class="comment">// Q=0 → P = 800</span><br>
+<span class="comment">// P=0 → Q = −8 000 (irrelevante)</span></div>
+</div>
+
+<div class="graph-box">
+  <svg viewBox="0 0 500 360" xmlns="http://www.w3.org/2000/svg" style="max-width: 480px;">
+    <!-- Axes -->
+    <line x1="60" y1="30" x2="60" y2="310" stroke="#2c2922" stroke-width="1.5"/>
+    <line x1="60" y1="310" x2="470" y2="310" stroke="#2c2922" stroke-width="1.5"/>
+    <!-- Arrows -->
+    <polygon points="60,25 56,35 64,35" fill="#2c2922"/>
+    <polygon points="475,310 465,306 465,314" fill="#2c2922"/>
+    <!-- Axis labels -->
+    <text x="40" y="20" font-family="Fraunces, serif" font-size="13" font-style="italic">P</text>
+    <text x="480" y="315" font-family="Fraunces, serif" font-size="13" font-style="italic">Q</text>
+
+    <!-- Demanda: from (Q=0, P=8000) → (Q=40000, P=0) -->
+    <!-- Scale: Q_max shown = 42000, P_max shown = 8500 -->
+    <!-- x = 60 + (Q/42000)*400, y = 310 - (P/8500)*270 -->
+    <!-- (0, 8000): x=60, y=310-(8000/8500)*270 = 310-254 = 56 -->
+    <!-- (40000, 0): x=60+(40000/42000)*400 = 60+381 = 441, y=310 -->
+    <line x1="60" y1="56" x2="441" y2="310" stroke="#b8432e" stroke-width="2"/>
+    <text x="380" y="140" font-family="Fraunces, serif" font-size="13" fill="#b8432e" font-weight="600">D</text>
+
+    <!-- Oferta: (Q=0, P=800) → (Q=24000, P=3200) → (higher) -->
+    <!-- (0, 800): x=60, y=310-(800/8500)*270 = 310-25 = 285 -->
+    <!-- (40000, 4800): x=441, y=310-(4800/8500)*270 = 310-152 = 158 -->
+    <line x1="60" y1="285" x2="441" y2="158" stroke="#2d6a6a" stroke-width="2"/>
+    <text x="420" y="175" font-family="Fraunces, serif" font-size="13" fill="#2d6a6a" font-weight="600">S</text>
+
+    <!-- Equilibrium point: Q*=24000, P*=3200 -->
+    <!-- x = 60 + (24000/42000)*400 = 60+228.6 = 288.6 -->
+    <!-- y = 310 - (3200/8500)*270 = 310-101.6 = 208.4 -->
+    <line x1="60" y1="208.4" x2="288.6" y2="208.4" stroke="#6b6562" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="288.6" y1="208.4" x2="288.6" y2="310" stroke="#6b6562" stroke-width="1" stroke-dasharray="3,3"/>
+    <circle cx="288.6" cy="208.4" r="5" fill="#c88a3f"/>
+
+    <!-- Labels for equilibrium -->
+    <text x="35" y="213" font-family="JetBrains Mono, monospace" font-size="11" fill="#2c2922">3200</text>
+    <text x="275" y="328" font-family="JetBrains Mono, monospace" font-size="11" fill="#2c2922">24000</text>
+
+    <!-- Label for intercepts -->
+    <text x="25" y="60" font-family="JetBrains Mono, monospace" font-size="10" fill="#b8432e">8000</text>
+    <text x="30" y="289" font-family="JetBrains Mono, monospace" font-size="10" fill="#2d6a6a">800</text>
+
+    <!-- Consumer surplus triangle (shaded) -->
+    <polygon points="60,56 60,208.4 288.6,208.4" fill="#b8432e" fill-opacity="0.12" stroke="none"/>
+    <text x="100" y="150" font-family="Fraunces, serif" font-size="12" fill="#8f3322" font-style="italic">EC</text>
+
+    <!-- Producer surplus triangle (shaded) -->
+    <polygon points="60,285 60,208.4 288.6,208.4" fill="#2d6a6a" fill-opacity="0.12" stroke="none"/>
+    <text x="100" y="258" font-family="Fraunces, serif" font-size="12" fill="#1f5050" font-style="italic">EP</text>
+
+    <!-- Equilibrium label -->
+    <text x="298" y="200" font-family="Fraunces, serif" font-size="11" fill="#a36e2a" font-style="italic">E*</text>
+  </svg>
+  <div class="graph-caption">Equilibrio del mercado de helados: E*(24 000, 3 200). EC arriba, EP abajo.</div>
+</div>
+
+<h3>Paso 5 — Calcular excedentes (P2.2)</h3>
+
+<p><strong>Excedente del consumidor</strong> — triángulo entre D y P*:</p>
+
+<div class="eq">EC = (1/2) × base × altura<br>
+EC = (1/2) × Q* × (P<sub>máx D</sub> − P*)<br>
+EC = (1/2) × 24 000 × (8 000 − 3 200)<br>
+EC = (1/2) × 24 000 × 4 800<br>
+<span class="answer">EC = 57 600 000</span></div>
+
+<p><strong>Excedente del productor</strong> — triángulo entre P* y S:</p>
+
+<div class="eq">EP = (1/2) × base × altura<br>
+EP = (1/2) × Q* × (P* − P<sub>mín S</sub>)<br>
+EP = (1/2) × 24 000 × (3 200 − 800)<br>
+EP = (1/2) × 24 000 × 2 400<br>
+<span class="answer">EP = 28 800 000</span></div>
+
+<p><strong>Bienestar total:</strong></p>
+
+<div class="eq">ET = EC + EP = 57 600 000 + 28 800 000<br>
+<span class="answer">ET = 86 400 000</span></div>
+
+<div class="key-idea">
+  <div class="key-label">Resultado P2.2</div>
+  <p>EC = <strong>57 600 000</strong> · EP = <strong>28 800 000</strong> · ET = <strong>86 400 000</strong></p>
+</div>
+
+<!-- ==================== CHECKLIST FINAL ==================== -->
+<h2><span class="num">08</span>Checklist para la prueba</h2>
+
+<div class="box box-control">
+  <div class="box-label">Antes de responder cualquier ejercicio de oferta/demanda</div>
+  <ul class="clean">
+    <li>¿Hay variables distintas al precio (M, R, N, etc.)? Sustituirlas primero.</li>
+    <li>¿Quedó Q<sup>d</sup> y Q<sup>s</sup> solo en función de P? Recién ahí igualar.</li>
+    <li>Al graficar, ¿pusiste P en el eje Y y Q en el eje X? Despejaste P antes de graficar.</li>
+    <li>Para excedentes: ¿identificaste correctamente los interceptos verticales de D y S?</li>
+    <li>Para la altura del triángulo del consumidor: P<sub>máx</sub> de la demanda menos P*.</li>
+    <li>Para la altura del triángulo del productor: P* menos P<sub>mín</sub> de la oferta.</li>
+    <li>¿Unidades? Si Q está en miles, tus excedentes están en miles × unidades de P.</li>
+  </ul>
+</div>
+
+<footer>
+  UDP · Introducción a la Economía · 2026-1 — Guía Bloque 1
+</footer>
+
+</body>
+</html>

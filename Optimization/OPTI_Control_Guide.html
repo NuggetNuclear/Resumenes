@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Emergencia — Optimización</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --card: #16213e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --text: #eee;
+    --dim: #8892b0;
+    --green: #64ffda;
+    --yellow: #ffd93d;
+    --orange: #ff6b35;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    line-height: 1.7;
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 1.6rem;
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: .5rem;
+    margin-bottom: 1.5rem;
+  }
+  h2 {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--green);
+    font-size: 1.2rem;
+    margin: 2rem 0 .8rem;
+    padding: 0.4rem 0.8rem;
+    background: rgba(100,255,218,0.08);
+    border-left: 4px solid var(--green);
+  }
+  h3 {
+    color: var(--yellow);
+    font-size: 1.05rem;
+    margin: 1.5rem 0 0.5rem;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 1.2rem;
+    margin: 1rem 0;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .bigm-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d1b3d 100%);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 1.4rem;
+    margin: 1.2rem 0;
+  }
+  .formula {
+    background: rgba(0,0,0,0.4);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.8rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    color: var(--green);
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+  .warn {
+    background: rgba(233,69,96,0.15);
+    border-left: 4px solid var(--accent);
+    padding: 0.8rem 1rem;
+    margin: 0.8rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .tip {
+    background: rgba(100,255,218,0.1);
+    border-left: 4px solid var(--green);
+    padding: 0.8rem 1rem;
+    margin: 0.8rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .example {
+    background: rgba(255,217,61,0.08);
+    border-left: 4px solid var(--yellow);
+    padding: 0.8rem 1rem;
+    margin: 0.8rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .step-num {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.8rem 0;
+    font-size: 0.92rem;
+  }
+  th {
+    background: var(--accent2);
+    padding: 0.6rem;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+  }
+  td {
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  tr:hover { background: rgba(255,255,255,0.03); }
+  strong { color: var(--yellow); }
+  em { color: var(--dim); font-style: italic; }
+  .tag {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 0.1rem;
+  }
+  .tag-green { background: rgba(100,255,218,0.25); color: var(--green); }
+  .divider {
+    border: none;
+    border-top: 2px dashed rgba(255,255,255,0.1);
+    margin: 2rem 0;
+  }
+  p { margin: 0.5rem 0; }
+  ul { padding-left: 1.3rem; margin: 0.4rem 0; }
+  li { margin: 0.3rem 0; }
+</style>
+</head>
+<body>
+
+<h1>🚨 Guía de Emergencia — Control de Optimización</h1>
+<p><em>Todo lo que necesitas para formular modelos. Lee esto y sigue la receta.</em></p>
+
+<!-- ============================================ -->
+<h2>PASO 1 → Estructura de todo modelo</h2>
+<!-- ============================================ -->
+
+<div class="card">
+<p>Todo problema de formulación tiene <strong>exactamente 5 partes</strong>, siempre en este orden:</p>
+
+<p><span class="step-num">1</span> <strong>Conjuntos e índices</strong> — ¿Sobre qué cosas decido?</p>
+<p><span class="step-num">2</span> <strong>Parámetros</strong> — ¿Qué datos me da el enunciado?</p>
+<p><span class="step-num">3</span> <strong>Variables de decisión</strong> — ¿Qué determino yo?</p>
+<p><span class="step-num">4</span> <strong>Función objetivo</strong> — ¿Qué maximizo o minimizo?</p>
+<p><span class="step-num">5</span> <strong>Restricciones</strong> — ¿Qué limitaciones existen?</p>
+
+<div class="tip">
+<strong>Consejo:</strong> Lee TODO el enunciado antes de escribir. Subraya cada condición. Cada frase del enunciado se convierte en una restricción o en un parámetro.
+</div>
+</div>
+
+<!-- ============================================ -->
+<h2>PASO 2 → Variables: la decisión más importante</h2>
+<!-- ============================================ -->
+
+<div class="card">
+<p>Pregúntate: ¿Qué tipo de decisión estoy tomando?</p>
+
+<table>
+<tr><th>Tipo de decisión</th><th>Variable</th><th>Ejemplo</th></tr>
+<tr>
+  <td>¿Cuánto? (cantidad)</td>
+  <td>Continua: yᵢ ≥ 0</td>
+  <td>Monto a invertir, cajas a enviar</td>
+</tr>
+<tr>
+  <td>¿Sí o no?</td>
+  <td>Binaria: xᵢ ∈ {0,1}</td>
+  <td>¿Selecciono proyecto i? ¿Uso medio m?</td>
+</tr>
+<tr>
+  <td>¿Cuántas unidades enteras?</td>
+  <td>Entera: nᵢ ∈ ℤ⁺</td>
+  <td>Número de camiones, turnos</td>
+</tr>
+</table>
+
+<div class="warn">
+<strong>Patrón clave:</strong> Cuando hay un <strong>costo fijo</strong> (pagar por usar algo) + un <strong>costo variable</strong> (pagar por cada unidad), SIEMPRE necesitas <strong>dos variables vinculadas</strong>:
+<ul>
+<li>xᵢ ∈ {0,1} → "¿uso esta cosa?"</li>
+<li>yᵢ ≥ 0 → "¿cuánto uso?"</li>
+<li>Vínculo: <strong>yᵢ ≤ M · xᵢ</strong> (si no la uso, no puedo tener cantidad)</li>
+</ul>
+</div>
+</div>
+
+<!-- ============================================ -->
+<h2>PASO 3 → Catálogo de restricciones</h2>
+<!-- ============================================ -->
+
+<div class="card">
+<h3>Restricciones de recurso / capacidad</h3>
+<p><em>"La bodega i tiene como máximo Rᵢ cajas"</em></p>
+<div class="formula">Σⱼ xᵢⱼ ≤ Rᵢ    ∀i ∈ I</div>
+<p>Lo que produces/envías no puede superar lo que tienes.</p>
+
+<h3>Restricciones de demanda</h3>
+<p><em>"La ciudad j necesita al menos rⱼ cajas"</em></p>
+<div class="formula">Σᵢ xᵢⱼ ≥ rⱼ    ∀j ∈ J</div>
+<p>Lo que recibe cada destino debe cubrir lo que necesita. Puede ser = si la demanda es exacta.</p>
+
+<h3>Presupuesto</h3>
+<p><em>"No gastar más de P"</em></p>
+<div class="formula">Σⱼ cⱼ · xⱼ ≤ P</div>
+
+<h3>Límite de selecciones</h3>
+<p><em>"A lo más G proyectos"</em> → <code>Σ xⱼ ≤ G</code></p>
+<p><em>"Al menos 1 de servicios básicos"</em> → <code>Σⱼ∈JSB xⱼ ≥ 1</code></p>
+
+<h3>Asignación exacta</h3>
+<p><em>"Cada curso va en exactamente un semestre"</em></p>
+<div class="formula">Σₜ xᵢₜ = 1    ∀i ∈ I</div>
+
+<h3>Precedencias / requisitos</h3>
+<p><em>"Para tomar el curso i, debes haber aprobado los cursos en Pᵢ en semestres anteriores"</em></p>
+<div class="formula">xᵢ₂ₜ₂ ≤ 1 - xᵢ₁ₜ₁    ∀i₁ ∈ I, i₂ ∈ Pᵢ₁, t₂ ≥ t₁</div>
+<p>Esto dice: si el requisito i₂ está en semestre t₂, el curso i₁ no puede estar en t₁ ≤ t₂.</p>
+</div>
+
+<!-- ============================================ -->
+<h2>PASO 4 → Restricciones lógicas con binarias</h2>
+<!-- ============================================ -->
+
+<div class="card">
+<p>Cuando el enunciado dice cosas como "si... entonces...", "o uno u otro", "no ambos", necesitas variables binarias y restricciones lógicas.</p>
+
+<table>
+<tr><th>Frase del enunciado</th><th>Restricción</th></tr>
+<tr>
+  <td>"i y j no pueden ir juntos" <span class="tag">excluyentes</span></td>
+  <td><code>xᵢ + xⱼ ≤ 1</code></td>
+</tr>
+<tr>
+  <td>"Si hago i, debo hacer k" <span class="tag">requisito</span></td>
+  <td><code>xᵢ ≤ xₖ</code></td>
+</tr>
+<tr>
+  <td>"Si hago 9, debo hacer 6 ó 7" <span class="tag">requisito múltiple</span></td>
+  <td><code>x₉ ≤ x₆ + x₇</code></td>
+</tr>
+<tr>
+  <td>"Si hago 1, NO puedo hacer 2 ni 3"</td>
+  <td><code>x₁ ≤ 1 - x₂</code> y <code>x₁ ≤ 1 - x₃</code></td>
+</tr>
+<tr>
+  <td>"Ambos juntos o ninguno"</td>
+  <td><code>xᵢ = xₖ</code></td>
+</tr>
+<tr>
+  <td>"Si invierto en 4, a lo más el triple de lo de 10"</td>
+  <td><code>y₄ ≤ 3·y₁₀</code></td>
+</tr>
+</table>
+
+<div class="tip">Estas restricciones son directas: no necesitan Big-M. Solo suman/restan binarias. Si puedes expresar la condición así, <strong>hazlo y no compliques con M</strong>.</div>
+</div>
+
+<!-- ============================================ -->
+<!-- BIG-M SECTION - THE MAIN EVENT -->
+<!-- ============================================ -->
+
+<h2>🔥 PASO 5 → BIG-M (explicado de verdad)</h2>
+
+<div class="bigm-card">
+<h3>¿Qué es M?</h3>
+<p>M es simplemente un <strong>número grande</strong> que usas como "interruptor" para <strong>prender o apagar</strong> una restricción.</p>
+
+<p>Imagina que tienes una restricción que dice <code>y ≤ 10</code>. Quieres que a veces se cumpla y a veces no, dependiendo de una decisión. Lo que haces es:</p>
+
+<div class="formula">y ≤ 10 + M · z</div>
+
+<p>Donde z ∈ {0,1}. Piensa qué pasa:</p>
+<ul>
+<li><strong>Si z = 0:</strong> queda <code>y ≤ 10 + 0 = 10</code> → la restricción ESTÁ ACTIVA, se cumple</li>
+<li><strong>Si z = 1:</strong> queda <code>y ≤ 10 + M</code> → si M es enorme (ej: 999999), esto es <code>y ≤ 1000009</code> → la restricción es inútil, DESAPARECE</li>
+</ul>
+
+<div class="warn">
+<strong>Eso es TODO lo que hace M.</strong> Es un número tan grande que cuando lo sumas, la restricción se vuelve irrelevante. Es un ON/OFF controlado por una binaria z.
+</div>
+</div>
+
+<div class="bigm-card">
+<h3>¿Qué valor le pongo a M?</h3>
+
+<p>M debe ser <strong>lo suficientemente grande para que la restricción no moleste cuando está apagada</strong>, pero no pongas "M = infinito". Usa la <strong>cota natural del problema</strong>:</p>
+
+<table>
+<tr><th>Contexto</th><th>Valor de M</th><th>Por qué</th></tr>
+<tr>
+  <td>Envío de ropa desde bodega i</td>
+  <td>M = Rᵢ</td>
+  <td>Nunca puedes enviar más de Rᵢ cajas</td>
+</tr>
+<tr>
+  <td>Inversión en proyecto n</td>
+  <td>M = Mₙ</td>
+  <td>El máximo que puedes invertir es Mₙ</td>
+</tr>
+<tr>
+  <td>Apariciones de producto en medio</td>
+  <td>M = MaxApₘₜ</td>
+  <td>El medio no acepta más que eso</td>
+</tr>
+<tr>
+  <td>Número de bodegas que sirven a j</td>
+  <td>M = n - 1</td>
+  <td>A lo más n bodegas, el exceso sobre 1 es n-1</td>
+</tr>
+<tr>
+  <td>Créditos de cursos</td>
+  <td>M = 1 + max Cᵢ</td>
+  <td>La mayor diferencia posible entre créditos</td>
+</tr>
+</table>
+
+<div class="tip">
+<strong>Truco:</strong> Pregúntate "¿cuál es el valor MÁXIMO que podría tomar el lado izquierdo de mi restricción?" — eso es tu M.
+</div>
+</div>
+
+<div class="bigm-card">
+<h3>Situación 1: "O se cumple A, o se cumple B"</h3>
+
+<p><em>Ejemplo: "O el curso i tiene más créditos que j, o j tiene más que i" (no pueden tener los mismos)</em></p>
+
+<p>Tienes dos restricciones, y al menos una debe cumplirse:</p>
+<div class="formula">f(x) ≤ 0    ...restricción A
+g(x) ≤ 0    ...restricción B</div>
+
+<p>Introduces z ∈ {0,1} y escribes:</p>
+<div class="formula">f(x) ≤ M · z           ← si z=0, A se cumple; si z=1, A se apaga
+g(x) ≤ M · (1 - z)     ← si z=1, B se cumple; si z=0, B se apaga</div>
+
+<p>Así <strong>siempre una de las dos está activa</strong>.</p>
+
+<div class="example">
+<strong>Ejemplo real (Control 2024, parte b):</strong> En semestre 4, no pueden haber dos cursos con los mismos créditos.<br><br>
+Condición: si xi4 = 1 y xj4 = 1, entonces Cᵢ ≠ Cⱼ.<br>
+Cᵢ ≠ Cⱼ significa: o Cᵢ - Cⱼ ≥ 1, o Cⱼ - Cᵢ ≥ 1.<br>
+Reescrito como ≤ 0: o (1 - Cᵢ·xi4 + Cⱼ·xj4 ≤ 0), o (1 - Cⱼ·xj4 + Cᵢ·xi4 ≤ 0).<br><br>
+<code>1 - Cᵢ·xi4 + Cⱼ·xj4 ≤ M·wᵢⱼ</code><br>
+<code>1 - Cⱼ·xj4 + Cᵢ·xi4 ≤ M·(1 - wᵢⱼ)</code>
+</div>
+</div>
+
+<div class="bigm-card">
+<h3>Situación 2: "Si pasa algo, entonces debe cumplirse otra cosa"</h3>
+
+<p>Esta es la MÁS COMÚN en controles.</p>
+
+<p>Estructura: <strong>"Si f(x) > 0, entonces g(x) ≤ 0"</strong></p>
+
+<p>El truco: esto es EQUIVALENTE a decir <strong>"O f(x) ≤ 0, O g(x) ≤ 0"</strong>. Piénsalo: si f(x) > 0 (la condición se cumple), entonces la única opción que queda es que g(x) ≤ 0. Si f(x) ≤ 0 (la condición no se cumple), no importa g.</p>
+
+<p>Para variables enteras, f(x) > 0 es lo mismo que f(x) ≥ 1, o sea f(x) - 1 ≥ 0:</p>
+
+<div class="formula">f(x) - 1 ≤ M · z
+g(x)     ≤ M · (1 - z)
+z ∈ {0,1}</div>
+
+<div class="example">
+<strong>Ejemplo real (Control 2025, parte d):</strong> "Solo una entre bodegas i e i' puede enviar ropa."<br><br>
+Condición: si envío ropa desde i (Σⱼ xᵢⱼ > 0), entonces no envío desde i' (Σⱼ xᵢ'ⱼ = 0).<br><br>
+f(x) = Σⱼ xᵢⱼ (si esto > 0, se activa la condición)<br>
+g(x) = Σⱼ xᵢ'ⱼ (esto debe ser ≤ 0)<br><br>
+<code>Σⱼ xᵢⱼ  ≤ M · w</code>      con M = Rᵢ<br>
+<code>Σⱼ xᵢ'ⱼ ≤ M · (1-w)</code>  con M = Rᵢ'<br>
+<code>w ∈ {0,1}</code>
+</div>
+
+<div class="example">
+<strong>Ejemplo real (Control 2025, parte e):</strong> "Penalización fⱼ si ciudad j recibe de más de una bodega."<br><br>
+Paso 1: crear zᵢⱼ ∈ {0,1} = 1 si envío algo de i a j:<br>
+<code>xᵢⱼ + yᵢⱼ ≤ (Rᵢ + Aᵢ) · zᵢⱼ</code><br><br>
+Paso 2: contar bodegas que sirven a j: <code>Σᵢ zᵢⱼ</code><br><br>
+Paso 3: si Σᵢ zᵢⱼ > 1, cobrar penalización. Esto es "si f(x) > 0, entonces vⱼ = 1":<br>
+f(x) = Σᵢ zᵢⱼ - 1<br>
+<code>Σᵢ zᵢⱼ - 1 ≤ M · vⱼ</code>  con M = n - 1<br><br>
+Paso 4: sumar penalización a la F.O.: <code>+ Σⱼ fⱼ · vⱼ</code>
+</div>
+</div>
+
+<div class="bigm-card">
+<h3>Situación 3: Activar variable binaria con variable continua</h3>
+<p><em>"Si no selecciono el proyecto, no puedo invertir en él"</em></p>
+
+<div class="formula">yₙ ≤ Mₙ · xₙ    ∀n</div>
+
+<p>Si xₙ = 0 → yₙ ≤ 0 → no inviertes nada.<br>
+Si xₙ = 1 → yₙ ≤ Mₙ → puedes invertir hasta el máximo.</p>
+
+<p>Esto NO es Big-M complicado. Es el uso más simple: <strong>vincular una continua con su binaria de activación</strong>.</p>
+</div>
+
+<div class="bigm-card">
+<h3>Resumen visual de Big-M</h3>
+<div class="formula">
+┌─────────────────────────────────────────────────┐
+│  ¿Qué necesito?          │  Qué escribo          │
+├─────────────────────────────────────────────────┤
+│  Vincular continua y      │  y ≤ M · x            │
+│  su binaria               │                       │
+├─────────────────────────────────────────────────┤
+│  "O A o B"                │  f(x) ≤ M·z           │
+│                           │  g(x) ≤ M·(1-z)       │
+├─────────────────────────────────────────────────┤
+│  "Si A entonces B"        │  f(x)-1 ≤ M·z         │
+│  (con enteros)            │  g(x) ≤ M·(1-z)       │
+├─────────────────────────────────────────────────┤
+│  Penalización/costo fijo  │  Vincular + sumar      │
+│  condicional              │  costo·v a la F.O.     │
+└─────────────────────────────────────────────────┘
+</div>
+</div>
+
+<!-- ============================================ -->
+<h2>PASO 6 → Función objetivo: patrones comunes</h2>
+<!-- ============================================ -->
+
+<div class="card">
+<table>
+<tr><th>Tipo</th><th>F.O.</th></tr>
+<tr><td>Maximizar utilidad</td><td><code>max Σ (ingreso - costo_variable)·y - Σ costo_fijo·x</code></td></tr>
+<tr><td>Minimizar costo de transporte</td><td><code>min Σᵢ Σⱼ cᵢⱼ · xᵢⱼ</code></td></tr>
+<tr><td>Maximizar beneficio social</td><td><code>max Σⱼ bⱼ · xⱼ</code></td></tr>
+<tr><td>Minimizar costo + penalización</td><td><code>min Σ cᵢⱼ·xᵢⱼ + Σ fⱼ·vⱼ</code></td></tr>
+<tr><td>Minimizar el máximo (holgura, ciclo)</td><td><code>min H  s.a. zₜ ≤ H ∀t</code></td></tr>
+</table>
+
+<div class="tip">
+<strong>"Minimizar el máximo"</strong> es un patrón especial: creas variable H, obligas a que H ≥ cada valor individual con <code>zₜ ≤ H</code>, y minimizas H. Apareció en el control 2024 (holgura de malla) y en línea de ensamblaje.
+</div>
+</div>
+
+<!-- ============================================ -->
+<h2>PASO 7 → Checklist final antes de entregar</h2>
+<!-- ============================================ -->
+
+<div class="card" style="border: 2px solid var(--green);">
+<p>Antes de soltar el lápiz, revisa:</p>
+<ul>
+<li>☐ ¿Definí <strong>todos los conjuntos</strong> e índices?</li>
+<li>☐ ¿Cada parámetro del enunciado tiene nombre?</li>
+<li>☐ ¿Las variables tienen <strong>dominio declarado</strong>? (xᵢ ∈ {0,1}, yᵢ ≥ 0)</li>
+<li>☐ ¿La F.O. dice <strong>min o max</strong>?</li>
+<li>☐ ¿Cada restricción tiene <strong>∀i, ∀t, ∀j</strong> donde corresponde?</li>
+<li>☐ ¿Cubrí <strong>TODAS</strong> las condiciones del enunciado? (relee y cuenta)</li>
+<li>☐ ¿Las unidades son consistentes? (no sumar pesos con cajas)</li>
+<li>☐ ¿Cada M tiene un valor justificado, no solo "M grande"?</li>
+</ul>
+</div>
+
+<hr class="divider">
+
+<div class="card" style="text-align:center; border: 2px solid var(--yellow);">
+<p style="font-size:1.1rem;"><strong>Recuerda:</strong> cada frase del enunciado = una restricción.<br>
+Lee, traduce, escribe. No inventes restricciones que no te piden.<br>
+Tú puedes, Gabriel. 💪</p>
+</div>
+
+</body>
+</html>
