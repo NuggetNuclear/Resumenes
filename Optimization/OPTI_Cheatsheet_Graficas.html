@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheatsheet Gráfico · CII2750 Optimización</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Literata:ital,wght@0,200..900;1,200..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#121419;
+  --bg-deep:#0d0f14;
+  --surface:#1a1d26;
+  --surface-raised:#222632;
+  --border:#2d323f;
+  --text:#eae0cc;
+  --text-dim:#8a8578;
+  --text-mute:#5c5a52;
+  --gold:#d4a853;
+  --gold-soft:#e8c88a;
+  --sage:#7ba99a;
+  --coral:#c85450;
+  --violet:#b89ae2;
+  --feasible:rgba(212,168,83,0.14);
+  --gridline:rgba(234,224,204,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Literata",Georgia,serif;
+  font-size:15px;
+  line-height:1.6;
+  font-feature-settings:"liga","kern","onum";
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  background-image:
+    radial-gradient(at 20% -10%,rgba(212,168,83,0.06) 0,transparent 50%),
+    radial-gradient(at 80% 110%,rgba(123,169,154,0.05) 0,transparent 50%);
+}
+.wrap{max-width:1200px;margin:0 auto;padding:clamp(1.5rem,4vw,3rem) clamp(1rem,3vw,2rem)}
+
+/* ═══ HERO ═══ */
+.hero{
+  padding:2rem 0 3rem;
+  border-bottom:1px solid var(--border);
+  margin-bottom:2.5rem;
+}
+.eyebrow{
+  font-family:"JetBrains Mono",monospace;
+  font-size:0.72rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:1rem;
+  display:flex;align-items:center;gap:0.75rem;
+}
+.eyebrow::before{content:"";width:24px;height:1px;background:var(--gold);display:inline-block}
+h1{
+  font-family:"Fraunces",serif;
+  font-variation-settings:"opsz" 144,"SOFT" 50,"WONK" 1;
+  font-weight:400;
+  font-size:clamp(2.5rem,6vw,4.5rem);
+  line-height:0.95;
+  letter-spacing:-0.02em;
+  color:var(--text);
+  margin-bottom:1rem;
+}
+h1 em{
+  font-style:italic;
+  color:var(--gold);
+  font-variation-settings:"opsz" 144,"SOFT" 100,"WONK" 1;
+}
+.subtitle{
+  font-family:"Literata",serif;
+  font-size:1.05rem;
+  color:var(--text-dim);
+  max-width:56ch;
+  font-style:italic;
+}
+
+/* ═══ NAV ═══ */
+.nav{
+  display:flex;
+  gap:0.5rem;
+  flex-wrap:wrap;
+  padding:0.75rem;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:2px;
+  margin-bottom:3rem;
+  font-family:"JetBrains Mono",monospace;
+  font-size:0.78rem;
+}
+.nav a{
+  color:var(--text-dim);
+  text-decoration:none;
+  padding:0.5rem 0.9rem;
+  border-radius:2px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  transition:all 0.2s;
+  border:1px solid transparent;
+}
+.nav a:hover{color:var(--gold);background:var(--bg-deep);border-color:var(--border)}
+
+/* ═══ SECTIONS ═══ */
+section{margin-bottom:4rem}
+.section-head{
+  display:flex;align-items:baseline;gap:1rem;
+  margin-bottom:2rem;
+  border-bottom:1px dashed var(--border);
+  padding-bottom:1rem;
+}
+.section-num{
+  font-family:"JetBrains Mono",monospace;
+  color:var(--gold);
+  font-size:1rem;
+  letter-spacing:0.1em;
+}
+.section-head h2{
+  font-family:"Fraunces",serif;
+  font-variation-settings:"opsz" 72;
+  font-weight:500;
+  font-size:clamp(1.6rem,3vw,2.3rem);
+  letter-spacing:-0.015em;
+}
+.section-intro{
+  color:var(--text-dim);
+  font-size:0.95rem;
+  margin-bottom:2rem;
+  max-width:68ch;
+}
+
+/* ═══ GRID ═══ */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:1.25rem;
+}
+.grid-wide{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:1.25rem;
+}
+@media(min-width:900px){
+  .grid-2{grid-template-columns:1fr 1fr}
+}
+
+/* ═══ CARD ═══ */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:1.4rem;
+  position:relative;
+  transition:border-color 0.2s;
+}
+.card:hover{border-color:rgba(212,168,83,0.3)}
+.card-num{
+  position:absolute;
+  top:1rem;right:1.2rem;
+  font-family:"JetBrains Mono",monospace;
+  font-size:0.7rem;
+  color:var(--text-mute);
+  letter-spacing:0.15em;
+}
+.card h3{
+  font-family:"Fraunces",serif;
+  font-variation-settings:"opsz" 24,"SOFT" 30;
+  font-weight:500;
+  font-size:1.25rem;
+  letter-spacing:-0.01em;
+  margin-bottom:0.3rem;
+  color:var(--gold-soft);
+}
+.card-sub{
+  font-family:"JetBrains Mono",monospace;
+  font-size:0.72rem;
+  color:var(--text-mute);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  margin-bottom:1rem;
+}
+
+/* ═══ SVG ═══ */
+.diagram{
+  width:100%;
+  height:auto;
+  max-width:360px;
+  display:block;
+  margin:0.25rem auto 1.2rem;
+  background:var(--bg-deep);
+  border-radius:2px;
+}
+.diagram text{font-family:"JetBrains Mono",monospace}
+
+/* ═══ EQUATIONS ═══ */
+.eq{
+  font-family:"JetBrains Mono",monospace;
+  font-size:0.92rem;
+  background:var(--bg-deep);
+  border-left:2px solid var(--gold);
+  padding:0.6rem 0.9rem;
+  margin:0.75rem 0;
+  color:var(--gold-soft);
+  overflow-x:auto;
+  white-space:nowrap;
+  border-radius:2px;
+}
+.eq-sub{
+  font-size:0.82rem;
+  color:var(--text-dim);
+  border-left-color:var(--sage);
+  color:var(--text);
+}
+
+/* ═══ LISTS ═══ */
+.info-list{list-style:none;font-size:0.92rem;margin-top:0.75rem}
+.info-list li{
+  padding:0.45rem 0 0.45rem 1.5rem;
+  position:relative;
+  border-bottom:1px dotted rgba(45,50,63,0.6);
+}
+.info-list li:last-child{border-bottom:none}
+.info-list li::before{
+  content:"→";
+  position:absolute;
+  left:0;top:0.45rem;
+  color:var(--sage);
+  font-family:"JetBrains Mono",monospace;
+  font-weight:500;
+}
+.info-list strong{color:var(--gold-soft);font-weight:600}
+.info-list code{
+  font-family:"JetBrains Mono",monospace;
+  font-size:0.85rem;
+  background:var(--bg-deep);
+  padding:0.05em 0.4em;
+  border-radius:2px;
+  color:var(--violet);
+}
+
+/* ═══ CALLOUTS ═══ */
+.tip,.trap{
+  margin-top:1rem;
+  padding:0.75rem 0.9rem;
+  border-radius:2px;
+  font-size:0.88rem;
+  line-height:1.5;
+  display:flex;
+  gap:0.7rem;
+}
+.tip{
+  background:rgba(123,169,154,0.08);
+  border-left:3px solid var(--sage);
+}
+.tip::before{
+  content:"TIP";
+  font-family:"JetBrains Mono",monospace;
+  font-size:0.65rem;
+  font-weight:700;
+  color:var(--sage);
+  letter-spacing:0.15em;
+  flex-shrink:0;
+  padding-top:0.1rem;
+}
+.trap{
+  background:rgba(200,84,80,0.08);
+  border-left:3px solid var(--coral);
+}
+.trap::before{
+  content:"OJO";
+  font-family:"JetBrains Mono",monospace;
+  font-size:0.65rem;
+  font-weight:700;
+  color:var(--coral);
+  letter-spacing:0.15em;
+  flex-shrink:0;
+  padding-top:0.1rem;
+}
+
+/* ═══ STRATEGY CARDS ═══ */
+.strategy-card{
+  background:var(--surface-raised);
+  border:1px solid var(--border);
+  border-top:3px solid var(--gold);
+  padding:1.5rem;
+  border-radius:3px;
+}
+.strategy-card h3{
+  font-family:"Fraunces",serif;
+  font-variation-settings:"opsz" 36;
+  font-weight:500;
+  color:var(--gold);
+  margin-bottom:0.75rem;
+  font-size:1.2rem;
+}
+.strategy-card p{margin-bottom:0.8rem;font-size:0.95rem}
+.strategy-card .eq{margin:0.6rem 0}
+
+/* ═══ FOOTER ═══ */
+footer{
+  margin-top:5rem;
+  padding-top:2rem;
+  border-top:1px solid var(--border);
+  text-align:center;
+  font-family:"JetBrains Mono",monospace;
+  font-size:0.78rem;
+  color:var(--text-mute);
+  letter-spacing:0.1em;
+}
+footer em{
+  color:var(--gold);
+  font-style:normal;
+  font-family:"Fraunces",serif;
+  font-variation-settings:"opsz" 14,"SOFT" 100;
+  font-style:italic;
+  letter-spacing:0;
+  font-size:0.95rem;
+}
+
+/* ═══ DECORATIVE ═══ */
+.corner-mark{
+  position:absolute;
+  top:0;left:0;
+  width:10px;height:10px;
+  border-top:1px solid var(--gold);
+  border-left:1px solid var(--gold);
+  margin:-1px 0 0 -1px;
+  opacity:0.4;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">CII2750 · Optimización · Solemne I</div>
+  <h1>Cheatsheet de <em>Gráficas</em></h1>
+  <p class="subtitle">Toda geometría que aparece en la Guía 1, con los trucos para no equivocarse bajo presión. Lee cada tarjeta: <strong>SVG primero, ecuación después, tips al final</strong>.</p>
+</header>
+
+<nav class="nav">
+  <a href="#figuras">01 · Figuras</a>
+  <a href="#niveles">02 · Curvas de Nivel</a>
+  <a href="#estrategia">03 · Estrategia</a>
+  <a href="#checklist">04 · Checklist</a>
+</nav>
+
+<!-- ══════════════════════════════════ SECCIÓN 1: FIGURAS ══════════════════════════════════ -->
+<section id="figuras">
+  <div class="section-head">
+    <span class="section-num">— 01</span>
+    <h2>Figuras geométricas</h2>
+  </div>
+  <p class="section-intro">Cada restricción del tipo <code style="font-family:'JetBrains Mono',monospace;background:var(--bg-deep);padding:0.1em 0.4em;border-radius:2px;color:var(--violet)">g(x,y) ≤ c</code> o <code style="font-family:'JetBrains Mono',monospace;background:var(--bg-deep);padding:0.1em 0.4em;border-radius:2px;color:var(--violet)">g(x,y) ≥ c</code> define una curva frontera y un semiplano/región. Reconoce la figura, después el signo.</p>
+
+  <div class="grid">
+
+    <!-- ─── CÍRCULO EN ORIGEN ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">01</div>
+      <h3>Círculo · centrado en origen</h3>
+      <div class="card-sub">Frontera cerrada</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <defs>
+          <pattern id="g1" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--gridline)" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <polygon points="140,0 132,-4 132,4" fill="#8a8578"/>
+        <polygon points="0,-120 -4,-112 4,-112" fill="#8a8578"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- circle r=3 -> 60 -->
+        <circle cx="0" cy="0" r="60" fill="rgba(212,168,83,0.18)" stroke="#d4a853" stroke-width="2"/>
+        <circle cx="0" cy="0" r="2.5" fill="#c85450"/>
+        <text x="6" y="-4" fill="#eae0cc" font-size="10">(0,0)</text>
+        <text x="0" y="-70" text-anchor="middle" fill="#d4a853" font-size="11">r = 3</text>
+        <text x="42" y="42" fill="#7ba99a" font-size="10">interior</text>
+      </svg>
+
+      <div class="eq">x² + y² ≤ r²</div>
+      <ul class="info-list">
+        <li><strong>Centro:</strong> siempre en <code>(0,0)</code>.</li>
+        <li><strong>Radio:</strong> <code>r = √(lado derecho)</code>. Si dice <code>≤ 25</code>, radio es <code>5</code>, no 25.</li>
+        <li><strong>≤</strong> → disco (interior + borde). <strong>≥</strong> → exterior + borde.</li>
+      </ul>
+      <div class="tip">Si aparecen ambas, <code>r₁² ≤ x²+y² ≤ r₂²</code>, la región es una <strong>corona</strong> (anillo).</div>
+    </article>
+
+    <!-- ─── CÍRCULO CORRIDO ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">02</div>
+      <h3>Círculo · con desplazamiento</h3>
+      <div class="card-sub">Centro distinto del origen</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <polygon points="140,0 132,-4 132,4" fill="#8a8578"/>
+        <polygon points="0,-120 -4,-112 4,-112" fill="#8a8578"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- circle center (2, 1) -> svg (40, -20), r=2 -> 40 -->
+        <circle cx="40" cy="-20" r="40" fill="rgba(212,168,83,0.18)" stroke="#d4a853" stroke-width="2"/>
+        <circle cx="40" cy="-20" r="2.5" fill="#c85450"/>
+        <line x1="40" y1="0" x2="40" y2="-20" stroke="#c85450" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="0" y1="-20" x2="40" y2="-20" stroke="#c85450" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="46" y="-24" fill="#c85450" font-size="10">(2,1)</text>
+        <text x="40" y="14" fill="#8a8578" font-size="9" text-anchor="middle">x=2</text>
+        <text x="-12" y="-18" fill="#8a8578" font-size="9" text-anchor="end">y=1</text>
+      </svg>
+
+      <div class="eq">(x − a)² + (y − b)² ≤ r²</div>
+      <ul class="info-list">
+        <li><strong>Centro:</strong> <code>(a, b)</code>. Los signos se <em>invierten</em>.</li>
+        <li>Si ves <code>(x − 2)²</code> → centro tiene <code>x = +2</code>.</li>
+        <li>Si ves <code>(x + 3)²</code> → centro tiene <code>x = −3</code>.</li>
+      </ul>
+      <div class="trap">La trampa más común de la Guía 1: leer <code>(x+4)²</code> y poner centro en <code>+4</code>. El centro es <strong>−4</strong>.</div>
+    </article>
+
+    <!-- ─── ELIPSE ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">03</div>
+      <h3>Elipse</h3>
+      <div class="card-sub">Dos semiejes</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <polygon points="140,0 132,-4 132,4" fill="#8a8578"/>
+        <polygon points="0,-120 -4,-112 4,-112" fill="#8a8578"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- ellipse center (0, -1), rx=3 (60), ry=2 (40) -->
+        <ellipse cx="0" cy="20" rx="60" ry="40" fill="rgba(212,168,83,0.18)" stroke="#d4a853" stroke-width="2"/>
+        <circle cx="0" cy="20" r="2.5" fill="#c85450"/>
+        <line x1="0" y1="20" x2="60" y2="20" stroke="#c85450" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="0" y1="20" x2="0" y2="-20" stroke="#c85450" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="30" y="15" fill="#c85450" font-size="9" text-anchor="middle">a=3</text>
+        <text x="-6" y="4" fill="#c85450" font-size="9" text-anchor="end">b=2</text>
+        <text x="6" y="26" fill="#eae0cc" font-size="10">(0,−1)</text>
+      </svg>
+
+      <div class="eq">(x−h)²/a² + (y−k)²/b² ≤ 1</div>
+      <ul class="info-list">
+        <li><strong>Centro:</strong> <code>(h, k)</code> (mismos signos invertidos).</li>
+        <li><strong>Semiejes:</strong> <code>a = √(denom. de x)</code>, <code>b = √(denom. de y)</code>.</li>
+        <li>Si ves <code>/9</code> y <code>/16</code> → <code>a=3</code> (horizontal), <code>b=4</code> (vertical).</li>
+        <li><strong>≤ 1</strong> interior · <strong>≥ 1</strong> exterior.</li>
+      </ul>
+      <div class="tip">El semieje mayor va con el denominador mayor. Determina si la elipse es "más ancha" o "más alta".</div>
+    </article>
+
+    <!-- ─── PARÁBOLA VERTICAL ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">04</div>
+      <h3>Parábola · vertical</h3>
+      <div class="card-sub">Abre arriba o abajo</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <polygon points="140,0 132,-4 132,4" fill="#8a8578"/>
+        <polygon points="0,-120 -4,-112 4,-112" fill="#8a8578"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- parabola y = x^2 - 1, vertex (0, -1) SVG (0, 20). Points: (-2.5, 5.25) -> (-50, -105); (-2, 3) -> (-40, -60); (-1, 0) -> (-20, 0); (0,-1)->(0,20); (1,0)->(20,0); (2,3)->(40,-60); (2.5, 5.25)->(50, -105) -->
+        <!-- Shade the region ABOVE the parabola (y >= x^2-1) up to top of canvas -->
+        <path d="M -50,-105 Q -40,-60 -20,0 Q 0,20 20,0 Q 40,-60 50,-105 L 140,-105 L 140,-120 L -140,-120 L -140,-105 Z" fill="rgba(212,168,83,0.14)"/>
+        <!-- parabola curve -->
+        <path d="M -50,-105 Q -35,-40 0,20 Q 35,-40 50,-105" fill="none" stroke="#d4a853" stroke-width="2"/>
+        <circle cx="0" cy="20" r="2.5" fill="#c85450"/>
+        <text x="6" y="28" fill="#c85450" font-size="10">vértice (0,−1)</text>
+        <text x="0" y="-80" text-anchor="middle" fill="#7ba99a" font-size="10">y ≥ x²−1 (sobre)</text>
+        <text x="0" y="40" text-anchor="middle" fill="#c85450" font-size="9">y ≤ x²−1 (bajo)</text>
+      </svg>
+
+      <div class="eq">y = a(x − h)² + k</div>
+      <ul class="info-list">
+        <li><strong>Vértice:</strong> <code>(h, k)</code>.</li>
+        <li><code>a &gt; 0</code> → abre <strong>hacia arriba</strong> (forma de U).</li>
+        <li><code>a &lt; 0</code> → abre <strong>hacia abajo</strong> (forma de ∩).</li>
+        <li><strong>y ≥ f(x)</strong> → región <strong>sobre</strong> la curva.</li>
+        <li><strong>y ≤ f(x)</strong> → región <strong>bajo</strong> la curva.</li>
+      </ul>
+      <div class="tip">Truco para despejar: si ves <code>x² − 1 ≥ y</code>, reescríbelo como <code>y ≤ x² − 1</code> antes de graficar.</div>
+    </article>
+
+    <!-- ─── PARÁBOLA HORIZONTAL ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">05</div>
+      <h3>Parábola · horizontal</h3>
+      <div class="card-sub">Abre derecha o izquierda</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <polygon points="140,0 132,-4 132,4" fill="#8a8578"/>
+        <polygon points="0,-120 -4,-112 4,-112" fill="#8a8578"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- x = y^2 opening right. y=-3 to 3, x from 0 to 9. Scale: (y^2, y) -> (20*y^2, -20*y). y=0: (0,0); y=1: (20, -20); y=2: (80, -40); y=3: (180,-60) off-screen; cap y at 2.4 -> x=5.76, svg(115, -48) -->
+        <path d="M 140,-110 L 140,110 L 115,48 Q 50,28 0,0 Q 50,-28 115,-48 L 140,-110 Z" fill="rgba(212,168,83,0.14)"/>
+        <path d="M 115,48 Q 50,28 0,0 Q 50,-28 115,-48" fill="none" stroke="#d4a853" stroke-width="2"/>
+        <circle cx="0" cy="0" r="2.5" fill="#c85450"/>
+        <text x="-6" y="-6" fill="#c85450" font-size="10" text-anchor="end">vértice</text>
+        <text x="70" y="-65" fill="#7ba99a" font-size="10">x ≥ y² (derecha)</text>
+        <text x="-70" y="-10" text-anchor="middle" fill="#c85450" font-size="10">x ≤ y² (izq)</text>
+      </svg>
+
+      <div class="eq">x = a(y − k)² + h</div>
+      <ul class="info-list">
+        <li><strong>Vértice:</strong> <code>(h, k)</code>.</li>
+        <li><code>a &gt; 0</code> → abre <strong>hacia la derecha</strong>.</li>
+        <li><code>a &lt; 0</code> → abre <strong>hacia la izquierda</strong>.</li>
+        <li>Aparece en Ej 3 con <code>x − y² ≤ 0</code> → <code>x ≤ y²</code> (izquierda del eje).</li>
+      </ul>
+      <div class="trap">Al ver <code>x − y² ≤ 0</code>, NO es un círculo ni elipse. Es parábola horizontal. Reconócelo por la ausencia de <code>x²</code>.</div>
+    </article>
+
+    <!-- ─── RECTA ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">06</div>
+      <h3>Recta · semiplanos</h3>
+      <div class="card-sub">Test del origen</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <polygon points="140,0 132,-4 132,4" fill="#8a8578"/>
+        <polygon points="0,-120 -4,-112 4,-112" fill="#8a8578"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- line x + 2y = 2: y = (2-x)/2. at x=-6: y=4(off); x=-4: y=3->-60; x=6:y=-2->40; cover x from -5 to 7 for SVG -->
+        <!-- Shade half-plane x + 2y <= 2 (below line) -->
+        <path d="M -140,120 L -140,-50 L 140,-10 L 140,120 Z" fill="rgba(212,168,83,0.14)"/>
+        <line x1="-140" y1="-50" x2="140" y2="-10" stroke="#d4a853" stroke-width="2"/>
+        <!-- Origin test -->
+        <circle cx="0" cy="0" r="4" fill="#7ba99a"/>
+        <text x="8" y="-4" fill="#7ba99a" font-size="10">(0,0) cumple</text>
+        <text x="-60" y="35" fill="#d4a853" font-size="10">x + 2y ≤ 2 ✓</text>
+        <text x="60" y="-65" fill="#c85450" font-size="10" text-anchor="middle">x + 2y &gt; 2 ✗</text>
+      </svg>
+
+      <div class="eq">ax + by ≤ c</div>
+      <ul class="info-list">
+        <li><strong>Dibuja la recta:</strong> encuentra interceptos, <code>y=0</code> → <code>x = c/a</code>; <code>x=0</code> → <code>y = c/b</code>.</li>
+        <li><strong>Pendiente:</strong> <code>m = −a/b</code>.</li>
+        <li><strong>Semiplano:</strong> prueba el origen <code>(0,0)</code> en la desigualdad. Si cumple, ese es el lado válido.</li>
+        <li>Si la recta pasa por el origen, usa otro punto fácil como <code>(1,0)</code>.</li>
+      </ul>
+      <div class="tip">El test del origen es el método más rápido y seguro. No intentes recordar reglas de <em>"si el signo es ≤ va para abajo"</em>.</div>
+    </article>
+
+    <!-- ─── HIPÉRBOLA ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">07</div>
+      <h3>Hipérbola</h3>
+      <div class="card-sub">Dos ramas · Ej 7</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <polygon points="140,0 132,-4 132,4" fill="#8a8578"/>
+        <polygon points="0,-120 -4,-112 4,-112" fill="#8a8578"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- Hyperbola x² - y² = 1. Right branch: x=1->(20,0); x=2->(40, ±√3≈1.73 -> ∓35); x=3->(60,±√8≈2.83 -> ∓57); x=3.5->(70, ±√11.25≈3.35 -> ∓67)  -->
+        <!-- Asymptotes y = ±x -->
+        <line x1="-120" y1="-120" x2="120" y2="120" stroke="#8a8578" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.5"/>
+        <line x1="-120" y1="120" x2="120" y2="-120" stroke="#8a8578" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.5"/>
+        <!-- Shade exterior region x² - y² >= 1 (both branches) -->
+        <path d="M 20,0 Q 30,-25 50,-50 L 75,-75 L 75,75 L 50,50 Q 30,25 20,0 Z" fill="rgba(212,168,83,0.16)"/>
+        <path d="M -20,0 Q -30,-25 -50,-50 L -75,-75 L -75,75 L -50,50 Q -30,25 -20,0 Z" fill="rgba(212,168,83,0.16)"/>
+        <!-- Right branch -->
+        <path d="M 20,0 Q 30,-25 50,-50 Q 65,-65 75,-75" fill="none" stroke="#d4a853" stroke-width="2"/>
+        <path d="M 20,0 Q 30,25 50,50 Q 65,65 75,75" fill="none" stroke="#d4a853" stroke-width="2"/>
+        <!-- Left branch -->
+        <path d="M -20,0 Q -30,-25 -50,-50 Q -65,-65 -75,-75" fill="none" stroke="#d4a853" stroke-width="2"/>
+        <path d="M -20,0 Q -30,25 -50,50 Q -65,65 -75,75" fill="none" stroke="#d4a853" stroke-width="2"/>
+        <circle cx="20" cy="0" r="2.5" fill="#c85450"/>
+        <circle cx="-20" cy="0" r="2.5" fill="#c85450"/>
+        <text x="22" y="-6" fill="#c85450" font-size="9">(1,0)</text>
+        <text x="-22" y="-6" fill="#c85450" font-size="9" text-anchor="end">(−1,0)</text>
+      </svg>
+
+      <div class="eq">x²/a² − y²/b² = 1</div>
+      <ul class="info-list">
+        <li><strong>Dos ramas</strong>: una a la izquierda (x ≤ −a) y otra a la derecha (x ≥ a).</li>
+        <li><strong>Vértices</strong> en <code>(±a, 0)</code>.</li>
+        <li><strong>Asíntotas:</strong> rectas <code>y = ±(b/a)x</code>.</li>
+        <li><strong>≥ 1</strong> → región <em>dentro</em> de las ramas (izq. y der. del eje Y).</li>
+        <li><strong>≤ 1</strong> → franja <em>entre</em> las ramas.</li>
+      </ul>
+      <div class="tip">En Ej 7, además hay <code>x² ≤ 4</code> que es <code>−2 ≤ x ≤ 2</code>: una franja vertical. Intersectada con la hipérbola te deja dos regiones pequeñas cerca de <code>(±2, 0)</code>.</div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ SECCIÓN 2: CURVAS DE NIVEL ══════════════════════════════════ -->
+<section id="niveles">
+  <div class="section-head">
+    <span class="section-num">— 02</span>
+    <h2>Curvas de nivel</h2>
+  </div>
+  <p class="section-intro">Las curvas de nivel de <code style="font-family:'JetBrains Mono',monospace;background:var(--bg-deep);padding:0.1em 0.4em;border-radius:2px;color:var(--violet)">f(x,y)</code> son los conjuntos donde <code style="font-family:'JetBrains Mono',monospace;background:var(--bg-deep);padding:0.1em 0.4em;border-radius:2px;color:var(--violet)">f = k</code> para distintos <code style="font-family:'JetBrains Mono',monospace;background:var(--bg-deep);padding:0.1em 0.4em;border-radius:2px;color:var(--violet)">k</code>. Para resolver gráficamente, las <strong>desplazas</strong> en la dirección del gradiente hasta el último punto que tocan la región factible.</p>
+
+  <div class="grid">
+
+    <!-- ─── CURVAS LINEALES ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">08</div>
+      <h3>Niveles lineales</h3>
+      <div class="card-sub">f = ax + by · rectas paralelas</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- f = 2x + y. Level curves: y = k - 2x. For k=-4,-2,0,2,4,6 -->
+        <!-- k=-4: y=-4-2x, slope -2. at x=-3: y=2->-40; x=3: y=-10 ->200 off. Let's plot visible range. -->
+        <!-- At x=-5: y=-4+10=6 -> svg(-100,-120); x=2: y=-8 -> (40,160) off, cap at x=1: y=-6 -> (20,120) -->
+        <g stroke="#d4a853" stroke-width="1.2" opacity="0.45" fill="none">
+          <line x1="-120" y1="-40" x2="80" y2="120"/>
+          <line x1="-120" y1="-80" x2="120" y2="112"/>
+          <line x1="-100" y1="-120" x2="140" y2="72"/>
+        </g>
+        <line x1="-80" y1="-120" x2="140" y2="56" stroke="#d4a853" stroke-width="2" fill="none"/>
+        <text x="-110" y="-50" fill="#d4a853" font-size="9" opacity="0.7">k=−4</text>
+        <text x="80" y="40" fill="#d4a853" font-size="9">k=6</text>
+        <!-- gradient arrow (2,1) normalized, at origin -->
+        <line x1="0" y1="0" x2="56" y2="-28" stroke="#7ba99a" stroke-width="2.5"/>
+        <polygon points="56,-28 46,-32 50,-22" fill="#7ba99a"/>
+        <text x="60" y="-32" fill="#7ba99a" font-size="10">∇f = (2,1)</text>
+        <text x="-50" y="110" fill="#c85450" font-size="9">↓ min</text>
+        <text x="78" y="-100" fill="#7ba99a" font-size="9">max ↑</text>
+      </svg>
+
+      <div class="eq">f(x,y) = ax + by = k</div>
+      <ul class="info-list">
+        <li><strong>Forma:</strong> rectas paralelas de pendiente <code>−a/b</code>.</li>
+        <li><strong>Gradiente:</strong> <code>∇f = (a, b)</code>. Es <strong>perpendicular</strong> a las curvas de nivel.</li>
+        <li><strong>Maximizar:</strong> mueve la recta en la dirección de <code>∇f</code>.</li>
+        <li><strong>Minimizar:</strong> mueve en dirección <code>−∇f</code>.</li>
+      </ul>
+      <div class="tip">Dibuja <strong>dos</strong> curvas de nivel (k₀ y k₁ con k₁&gt;k₀), y la flecha del gradiente. Eso ya cumple el requisito de la profe.</div>
+    </article>
+
+    <!-- ─── CURVAS CIRCULARES ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">09</div>
+      <h3>Niveles circulares</h3>
+      <div class="card-sub">f = (x−a)² + (y−b)² · distancia²</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- Concentric circles at (2, -1) svg(40, 20), radii 1,2,3,4 -> 20,40,60,80 -->
+        <g fill="none" stroke="#d4a853" opacity="0.4" stroke-width="1.2">
+          <circle cx="40" cy="20" r="20"/>
+          <circle cx="40" cy="20" r="40"/>
+          <circle cx="40" cy="20" r="60"/>
+        </g>
+        <circle cx="40" cy="20" r="80" fill="none" stroke="#d4a853" stroke-width="2"/>
+        <circle cx="40" cy="20" r="3" fill="#c85450"/>
+        <text x="46" y="18" fill="#c85450" font-size="10">(2,−1)</text>
+        <text x="46" y="34" fill="#7ba99a" font-size="9">mín f = 0</text>
+        <text x="40" y="-72" fill="#d4a853" font-size="9" text-anchor="middle">f crece ↗</text>
+      </svg>
+
+      <div class="eq">f(x,y) = (x−a)² + (y−b)²</div>
+      <ul class="info-list">
+        <li><strong>Forma:</strong> círculos concéntricos en <code>(a, b)</code>.</li>
+        <li><strong>Mínimo irrestricto:</strong> en <code>(a, b)</code>, con <code>f = 0</code>.</li>
+        <li>Aparece en Ej 2, Ej 6, Ej 7 (con cuidado del centro).</li>
+        <li><strong>Para minimizar en la región:</strong> buscas el <em>punto de la región factible más cercano</em> al centro <code>(a, b)</code>.</li>
+      </ul>
+      <div class="tip">Si <code>(a,b)</code> está <em>dentro</em> de la región factible, ese es el mínimo. Si está fuera, el mínimo está en la frontera, sobre la restricción más cercana al centro (tangencia).</div>
+    </article>
+
+    <!-- ─── CURVAS ELÍPTICAS ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">10</div>
+      <h3>Niveles elípticos</h3>
+      <div class="card-sub">f = (x−a)²/p² + (y−b)²/q²</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- Concentric ellipses at (3, 0) svg(60, 0), ratio rx:ry = 3:1 -->
+        <g fill="none" stroke="#d4a853" opacity="0.4" stroke-width="1.2">
+          <ellipse cx="60" cy="0" rx="30" ry="10"/>
+          <ellipse cx="60" cy="0" rx="60" ry="20"/>
+          <ellipse cx="60" cy="0" rx="90" ry="30"/>
+        </g>
+        <ellipse cx="60" cy="0" rx="120" ry="40" fill="none" stroke="#d4a853" stroke-width="2"/>
+        <circle cx="60" cy="0" r="3" fill="#c85450"/>
+        <text x="66" y="-6" fill="#c85450" font-size="10">(3,0)</text>
+        <text x="66" y="12" fill="#7ba99a" font-size="9">mín f = 0</text>
+      </svg>
+
+      <div class="eq">f crece proporcional a distancia escalada</div>
+      <ul class="info-list">
+        <li><strong>Forma:</strong> elipses concéntricas con misma proporción de semiejes.</li>
+        <li><strong>Proporción:</strong> misma razón <code>p:q</code> siempre. Si <code>p &gt; q</code> → elipses "anchas".</li>
+        <li>Aparece en Ej 14: <code>(x₁−3)²/9 + x₂²</code>. Relación 3:1, centro en <code>(3, 0)</code>.</li>
+      </ul>
+      <div class="trap">No confundas <code>/9</code> con <code>/3</code>. El semieje es <strong>√9 = 3</strong>, no 9. Las elipses tienen semieje horizontal 3× el vertical.</div>
+    </article>
+
+    <!-- ─── CURVAS PARABÓLICAS ─── -->
+    <article class="card">
+      <div class="corner-mark"></div>
+      <div class="card-num">11</div>
+      <h3>Niveles parabólicos</h3>
+      <div class="card-sub">f = x² + y · f mixto</div>
+
+      <svg class="diagram" viewBox="-140 -120 280 240">
+        <rect x="-140" y="-120" width="280" height="240" fill="url(#g1)"/>
+        <line x1="-140" y1="0" x2="140" y2="0" stroke="#8a8578" stroke-width="1"/>
+        <line x1="0" y1="-120" x2="0" y2="120" stroke="#8a8578" stroke-width="1"/>
+        <text x="132" y="-8" fill="#8a8578" font-size="11">x</text>
+        <text x="8" y="-112" fill="#8a8578" font-size="11">y</text>
+        <!-- f = x² + y = k -> y = k - x². Parabolas opening DOWN, vertex at (0, k) -->
+        <!-- k=-4: vertex (0,-4)->svg(0,80). k=-2:(0,-2)->(0,40). k=0:(0,0). k=2:(0,2)->(0,-40). k=4:(0,4)->(0,-80) -->
+        <g fill="none" stroke="#d4a853" opacity="0.4" stroke-width="1.2">
+          <path d="M -50,-20 Q 0,80 50,-20"/>
+          <path d="M -60,-60 Q 0,40 60,-60"/>
+          <path d="M -70,-120 Q 0,-80 70,-120"/>
+        </g>
+        <path d="M -60,-100 Q 0,0 60,-100" fill="none" stroke="#d4a853" stroke-width="2"/>
+        <text x="0" y="90" fill="#d4a853" font-size="9" text-anchor="middle" opacity="0.7">k=−4</text>
+        <text x="0" y="-98" fill="#d4a853" font-size="9" text-anchor="middle" opacity="0.7">k=4</text>
+        <!-- gradient at (1, 0): ∇f = (2x, 1) = (2, 1). arrow -->
+        <circle cx="20" cy="0" r="2.5" fill="#c85450"/>
+        <line x1="20" y1="0" x2="60" y2="-20" stroke="#7ba99a" stroke-width="2"/>
+        <polygon points="60,-20 50,-22 54,-14" fill="#7ba99a"/>
+        <text x="64" y="-22" fill="#7ba99a" font-size="9">∇f aquí</text>
+      </svg>
+
+      <div class="eq">f(x,y) = x² + y → y = k − x²</div>
+      <ul class="info-list">
+        <li><strong>Forma:</strong> parábolas que abren hacia abajo, vértices en <code>(0, k)</code>.</li>
+        <li><strong>Gradiente variable:</strong> <code>∇f = (2x, 1)</code>. Depende del punto. No es constante como en el caso lineal.</li>
+        <li><strong>Para minimizar:</strong> mueves las parábolas <em>hacia abajo</em> (k decrece).</li>
+        <li>Aparece en Ej 9 (<code>f = x² + y</code>) y Ej 10 (<code>f = y − (x−2)²</code>).</li>
+      </ul>
+      <div class="tip">En estos problemas no lineales, el gradiente cambia de punto a punto. Para la tangencia, iguala <code>∇f(x*,y*) = λ ∇h(x*,y*)</code> solo en el punto óptimo.</div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ SECCIÓN 3: ESTRATEGIA ══════════════════════════════════ -->
+<section id="estrategia">
+  <div class="section-head">
+    <span class="section-num">— 03</span>
+    <h2>Estrategia de resolución</h2>
+  </div>
+  <p class="section-intro">Cómo pasar de "tengo la región factible dibujada" a "este es el óptimo", con el mínimo error posible.</p>
+
+  <div class="grid-wide grid-2">
+
+    <article class="strategy-card">
+      <h3>① Identifica el <em>tipo</em> de curva de nivel</h3>
+      <p>Antes de dibujar nada, mira la función objetivo:</p>
+      <ul class="info-list">
+        <li><strong>f lineal</strong> (<code>ax + by</code>) → rectas paralelas.</li>
+        <li><strong>f cuadrática simétrica</strong> (<code>(x−a)²+(y−b)²</code>) → círculos concéntricos.</li>
+        <li><strong>f cuadrática con denominadores</strong> → elipses concéntricas.</li>
+        <li><strong>f mixta</strong> (<code>x²+y</code>, <code>y−x²</code>) → parábolas trasladadas.</li>
+      </ul>
+    </article>
+
+    <article class="strategy-card">
+      <h3>② Para <em>lineal</em>: ve al vértice</h3>
+      <p>En problemas con región factible poliédrica (solo rectas) y f lineal, el óptimo siempre está en un <strong>vértice</strong>.</p>
+      <div class="eq eq-sub">Evalúa f en cada vértice → toma el mejor</div>
+      <p>Si hay curvas no lineales en las restricciones activas, el óptimo puede estar en un punto de tangencia sobre la frontera curva.</p>
+    </article>
+
+    <article class="strategy-card">
+      <h3>③ Para <em>no lineal</em>: usa tangencia</h3>
+      <p>Cuando f o alguna restricción activa es no lineal, usa la condición de gradientes paralelos:</p>
+      <div class="eq">∇f(x*,y*) = λ ∇h(x*,y*)</div>
+      <p>Esto te da dos ecuaciones. Sumas <code>h(x*,y*) = 0</code> (la restricción activa) y tienes sistema de 3 ecuaciones con 3 incógnitas (<code>x*, y*, λ</code>).</p>
+    </article>
+
+    <article class="strategy-card">
+      <h3>④ Identifica restricciones <em>activas</em></h3>
+      <p>Una restricción es <strong>activa</strong> en <code>(x*, y*)</code> si se cumple con igualdad. Visualmente: el óptimo está <em>sobre</em> esa curva frontera.</p>
+      <p>Para lineal: el óptimo está en intersección de 2 rectas activas.</p>
+      <p>Para no lineal: el óptimo suele estar en 1 restricción activa, con tangencia.</p>
+      <div class="tip">Si en el gráfico ves que el óptimo está en un vértice curva-recta (una curva no lineal y una recta), tienes 2 activas. Resuelves el sistema de 2 ecuaciones directamente.</div>
+    </article>
+
+    <article class="strategy-card">
+      <h3>⑤ Región factible <em>no acotada</em>?</h3>
+      <p>Si la región no está acotada pero pide mínimo: verifica si al ir a infinito <code>f → +∞</code>. Si sí, existe mínimo (corolario BW).</p>
+      <p>Si al ir a infinito f mejora → el problema es <strong>no acotado</strong> (no existe óptimo).</p>
+    </article>
+
+    <article class="strategy-card">
+      <h3>⑥ Óptimos <em>locales</em> vs <em>globales</em></h3>
+      <p><strong>Local:</strong> mejor que sus vecinos inmediatos, pero hay puntos mejores en otra parte de la región.</p>
+      <p><strong>Global:</strong> mejor en toda la región factible.</p>
+      <p>Ocurren múltiples locales cuando la región es <strong>disconexa</strong> o <strong>no convexa</strong> (típico con restricciones de "exterior de círculo").</p>
+      <div class="trap">No todo mínimo local es global. Evalúa f en cada candidato y compara.</div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ CHECKLIST ══════════════════════════════════ -->
+<section id="checklist">
+  <div class="section-head">
+    <span class="section-num">— 04</span>
+    <h2>Checklist pre-gráfico</h2>
+  </div>
+  <p class="section-intro">Antes de poner lápiz al papel, pasa esta lista mental. Evita el 80% de los errores bajo presión.</p>
+
+  <div class="strategy-card">
+    <ul class="info-list" style="font-size:1rem">
+      <li><strong>Identifica la figura de cada restricción</strong> leyendo la forma de la ecuación (círculo / elipse / parábola / recta / hipérbola).</li>
+      <li><strong>Localiza el centro o vértice</strong>: recuerda invertir signos de los términos dentro del paréntesis.</li>
+      <li><strong>Determina si el lado factible es interior o exterior</strong> usando el test del origen cuando aplique.</li>
+      <li><strong>Marca los puntos de intersección</strong> entre todas las curvas (candidatos a óptimo en lineal).</li>
+      <li><strong>Dibuja al menos dos curvas de nivel</strong> de la función objetivo (la profe lo pide explícitamente).</li>
+      <li><strong>Dibuja la flecha del gradiente</strong> para indicar la dirección de crecimiento.</li>
+      <li><strong>Sombrea claramente la región factible</strong> (la profe lo enfatiza en el enunciado).</li>
+      <li><strong>Identifica visualmente el óptimo</strong> antes de calcular, para validar que tu sistema de ecuaciones da la respuesta correcta.</li>
+      <li><strong>Después de resolver</strong>: verifica que el punto óptimo cumple <em>todas</em> las restricciones, no solo las activas.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p><em>Suerte en la solemne.</em> &nbsp; · &nbsp; CII2750 · Primer Semestre 2026</p>
+</footer>
+
+</div>
+</body>
+</html>
